@@ -38,8 +38,5 @@ export const routes: Routes = [
   { path: 'contact', component: Contact },
   { path: 'login', component: Login },
 
-  { path: 'conference/2024', component: Conference },
-  { path: 'conference/2020', component: Conference },
-  { path: 'conference/2017', component: Conference },
-  { path: 'conference/proceedings', component: Conference }
+  { path: 'conference', component: Conference }
 ];

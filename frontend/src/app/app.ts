@@ -2,14 +2,15 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
+import { Footer } from './footer/footer'; // 🌟 成功引入 Footer 组件
 
 declare var AOS: any; // 🌟 声明全局动画引擎
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Navbar],
-  templateUrl: './app.html'
+  imports: [CommonModule, RouterOutlet, Navbar, Footer], // 🌟 把 Footer 挂载到主程序里
+  templateUrl: './app.html' // 或者叫 ./app.component.html
 })
 export class App implements OnInit {
   isDarkMode = false;

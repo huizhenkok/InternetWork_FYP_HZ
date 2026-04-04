@@ -6,7 +6,7 @@ declare var AOS: any;
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule], // 🌟 已经帮你移除了 RouterLink，消除终端的黄色警告
+  imports: [CommonModule],
   templateUrl: './news.html'
 })
 export class News implements OnInit {

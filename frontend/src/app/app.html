@@ -1,7 +1,11 @@
-<app-navbar [isDarkMode]="isDarkMode" (toggleThemeEvent)="toggleTheme()"></app-navbar>
+<div class="flex flex-col min-h-screen bg-slate-50 dark:bg-background-dark transition-colors duration-300">
 
-<main class="min-h-screen bg-slate-50 dark:bg-background-dark pt-20 transition-colors duration-300">
-  <router-outlet></router-outlet>
-</main>
+  <app-navbar [isDarkMode]="isDarkMode" (toggleThemeEvent)="toggleTheme()"></app-navbar>
 
+  <main class="flex-grow pt-20">
+    <router-outlet></router-outlet>
+  </main>
 
+  <app-footer></app-footer>
+
+</div>

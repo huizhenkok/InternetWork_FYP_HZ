@@ -20,18 +20,7 @@
       <a routerLink="/people" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">People</a>
       <a routerLink="/news" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">News&Events</a>
 
-      <div class="relative group" (mouseenter)="isNetappsMenuOpen = true" (mouseleave)="isNetappsMenuOpen = false">
-        <button routerLinkActive="!text-primary !font-bold" class="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 py-2 border-none bg-transparent cursor-pointer">
-          Conference <span class="material-symbols-outlined text-[18px]">expand_more</span>
-        </button>
-
-        <div *ngIf="isNetappsMenuOpen" class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden animate-fade-in z-50">
-          <a routerLink="/conference/2024" class="block px-5 py-3 text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 hover:text-primary dark:hover:bg-white/5 transition-colors no-underline">7th NETAPPS 2024</a>
-          <a routerLink="/conference/2020" class="block px-5 py-3 text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 hover:text-primary dark:hover:bg-white/5 transition-colors no-underline">6th NETAPPS 2020</a>
-          <a routerLink="/conference/2017" class="block px-5 py-3 text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 hover:text-primary dark:hover:bg-white/5 transition-colors no-underline">5th NETAPPS 2017</a>
-          <a routerLink="/conference/proceedings" class="block px-5 py-3 text-sm font-medium text-slate-700 dark:text-gray-300 hover:bg-slate-50 hover:text-primary dark:hover:bg-white/5 transition-colors bg-slate-50/50 dark:bg-black/50 no-underline">Proceedings</a>
-        </div>
-      </div>
+      <a routerLink="/conference" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Conference</a>
 
       <a routerLink="/forum" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Forum</a>
       <a routerLink="/contact" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Contact</a>
