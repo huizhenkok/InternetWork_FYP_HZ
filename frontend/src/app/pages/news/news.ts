@@ -1,13 +1,12 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 declare var AOS: any;
 
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule], // 🌟 已经帮你移除了 RouterLink，消除终端的黄色警告
   templateUrl: './news.html'
 })
 export class News implements OnInit {
@@ -32,10 +31,10 @@ export class News implements OnInit {
   // 🌟 核心：切换标签页
   setTab(tab: string) {
     this.activeTab = tab;
-    // 强制刷新动画，让切换显得极其丝滑
+    // 🌟 修复动画消失的问题：使用 refreshHard() 并增加一点延迟，等 Angular 渲染完新代码再触发动画
     setTimeout(() => {
-      if (typeof AOS !== 'undefined') AOS.refresh();
-    }, 50);
+      if (typeof AOS !== 'undefined') AOS.refreshHard();
+    }, 100);
   }
 
   // 🌟 核心：处理 RSVP 点击
