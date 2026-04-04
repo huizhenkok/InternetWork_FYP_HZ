@@ -1,0 +1,204 @@
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
+  <div class="tech-square sq-1"></div><div class="tech-square sq-3"></div><div class="tech-square sq-5"></div>
+</div>
+
+<div class="relative min-h-screen flex flex-col w-full">
+  <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+    <div class="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-accent-teal rounded-full blur-[120px] opacity-10 dark:opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-accent-cyan rounded-full blur-[140px] opacity-10 dark:opacity-10"></div>
+  </div>
+
+  <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
+    <main class="w-full max-w-7xl mx-auto flex flex-col gap-12 pt-4 pb-20 px-6">
+
+      <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-slate-200 pb-8 dark:border-white/5" data-aos="fade-down">
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2 text-primary mb-2">
+            <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+            <span class="text-xs font-bold tracking-[0.2em] uppercase">System Online</span>
+          </div>
+          <h1 class="text-5xl md:text-6xl font-bold tracking-tighter uppercase text-slate-900 dark:text-white">
+            NEWS <span class="text-gradient">& EVENTS</span>
+          </h1>
+          <p class="text-slate-500 dark:text-gray-400 max-w-xl mt-2 font-light font-body">
+            Stay synchronized with our latest research breakthroughs, lab upgrades, and upcoming academic gatherings.
+          </p>
+        </div>
+
+        <div class="glass-panel p-1 rounded-full flex flex-wrap items-center">
+          <button (click)="setTab('UPCOMING')"
+                  [ngClass]="activeTab === 'UPCOMING' ? 'bg-gradient-primary text-black dark:text-black shadow-[0_0_15px_rgba(13,242,242,0.2)]' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/5 dark:hover:bg-white/10'"
+                  class="px-6 py-2 rounded-full font-bold text-sm transition-all cursor-pointer border-none outline-none">
+            UPCOMING
+          </button>
+          <button (click)="setTab('LATEST NEWS')"
+                  [ngClass]="activeTab === 'LATEST NEWS' ? 'bg-gradient-primary text-black dark:text-black shadow-[0_0_15px_rgba(13,242,242,0.2)]' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/5 dark:hover:bg-white/10'"
+                  class="px-6 py-2 rounded-full font-bold text-sm transition-all cursor-pointer border-none outline-none">
+            LATEST NEWS
+          </button>
+          <button (click)="setTab('ARCHIVE')"
+                  [ngClass]="activeTab === 'ARCHIVE' ? 'bg-gradient-primary text-black dark:text-black shadow-[0_0_15px_rgba(13,242,242,0.2)]' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/5 dark:hover:bg-white/10'"
+                  class="px-6 py-2 rounded-full font-bold text-sm transition-all cursor-pointer border-none outline-none">
+            ARCHIVE
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'UPCOMING'" class="animate-fade-in flex flex-col gap-12 w-full">
+
+        <section class="w-full">
+          <div class="flex items-center gap-4 mb-6">
+            <span class="material-symbols-outlined text-primary">star</span>
+            <h2 class="text-xl font-bold tracking-wide text-slate-900 dark:text-white">FEATURED SIGNAL</h2>
+          </div>
+          <div class="glass-card rounded-2xl overflow-hidden group relative" data-aos="zoom-in">
+            <div class="absolute inset-0 bg-gradient-to-r from-accent-teal/20 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="flex flex-col lg:flex-row">
+              <div class="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10 opacity-80 dark:from-[#020403]/80"></div>
+                <div class="w-full h-full bg-slate-200 dark:bg-white/5 flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out">
+                  <span class="material-symbols-outlined text-8xl text-primary/30">hub</span>
+                </div>
+                <div class="absolute top-6 left-6 z-20">
+                  <span class="px-3 py-1 bg-white/70 dark:bg-black/60 backdrop-blur-md border border-primary/30 text-primary text-xs font-bold rounded uppercase tracking-wider">Flagship Event</span>
+                </div>
+              </div>
+              <div class="lg:w-5/12 p-8 lg:p-12 flex flex-col justify-center relative z-20 bg-white/50 dark:bg-[#050505]/70">
+                <div class="flex items-center gap-3 text-primary mb-4">
+                  <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                  <span class="text-sm font-bold tracking-widest text-slate-700 dark:text-primary">NOV 6-7, 2026</span>
+                  <span class="w-1 h-1 bg-slate-400 dark:bg-gray-600 rounded-full"></span>
+                  <span class="text-sm font-medium text-slate-500 dark:text-gray-400">ALOR SETAR</span>
+                </div>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors duration-300">
+                  NETAPPS 2026 Summit
+                </h3>
+                <p class="text-slate-600 dark:text-gray-400 mb-6 leading-relaxed font-light">
+                  Join us for an immersive discussion on the next horizon of decentralized protocols and network defense strategies.
+                </p>
+                <div class="flex items-center gap-4">
+                  <button (click)="handleRSVP('NETAPPS 2026 Summit')" class="glow-button h-12 px-8 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-sm tracking-widest hover:-translate-y-1 transition-all duration-300 transform flex items-center gap-2 cursor-pointer border-none">
+                    <span>RSVP NOW</span>
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                  </button>
+                  <button (click)="shareEvent('NETAPPS 2026 Summit')" class="h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 flex items-center justify-center text-slate-900 dark:text-white transition-all cursor-pointer">
+                    <span class="material-symbols-outlined">share</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+          <div class="lg:col-span-8 flex flex-col gap-6">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-4">
+                <span class="material-symbols-outlined text-primary">event</span>
+                <h2 class="text-xl font-bold tracking-wide text-slate-900 dark:text-white">INCOMING GATHERINGS</h2>
+              </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl flex flex-col sm:flex-row gap-6 items-center group" data-aos="fade-up">
+              <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden shrink-0 relative bg-slate-100 dark:bg-white/5 flex items-center justify-center">
+                <span class="material-symbols-outlined text-4xl text-primary/40 group-hover:scale-110 transition-transform">security</span>
+              </div>
+              <div class="flex flex-col flex-grow text-center sm:text-left">
+                <div class="flex items-center justify-center sm:justify-start gap-3 text-xs font-bold tracking-wider text-primary mb-2">
+                  <span>NOV 12</span>
+                  <span class="w-1 h-1 bg-slate-400 dark:bg-gray-600 rounded-full"></span>
+                  <span class="text-slate-500 dark:text-gray-400">LAB A</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">Cyber Forensics Workshop</h3>
+                <p class="text-sm text-slate-600 dark:text-gray-400 font-light mb-4 leading-relaxed">
+                  Advanced techniques in digital evidence recovery and analysis for next-gen networks.
+                </p>
+                <div class="mt-auto flex justify-center sm:justify-start">
+                  <button (click)="handleRSVP('Cyber Forensics Workshop')" class="glow-button h-9 px-6 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-xs tracking-wider opacity-90 hover:opacity-100 hover:shadow-[0_0_30px_rgba(13,242,242,0.35)] transition-all cursor-pointer border-none">
+                    RSVP
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-xl flex flex-col sm:flex-row gap-6 items-center group" data-aos="fade-up" data-aos-delay="100">
+              <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden shrink-0 relative bg-slate-100 dark:bg-white/5 flex items-center justify-center">
+                <span class="material-symbols-outlined text-4xl text-primary/40 group-hover:scale-110 transition-transform">psychology</span>
+              </div>
+              <div class="flex flex-col flex-grow text-center sm:text-left">
+                <div class="flex items-center justify-center sm:justify-start gap-3 text-xs font-bold tracking-wider text-primary mb-2">
+                  <span>DEC 05</span>
+                  <span class="w-1 h-1 bg-slate-400 dark:bg-gray-600 rounded-full"></span>
+                  <span class="text-slate-500 dark:text-gray-400">VIRTUAL</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary transition-colors">PhD Thesis Defense: AI Ethics</h3>
+                <p class="text-sm text-slate-600 dark:text-gray-400 font-light mb-4 leading-relaxed">
+                  Defending the framework for ethical decision making in autonomous network agents.
+                </p>
+                <div class="mt-auto flex justify-center sm:justify-start">
+                  <button (click)="handleRSVP('PhD Thesis Defense')" class="glow-button h-9 px-6 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-xs tracking-wider opacity-90 hover:opacity-100 hover:shadow-[0_0_30px_rgba(13,242,242,0.35)] transition-all cursor-pointer border-none">
+                    RSVP
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 flex flex-col gap-6" data-aos="fade-left">
+            <div class="flex items-center gap-4 mb-2">
+              <span class="material-symbols-outlined text-slate-500 dark:text-gray-400">tips_and_updates</span>
+              <h2 class="text-xl font-bold tracking-wide text-slate-900 dark:text-white">QUICK UPDATES</h2>
+            </div>
+            <div class="glass-panel p-6 rounded-2xl border border-slate-200/60 dark:border-white/10">
+              <div class="flex flex-col gap-6">
+                <article>
+                  <span class="text-xs font-medium text-slate-500 dark:text-gray-500">NEXT WEEK</span>
+                  <h4 class="text-slate-900 dark:text-white font-medium leading-snug mt-1">Lab server maintenance scheduled.</h4>
+                </article>
+                <div class="h-px w-full bg-slate-200 dark:bg-white/5"></div>
+                <article>
+                  <span class="text-xs font-medium text-slate-500 dark:text-gray-500">REMINDER</span>
+                  <h4 class="text-slate-900 dark:text-white font-medium leading-snug mt-1">Call for papers deadline extended to Nov 1.</h4>
+                </article>
+              </div>
+            </div>
+
+            <div class="relative overflow-hidden rounded-2xl p-8 border border-primary/20 glass-card">
+              <div class="absolute inset-0 bg-gradient-to-br from-[#1F958D]/10 to-transparent z-0"></div>
+              <div class="relative z-10 flex flex-col items-start gap-4">
+                <span class="material-symbols-outlined text-4xl text-primary opacity-50">format_quote</span>
+                <p class="text-lg text-slate-800 dark:text-white font-medium leading-relaxed italic">
+                  "Innovation in networking is not just about speed, but securing the foundation of tomorrow's digital society."
+                </p>
+                <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mt-2">— INWLab Vision</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'LATEST NEWS'" class="animate-fade-in w-full text-center py-20">
+        <div class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+          <span class="material-symbols-outlined text-5xl text-primary animate-pulse">campaign</span>
+        </div>
+        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Latest Research News</h2>
+        <p class="text-slate-500 dark:text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+          Our editorial team is currently compiling the latest publications and achievements. Check back shortly for major announcements regarding our network security breakthroughs.
+        </p>
+      </div>
+
+      <div *ngIf="activeTab === 'ARCHIVE'" class="animate-fade-in w-full text-center py-20">
+        <div class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+          <span class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-600">inventory_2</span>
+        </div>
+        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Historical Archives</h2>
+        <p class="text-slate-500 dark:text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+          Accessing legacy records and past conference proceedings. The digital archive is currently undergoing index optimization.
+        </p>
+      </div>
+
+    </main>
+  </div>
+</div>

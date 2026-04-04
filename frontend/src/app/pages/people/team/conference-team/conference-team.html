@@ -1,0 +1,48 @@
+<div class="w-full">
+  <div *ngFor="let committee of filteredCommittees" class="mb-16">
+
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-8 border-b-2 border-accent-cyan pb-3 inline-block" data-aos="fade-right">
+      {{ committee.title }}
+    </h2>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2" [ngClass]="{'xl:grid-cols-2': committee.title === 'Executive Chairs', 'xl:grid-cols-3': committee.title !== 'Executive Chairs'}">
+
+      <div *ngFor="let member of committee.members; let i = index"
+           data-aos="fade-up" [attr.data-aos-delay]="(i % 3) * 100"
+           [ngClass]="{'border-amber-400/50 bg-amber-50/30 dark:border-amber-400/30 dark:bg-amber-400/10': committee.title === 'Executive Chairs', 'dark:bg-white/5 dark:border-white/10': committee.title !== 'Executive Chairs'}"
+           class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-accent-cyan/40 hover:shadow-xl dark:hover:bg-white/10 dark:hover:border-accent-cyan/80 dark:hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]">
+
+        <div class="flex items-center gap-4 mb-4 border-b border-slate-100 dark:border-white/10 pb-4">
+
+          <div class="shrink-0 h-16 w-16 overflow-hidden rounded-full border-2 border-accent-cyan/30 bg-slate-50 flex items-center justify-center transition-transform duration-500 group-hover:scale-105 group-hover:border-accent-cyan dark:border-accent-cyan/60 dark:bg-[#121212] shadow-sm"
+               [ngClass]="{'border-amber-400/50 dark:border-amber-500/60 group-hover:border-amber-500': committee.title === 'Executive Chairs'}">
+            <span class="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-500">person</span>
+          </div>
+
+          <div class="flex-1">
+            <h3 class="text-lg font-bold text-slate-900 transition-colors group-hover:text-accent-cyan dark:text-white dark:group-hover:text-primary mb-1">
+              {{ member.name }}
+            </h3>
+
+            <p *ngIf="member.role" class="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-500">
+              {{ member.role }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 mt-auto">
+          <span class="material-symbols-outlined text-[16px] shrink-0">account_balance</span>
+          <span>{{ member.org }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="filteredCommittees.length === 0" class="text-center py-12">
+    <div class="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+      <span class="material-symbols-outlined text-slate-400 text-3xl">search_off</span>
+    </div>
+    <h3 class="text-lg font-bold text-slate-700 dark:text-white mb-1">No Team Members Found</h3>
+    <p class="text-slate-500 dark:text-gray-400">Try searching for a different name, role, or institution.</p>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
+  <div class="tech-square sq-1"></div><div class="tech-square sq-2"></div>
+  <div class="tech-square sq-3"></div><div class="tech-square sq-4"></div>
+</div>
+
+<div class="relative min-h-screen flex flex-col w-full">
+  <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+    <div class="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-accent-teal rounded-full blur-[120px] opacity-10 dark:opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-accent-cyan rounded-full blur-[140px] opacity-10 dark:opacity-10"></div>
+  </div>
+
+  <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
+    <main class="container mx-auto w-full max-w-[1440px] flex-grow px-4 py-12 sm:px-6 lg:px-8">
+
+      <div class="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end" data-aos="fade-right">
+        <div class="max-w-2xl">
+          <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white">
+            Our Researchers & Scholars
+          </h1>
+          <p class="max-w-xl text-lg font-light leading-relaxed text-slate-500 dark:text-slate-400 font-body">
+            A dedicated team of academic professionals, post-graduate researchers, and alumni advancing the field of network intelligence.
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-12 flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="group relative w-full lg:w-96 glass-panel rounded-full focus-within:border-primary">
+          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+            <span class="material-symbols-outlined">search</span>
+          </div>
+          <input [(ngModel)]="searchTerm" class="w-full border-none bg-transparent py-3.5 pl-12 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-0 dark:text-white font-body" placeholder="Search team members by name or role..." type="search"/>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button *ngFor="let tab of tabs"
+                  (click)="setTab(tab)"
+                  [ngClass]="activeTab === tab ? 'border-primary bg-primary/10 text-primary dark:border-primary/50 dark:shadow-[0_0_15px_rgba(13,242,242,0.15)]' : 'border-slate-200 bg-slate-100 text-slate-600 hover:border-slate-300 hover:bg-slate-200 dark:border-white/5 dark:bg-white/5 dark:text-slate-400 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white'"
+                  class="rounded-full border px-5 py-2.5 text-sm font-semibold shadow-sm transition-all cursor-pointer">
+            {{ tab }}
+          </button>
+        </div>
+      </div>
+
+      <div class="w-full min-h-[500px]">
+        <app-our-team *ngIf="activeTab === 'Our Team'" [searchTerm]="searchTerm"></app-our-team>
+        <app-directory *ngIf="activeTab === 'Directory of Expert'" [searchTerm]="searchTerm"></app-directory>
+        <app-active-student *ngIf="activeTab === 'Active Student'" [searchTerm]="searchTerm"></app-active-student>
+        <app-alumni *ngIf="activeTab === 'Alumni'" [searchTerm]="searchTerm"></app-alumni>
+        <app-conference-team *ngIf="activeTab === 'Conference Team'" [searchTerm]="searchTerm"></app-conference-team>
+      </div>
+
+    </main>
+  </div>
+</div>

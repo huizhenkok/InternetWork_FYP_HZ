@@ -1,0 +1,78 @@
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
+  <div class="tech-square sq-1"></div><div class="tech-square sq-3"></div><div class="tech-square sq-4"></div>
+</div>
+
+<div class="relative min-h-screen flex flex-col w-full">
+  <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+    <div class="absolute top-[-10%] right-[10%] w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[150px] opacity-20 dark:opacity-30 animate-pulse"></div>
+  </div>
+
+  <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
+    <main class="relative w-full max-w-[1200px] px-6 pb-20 pt-6 md:pt-10 mx-auto">
+
+      <div class="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-gray-400 mb-8" data-aos="fade-right">
+        <a routerLink="/research" class="hover:text-primary transition-colors no-underline">Research Areas</a>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span class="text-slate-900 dark:text-white">Digital Forensics</span>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-12 items-center mb-24" data-aos="fade-up">
+        <div class="flex-1 flex flex-col gap-6">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-accent-cyan flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.4)]">
+            <span class="material-symbols-outlined text-4xl text-white">manage_search</span>
+          </div>
+          <h1 class="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
+            Digital <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-accent-cyan">Forensics Lab</span>
+          </h1>
+          <p class="text-lg text-slate-500 dark:text-gray-400 font-body leading-relaxed max-w-xl">
+            Uncovering the truth in the digital realm. We pioneer advanced methodologies for evidence recovery, cybercrime investigation, and mobile device forensics to support legal and corporate entities.
+          </p>
+        </div>
+
+        <div class="w-full lg:w-[400px] glass-card rounded-3xl p-8 border-l-4 border-l-blue-500" data-aos="zoom-in" data-aos-delay="200">
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Lab Overview</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4">
+              <span class="text-slate-500 dark:text-gray-400 font-body">Lead Researcher</span>
+              <span class="font-bold text-slate-900 dark:text-white">Dr. Alan Turing</span>
+            </div>
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4">
+              <span class="text-slate-500 dark:text-gray-400 font-body">Active Cases/Projects</span>
+              <span class="font-bold text-blue-500 text-xl">8</span>
+            </div>
+            <div class="flex justify-between items-center pb-2">
+              <span class="text-slate-500 dark:text-gray-400 font-body">Law Enforcement Partners</span>
+              <span class="font-bold text-slate-900 dark:text-white">15+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-8" data-aos="fade-up">Core Focus Areas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+        <div class="glass-panel rounded-2xl p-6 border-t-2 border-t-blue-400 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="0">
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Cybercrime Analysis</h4>
+          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">Tracing digital footprints, analyzing ransomware attacks, and identifying malicious actors in complex networks.</p>
+        </div>
+        <div class="glass-panel rounded-2xl p-6 border-t-2 border-t-blue-500 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Mobile Forensics</h4>
+          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">Extracting and analyzing encrypted data, geolocation logs, and communication histories from smart devices.</p>
+        </div>
+        <div class="glass-panel rounded-2xl p-6 border-t-2 border-t-accent-cyan hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Evidence Recovery</h4>
+          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">Advanced physical and logical recovery techniques for damaged storage media and intentionally deleted data.</p>
+        </div>
+      </div>
+
+      <div class="text-center pt-8 border-t border-slate-200 dark:border-white/10" data-aos="fade-in">
+        <a routerLink="/research" class="glow-button inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-accent-cyan hover:to-blue-600 text-white font-bold text-sm px-8 py-3 rounded-full transition-all duration-300 no-underline">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          Back to All Areas
+        </a>
+      </div>
+
+    </main>
+  </div>
+</div>
