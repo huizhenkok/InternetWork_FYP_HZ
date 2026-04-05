@@ -17,6 +17,8 @@ import { Ai } from './pages/Research_explore/ai/ai';
 import { Cloud } from './pages/Research_explore/cloud/cloud';
 import { Network } from './pages/Research_explore/network/network';
 
+import { ThreadDetail } from './pages/forum/thread-detail/thread-detail'; // 确保路径正确
+
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: Home },
@@ -35,6 +37,7 @@ export const routes: Routes = [
   { path: 'people', component: People },
   { path: 'news', component: News },
   { path: 'forum', component: Forum },
+  { path: 'forum/thread/:id', component: ThreadDetail }, // 🌟 加上这行新路由
   { path: 'contact', component: Contact },
   { path: 'login', component: Login },
 
