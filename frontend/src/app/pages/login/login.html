@@ -1,1 +1,81 @@
-<p>login works!</p>
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
+  <div class="tech-square sq-1"></div><div class="tech-square sq-3"></div><div class="tech-square sq-5"></div>
+</div>
+
+<div class="relative min-h-screen flex flex-col w-full selection:bg-accent-cyan selection:text-black bg-slate-50 dark:bg-[#050505]">
+  <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+
+    <div class="absolute top-[-5%] left-1/2 -translate-x-1/2 w-[90%] max-w-4xl h-64 bg-primary/40 dark:bg-primary/20 blur-[120px] animate-pulse z-20 pointer-events-none"></div>
+  </div>
+
+  <div class="relative z-50 p-6 md:p-10">
+    <a routerLink="/home" class="group inline-flex items-center gap-3 text-slate-500 hover:text-primary transition-all no-underline cursor-pointer">
+      <div class="size-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center bg-white/50 dark:bg-white/5 backdrop-blur-md group-hover:border-primary/50 group-hover:bg-primary/5">
+        <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+      </div>
+      <span class="font-bold text-sm tracking-widest uppercase">Back to Home</span>
+    </a>
+  </div>
+
+  <div class="relative z-30 flex-grow flex flex-col items-center justify-center w-full px-4 -mt-16">
+
+    <div class="w-full max-w-[480px]" data-aos="zoom-out-up" data-aos-duration="1000">
+
+      <div class="relative w-full rounded-3xl border border-slate-200 bg-white/70 backdrop-blur-2xl shadow-2xl flex flex-col p-8 sm:p-10 dark:border-white/10 dark:bg-[#112120]/60">
+
+        <div class="mb-8 flex flex-col items-center text-center">
+          <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-teal to-accent-cyan shadow-[0_0_20px_rgba(13,242,242,0.3)]">
+            <span class="material-symbols-outlined text-4xl text-white">fingerprint</span>
+          </div>
+          <h2 class="mb-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">INWLab Portal</h2>
+          <p class="text-sm font-normal text-slate-500 dark:text-gray-400 font-body">Identify yourself to access secure resources.</p>
+        </div>
+
+        <form (submit)="onLogin(); $event.preventDefault()" class="flex w-full flex-col gap-6">
+          <div class="flex flex-col gap-2">
+            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Email Address</label>
+            <div class="relative">
+              <input [(ngModel)]="loginData.email" name="email" type="email" placeholder=""
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-4 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <span class="material-symbols-outlined absolute right-4 top-4 text-slate-400">mail</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div class="flex justify-between items-center pl-1">
+              <label class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Security Key</label>
+            </div>
+            <div class="relative">
+              <input [type]="isPasswordVisible ? 'text' : 'password'" [(ngModel)]="loginData.password" name="password" placeholder="••••••••"
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-4 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <button type="button" (click)="togglePassword()" class="absolute right-4 top-4 text-slate-400 hover:text-primary cursor-pointer border-none bg-transparent outline-none">
+                <span class="material-symbols-outlined">{{ isPasswordVisible ? 'visibility' : 'visibility_off' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center px-1">
+            <a routerLink="/sign-up" class="text-xs font-bold text-slate-500 hover:text-primary transition-colors no-underline">Create Account</a>
+            <a (click)="navigateToForgetPassword()" class="text-xs font-bold text-primary hover:underline cursor-pointer">Forgot Key?</a>
+          </div>
+
+          <button type="submit" class="glow-button h-14 w-full rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold tracking-widest transition-all hover:scale-[1.02] cursor-pointer border-none">
+            AUTHENTICATE
+          </button>
+
+          <div class="relative flex items-center justify-center py-2">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200 dark:border-white/10"></div></div>
+            <span class="relative bg-white dark:bg-[#0a1211] px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Or</span>
+          </div>
+
+          <button type="button" (click)="loginWithUniversityId()" class="h-14 w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 text-slate-600 dark:text-white font-bold text-sm flex items-center justify-center gap-3 hover:bg-white dark:hover:bg-white/10 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-primary">account_balance</span>
+            Login with University ID
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

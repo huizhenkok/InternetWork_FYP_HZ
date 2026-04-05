@@ -1,0 +1,111 @@
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
+  <div class="tech-square sq-2"></div><div class="tech-square sq-4"></div><div class="tech-square sq-5"></div>
+</div>
+
+<div class="relative min-h-screen flex flex-col w-full selection:bg-accent-cyan selection:text-black pb-20 bg-slate-50 dark:bg-[#050505]">
+  <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+    <div class="absolute top-[-5%] left-1/2 -translate-x-1/2 w-[90%] max-w-4xl h-64 bg-primary/40 dark:bg-primary/20 blur-[120px] animate-pulse z-20 pointer-events-none"></div>
+  </div>
+
+  <div class="relative z-50 p-6 md:p-10">
+    <a routerLink="/login" class="group inline-flex items-center gap-3 text-slate-500 hover:text-primary transition-all no-underline cursor-pointer">
+      <div class="size-10 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center bg-white/50 dark:bg-white/5 backdrop-blur-md group-hover:border-primary/50 group-hover:bg-primary/5">
+        <span class="material-symbols-outlined transition-transform group-hover:-translate-x-1">arrow_back</span>
+      </div>
+      <span class="font-bold text-sm tracking-widest uppercase">Back to Login</span>
+    </a>
+  </div>
+
+  <div class="relative z-30 flex-grow flex flex-col items-center justify-center w-full px-4 -mt-8">
+
+    <div class="w-full max-w-[500px]" data-aos="zoom-out-up" data-aos-duration="1000">
+
+      <div class="relative w-full rounded-3xl border border-slate-200 bg-white/70 backdrop-blur-2xl shadow-2xl flex flex-col p-8 sm:p-10 dark:border-white/10 dark:bg-[#112120]/60">
+
+        <div class="mb-8 flex flex-col items-center text-center">
+          <div class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-accent-teal to-accent-cyan shadow-[0_0_20px_rgba(13,242,242,0.3)]">
+            <span class="material-symbols-outlined text-4xl text-white">how_to_reg</span>
+          </div>
+          <h2 class="mb-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Join INWLab</h2>
+          <p class="text-sm font-normal text-slate-500 dark:text-gray-400 font-body">Create your secure research identity.</p>
+        </div>
+
+        <div class="flex p-1 bg-slate-200/50 dark:bg-black/40 rounded-xl mb-8 border border-slate-200 dark:border-white/5">
+          <button type="button" (click)="regType = 'Student'"
+                  [ngClass]="regType === 'Student' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
+                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none">
+            Student
+          </button>
+          <button type="button" (click)="regType = 'Alumni'"
+                  [ngClass]="regType === 'Alumni' ? 'bg-white dark:bg-white/10 text-accent-cyan shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
+                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none">
+            Alumni
+          </button>
+        </div>
+
+        <form (submit)="onRegister(); $event.preventDefault()" class="flex w-full flex-col gap-5">
+
+          <div class="flex flex-col gap-2">
+            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Full Name</label>
+            <div class="relative">
+              <input [(ngModel)]="formData.fullName" name="fullName" type="text" placeholder="Your Full Name" required
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">badge</span>
+            </div>
+          </div>
+
+          <div *ngIf="regType === 'Student'" class="flex flex-col gap-2">
+            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Student ID</label>
+            <div class="relative">
+              <input [(ngModel)]="formData.matricNumber" name="matricNumber" type="text" placeholder="Your Matric Number (e.g. 298068)" required
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">pin</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Email</label>
+            <div class="relative">
+              <input [(ngModel)]="formData.email" name="email" type="email" placeholder="" required
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">mail</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Phone Number <span class="text-[10px] text-slate-400 dark:text-gray-500 lowercase normal-case ml-1">(Optional)</span></label>
+            <div class="relative">
+              <input [(ngModel)]="formData.phone" name="phone" type="tel" placeholder="e.g. 012-3456789"
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">call</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Password</label>
+              <input [(ngModel)]="formData.password" name="password" type="password" placeholder="••••••••" required
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+            </div>
+            <div class="flex flex-col gap-2">
+              <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Confirm Password</label>
+              <input [(ngModel)]="formData.confirmPassword" name="confirmPassword" type="password" placeholder="••••••••" required
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+            </div>
+          </div>
+
+          <button type="submit" class="glow-button mt-4 h-14 w-full rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold tracking-widest transition-all hover:scale-[1.02] cursor-pointer border-none">
+            REGISTER ACCOUNT
+          </button>
+
+          <p class="mt-2 text-center text-sm text-slate-500 dark:text-gray-400 font-body">
+            Already have an identity?
+            <a routerLink="/login" class="font-bold text-primary hover:underline transition-all">Authenticate here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
