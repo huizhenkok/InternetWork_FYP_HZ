@@ -1,6 +1,8 @@
 <div class="flex flex-col min-h-screen bg-slate-50 dark:bg-background-dark transition-colors duration-300">
 
-  <app-navbar *ngIf="!isAuthPage" [isDarkMode]="isDarkMode" (toggleThemeEvent)="toggleTheme()"></app-navbar>
+  <app-navbar *ngIf="!isAuthPage && !isInternalPage" [isDarkMode]="isDarkMode" (toggleThemeEvent)="toggleTheme()"></app-navbar>
+
+  <app-internal-navbar *ngIf="isInternalPage" [isDarkMode]="isDarkMode" (toggleThemeEvent)="toggleTheme()"></app-internal-navbar>
 
   <main class="flex-grow" [ngClass]="{'pt-20': !isAuthPage}">
     <router-outlet></router-outlet>

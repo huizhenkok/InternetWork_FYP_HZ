@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-declare var AOS: any; // 🌟 声明动画引擎
+declare var AOS: any;
 
 @Component({
   selector: 'app-sign-up',
@@ -15,41 +15,46 @@ export class SignUp implements OnInit {
   regType: 'Student' | 'Alumni' = 'Student';
 
   formData = {
-    fullName: '',
-    matricNumber: '', // 仅 Student 需要
+    fullName: '',     // 用户的全名
+    matricNumber: '',
     email: '',
-    phone: '',        // Optional
+    phone: '',
     password: '',
-    confirmPassword: '' // 确认密码
+    confirmPassword: ''
   };
 
   constructor(
     private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object // 🌟 注入平台判断
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  // 🌟 核心修复：进页面时，强制唤醒 AOS 动画引擎！
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         if (typeof AOS !== 'undefined') {
           AOS.init({ duration: 800, once: true, offset: 50 });
           AOS.refreshHard();
-          window.scrollTo(0, 0); // 确保页面在最顶部
+          window.scrollTo(0, 0);
         }
-      }, 150); // 给 150ms 缓冲，保证动画绝对丝滑
+      }, 150);
     }
   }
 
   onRegister() {
-    // 1. 验证两次密码是否一致
+    // 1. 验证密码
     if (this.formData.password !== this.formData.confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
     }
 
+    // 2. 验证名字是否为空
+    if (!this.formData.fullName.trim()) {
+      alert("Please enter your full name.");
+      return;
+    }
+
+    // 3. 验证学生ID
     if (this.regType === 'Student') {
-      // 2. 验证学生：必须有 6 位 Matric Number
       const isIdValid = /^\d{6}$/.test(this.formData.matricNumber);
       if (!isIdValid) {
         alert("Student Matric Number must be exactly 6 digits (e.g., 298068).");
@@ -57,13 +62,31 @@ export class SignUp implements OnInit {
       }
     }
 
-    // 简单验证邮箱
     if (!this.formData.email) {
       alert("Please provide an email.");
       return;
     }
 
-    alert(`Registration Successful as ${this.regType}! Redirecting to Login...`);
+    // 🌟 核心修复区：这次一定要把 fullName 存进去！
+    const newUser = {
+      fullName: this.formData.fullName, // 👈 之前漏掉了这一行！
+      email: this.formData.email.toLowerCase(),
+      password: this.formData.password,
+      role: this.regType
+    };
+
+    let users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
+
+    const userExists = users.find((u: any) => u.email === newUser.email);
+    if (userExists) {
+      alert("This email is already registered! Please login.");
+      return;
+    }
+
+    users.push(newUser);
+    localStorage.setItem('inwlab_users', JSON.stringify(users));
+
+    alert(`Registration Successful as ${this.regType}! You can now login with your email.`);
     this.router.navigate(['/login']);
   }
 }

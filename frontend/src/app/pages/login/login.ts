@@ -35,44 +35,67 @@ export class Login implements OnInit {
     }
   }
 
-  // 🌟 1. 修复 Authenticate 跳转逻辑
+  // 🌟 修复点 1：普通登录签发通行证
   onLogin() {
     const email = this.loginData.email.toLowerCase().trim();
+    const password = this.loginData.password;
 
-    if (!email || !this.loginData.password) {
+    if (!email || !password) {
       alert("Please enter both email and password.");
       return;
     }
 
-    // 区分 Student 和 Alumni
-    if (email.endsWith('@student.uum.edu.my')) {
-      alert("Authentication Successful! Redirecting to Student Dashboard...");
-      this.router.navigate(['/student']); // 确保路由中配置了 /student
-    } else if (email.endsWith('@alumni.uum.edu.my')) {
-      alert("Authentication Successful! Redirecting to Alumni Dashboard...");
-      this.router.navigate(['/alumni']); // 确保路由中配置了 /alumni
-    } else {
-      alert("Login Failed: Please use your UUM official email (@student.uum.edu.my or @alumni.uum.edu.my).");
-    }
-  }
+    const users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
+    const foundUser = users.find((u: any) => u.email === email && u.password === password);
 
-  // 🌟 2. 修复 University ID 跳转 (UUM SSO)
-  loginWithUniversityId() {
-    const ssoUrl = "https://auth.uum.edu.my/nidp/idff/sso?id=3&sid=0&option=credential&sid=0&target=https://portal.uum.edu.my/";
+    if (foundUser) {
+      alert("Authentication Successful! Welcome back.");
 
-    if (confirm("You are now redirecting to UUM Official Portal for identity verification. Once verified, you will be returned to INWLab Nexus.")) {
-      // 在实际生产中，验证后 UUM 会重定向回来。在原型演示时，我们可以模拟这个过程。
-      window.open(ssoUrl, '_blank');
+      // 🌟 【核心魔法】保存当前登录的用户为 Active User
+      localStorage.setItem('active_user', JSON.stringify(foundUser));
 
-      // 模拟 3 秒后验证成功并自动进入系统（用于展示 Prototype）
-      setTimeout(() => {
-        alert("Verification Success from UUM Portal! Welcome back.");
+      if (foundUser.role === 'Student') {
         this.router.navigate(['/student']);
-      }, 3000);
+      } else {
+        this.router.navigate(['/alumni']);
+      }
+    } else {
+      if (email === 'admin@uum.edu.my') {
+        // 万能后门测试账号
+        localStorage.setItem('active_user', JSON.stringify({ fullName: 'System Admin', role: 'Student' }));
+        this.router.navigate(['/student']);
+      } else {
+        alert("Invalid Email or Password. Please Create an Account first.");
+      }
     }
   }
 
-  // 🌟 4. 修复 Forget Password 跳转
+  // 🌟 修复点 2：SSO 模拟回传名字资料
+  loginWithUniversityId() {
+    const ssoId = prompt("--- UUM PORTAL SIMULATION ---\n\n(Backend pending...)\nPlease enter your University ID to verify:\n- 6 digits (e.g. 299326) for Student\n- 4+ digits (e.g. 6003) for Alumni/Staff");
+
+    if (ssoId) {
+      // 模拟 UUM 系统要求确认你的全名
+      const ssoName = prompt("UUM IDENTITY VERIFIED.\n\nPlease enter your First Name to retrieve your UUM profile data:") || "Scholar";
+
+      setTimeout(() => {
+        if (/^\d{6}$/.test(ssoId)) {
+          alert("Identity Confirmed: UUM Student.\nRedirecting to Dashboard...");
+          // 🌟 签发 Student 通行证
+          localStorage.setItem('active_user', JSON.stringify({ fullName: ssoName, role: 'Student' }));
+          this.router.navigate(['/student']);
+        } else if (ssoId.length >= 4) {
+          alert("Identity Confirmed: UUM Alumni/Staff.\nRedirecting to Dashboard...");
+          // 🌟 签发 Alumni 通行证
+          localStorage.setItem('active_user', JSON.stringify({ fullName: ssoName, role: 'Alumni' }));
+          this.router.navigate(['/alumni']);
+        } else {
+          alert("UUM Portal Error: Invalid ID format.");
+        }
+      }, 1000);
+    }
+  }
+
   navigateToForgetPassword() {
     this.router.navigate(['/forget-password']);
   }

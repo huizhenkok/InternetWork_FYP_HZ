@@ -1,21 +1,21 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterOutlet, Router } from '@angular/router'; // 🌟 引入 Router
+import { RouterOutlet, Router } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
 import { Footer } from './footer/footer';
+import { InternalNavbar } from './components/internal-navbar/internal-navbar'; // 🌟 引入刚建好的专属 Navbar
 
 declare var AOS: any;
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Navbar, Footer],
+  imports: [CommonModule, RouterOutlet, Navbar, Footer, InternalNavbar], // 🌟 必须把它放进 imports 里
   templateUrl: './app.html'
 })
 export class App implements OnInit {
   isDarkMode = false;
 
-  // 🌟 注入 Router
   constructor(@Inject(PLATFORM_ID) private platformId: Object, public router: Router) {}
 
   ngOnInit() {
@@ -29,10 +29,18 @@ export class App implements OnInit {
     }
   }
 
-  // 🌟 核心魔法：判断当前是不是 Login / Sign Up / Forget Password 页面
+  // 判断是否为登录/注册验证页 (不显示任何 Navbar)
   get isAuthPage(): boolean {
     const url = this.router.url;
     return url.includes('/login') || url.includes('/sign-up') || url.includes('/forget-password');
+  }
+
+  // 🌟 判断是否为内部系统页面 (显示专属 Navbar)
+  get isInternalPage(): boolean {
+    const url = this.router.url;
+    return url.includes('/student') || url.includes('/alumni') ||
+      url.includes('/my-profile') || url.includes('/booking') ||
+      url.includes('/forum-activity') || url.includes('/publication');
   }
 
   toggleTheme() {
@@ -58,8 +66,6 @@ export class App implements OnInit {
           animatedElements.forEach(el => el.classList.remove('aos-animate'));
           setTimeout(() => {
             AOS.refreshHard();
-            window.scrollTo({ top: window.scrollY + 1, behavior: 'instant' });
-            window.scrollTo({ top: window.scrollY - 1, behavior: 'instant' });
           }, 50);
         }, 50);
       }
