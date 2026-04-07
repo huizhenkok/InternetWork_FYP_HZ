@@ -1,0 +1,76 @@
+<div class="relative min-h-screen flex flex-col w-full selection:bg-accent-cyan selection:text-black pb-20">
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+
+    <canvas #particleCanvas class="absolute inset-0 pointer-events-none z-[25] opacity-70 dark:opacity-50"></canvas>
+  </div>
+
+  <main class="relative z-30 flex-1 flex flex-col max-w-[1280px] w-full mx-auto px-6 py-12 gap-8 mt-6">
+
+    <div class="flex items-center gap-2 text-sm mb-2" data-aos="fade-in">
+      <a routerLink="/publication" class="flex items-center gap-1 text-slate-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary-dark transition-colors bg-transparent border-none cursor-pointer p-0 font-bold outline-none no-underline">
+        <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to Import
+      </a>
+    </div>
+
+    <section class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6" data-aos="fade-right">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-primary dark:from-white dark:to-primary-dark tracking-tighter">
+          Global Archive
+        </h1>
+        <p class="text-lg text-slate-500 dark:text-gray-400 font-light max-w-2xl tracking-wide">
+          Explore and download public research papers shared by INWLab members.
+        </p>
+      </div>
+    </section>
+
+    <div class="relative w-full max-w-2xl group" data-aos="fade-up">
+      <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+        <span class="material-symbols-outlined">search</span>
+      </div>
+      <input [(ngModel)]="searchQuery" (input)="searchPapers()" type="text" placeholder="Search by title, author, or role..."
+             class="block w-full pl-12 pr-4 py-4 border border-slate-200 dark:border-white/10 rounded-2xl bg-white/70 dark:bg-[#121212]/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-primary font-body transition-all shadow-lg backdrop-blur-xl">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4" data-aos="fade-up" data-aos-delay="100">
+
+      <div *ngIf="filteredPapers.length === 0" class="col-span-full py-16 flex flex-col items-center text-center">
+        <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">search_off</span>
+        <h3 class="text-xl font-bold text-slate-700 dark:text-white">No public papers found</h3>
+        <p class="text-slate-500 dark:text-gray-400 mt-2">Check back later or import a document and make it public.</p>
+      </div>
+
+      <div *ngFor="let paper of filteredPapers" class="glass-panel bg-white/80 dark:bg-[#121212]/80 rounded-3xl p-6 flex flex-col border border-slate-200 dark:border-white/10 shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all group">
+        <div class="flex justify-between items-start mb-4">
+          <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shrink-0 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">article</span>
+          </div>
+          <span class="text-[10px] text-slate-400 dark:text-gray-500 font-mono">{{ paper.dateStr.split(' ')[0] }}</span>
+        </div>
+
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white line-clamp-2 mb-4 group-hover:text-primary transition-colors" [title]="paper.fileName">{{ paper.fileName }}</h3>
+
+        <div class="mt-auto pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-xs text-slate-400 dark:text-gray-500 font-bold uppercase tracking-wider mb-0.5">Author</span>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-bold text-slate-700 dark:text-gray-300">{{ paper.authorName }}</span>
+              <span [ngClass]="{
+                                'text-primary bg-primary/10 border-primary/20': paper.authorRole === 'Student',
+                                'text-teal-600 dark:text-teal-400 bg-teal-500/10 border-teal-500/20': paper.authorRole === 'Faculty',
+                                'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20': paper.authorRole === 'Alumni'
+                            }" class="text-[8px] px-1.5 py-0.5 rounded border font-bold uppercase tracking-widest">
+                                {{ paper.authorRole }}
+                            </span>
+            </div>
+          </div>
+          <button (click)="downloadMock(paper.fileName)" class="size-10 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-black transition-all flex items-center justify-center cursor-pointer border-none outline-none shadow-sm">
+            <span class="material-symbols-outlined text-[20px]">download</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

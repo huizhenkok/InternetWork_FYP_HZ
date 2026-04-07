@@ -36,12 +36,16 @@ export class App implements OnInit {
   }
 
   // 🌟 判断是否为内部系统页面 (显示专属 Navbar)
-  // 判断是否为内部系统页面 (显示专属 Navbar)
   get isInternalPage(): boolean {
     const url = this.router.url;
-    return url.includes('/student') || url.includes('/alumni') || url.includes('/faculty') || // 🌟 加了 faculty
-      url.includes('/my-profile') || url.includes('/booking') ||
-      url.includes('/forum-activity') || url.includes('/publication');
+    return url.includes('/student') ||
+      url.includes('/alumni') ||
+      url.includes('/faculty') ||
+      url.includes('/my-profile') ||
+      url.includes('/booking') ||
+      url.includes('/forum-activity') ||
+      url.includes('/publication') ||
+      url.includes('/archive'); // 🌟 完美修复：把 archive 页面加入内部白名单
   }
 
   toggleTheme() {

@@ -20,7 +20,7 @@ import { Cloud } from './pages/Research_explore/cloud/cloud';
 import { Network } from './pages/Research_explore/network/network';
 import { ThreadDetail } from './pages/forum/thread-detail/thread-detail';
 
-// 🌟 Student/Alumni 共用的身份判定页面
+// 🌟 Student/Alumni/Faculty 共用的身份判定页面
 import { StudentAlumni } from './student-alumni/student-alumni';
 
 // 🌟 内部功能页面
@@ -28,6 +28,8 @@ import { MyProfile } from './student-alumni/my-profile/my-profile';
 import { Booking } from './student-alumni/booking/booking';
 import { ForumActivity } from './student-alumni/forum-activity/forum-activity';
 import { Publication } from './student-alumni/publication/publication';
+// 🌟 修复：把路径从 pages 改成了 student-alumni
+import { Archive } from './student-alumni/archive/archive';
 
 // 注意：BookingModal 不需要在这里注册！
 
@@ -58,15 +60,15 @@ export const routes: Routes = [
   { path: 'sign-up', component: SignUp },
   { path: 'forget-password', component: ForgetPassword },
 
-  // 🌟 学生/校友核心 Dashboard 路由
+  // 🌟 学生/校友/教职员 核心 Dashboard 路由
   { path: 'student', component: StudentAlumni, data: { role: 'Student' } },
   { path: 'alumni', component: StudentAlumni, data: { role: 'Alumni' } },
-  // 在你的 routes 数组里，找到 student 和 alumni 的地方，加上这一行：
   { path: 'faculty', component: StudentAlumni, data: { role: 'Faculty' } },
 
   // 🌟 内部子系统路由
   { path: 'my-profile', component: MyProfile },
   { path: 'booking', component: Booking },
   { path: 'forum-activity', component: ForumActivity },
-  { path: 'publication', component: Publication }
+  { path: 'publication', component: Publication },
+  { path: 'archive', component: Archive }, // 全局文献大厅
 ];
