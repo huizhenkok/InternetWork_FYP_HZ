@@ -1,1 +1,179 @@
-<p>forum-activity works!</p>
+<div class="relative min-h-screen flex flex-col w-full selection:bg-accent-cyan selection:text-black pb-20">
+
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/30 dark:bg-primary/20 rounded-full blur-[100px] animate-pulse z-20 pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-accent-teal/30 dark:bg-accent-teal/20 rounded-full blur-[120px] animate-pulse z-20 pointer-events-none" style="animation-duration: 3s;"></div>
+
+    <canvas #particleCanvas class="absolute inset-0 pointer-events-none z-[25] opacity-70 dark:opacity-50"></canvas>
+
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] max-w-4xl h-48 bg-primary/40 dark:bg-primary/20 blur-[100px] animate-pulse z-[25] pointer-events-none"></div>
+  </div>
+
+  <main class="relative z-30 flex-1 flex justify-center py-4 px-4 sm:px-8 lg:px-12 mt-6">
+    <div class="w-full max-w-[900px] flex flex-col gap-6">
+
+      <ng-container *ngIf="!activeTopic">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-4 border-b border-slate-200 dark:border-white/10" data-aos="fade-down">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2 text-primary dark:text-primary-dark text-xs font-mono tracking-widest uppercase mb-1">
+              <span class="material-symbols-outlined text-sm">forum</span> INWLab Community
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-primary dark:from-white dark:to-primary-dark tracking-tighter">
+              Research Topics
+            </h1>
+            <p class="text-slate-500 dark:text-gray-400 text-lg font-light max-w-xl">
+              Share ideas, discuss implementations, and collaborate with your peers.
+            </p>
+          </div>
+          <button (click)="toggleCreateTopic()" class="glow-button bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 transition-all hover:scale-105 cursor-pointer border-none shadow-md">
+            <span class="material-symbols-outlined text-[18px]">add</span> {{ isCreatingTopic ? 'Cancel' : 'New Topic' }}
+          </button>
+        </div>
+
+        <div *ngIf="isCreatingTopic" class="glass-panel bg-white/90 dark:bg-[#121212]/90 p-6 md:p-8 rounded-2xl border border-primary/30 shadow-xl" data-aos="zoom-in">
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Start a New Discussion</h3>
+          <div class="flex flex-col gap-4">
+            <div class="flex gap-4">
+              <input [(ngModel)]="newTopicTitle" type="text" placeholder="Topic Title..." class="flex-1 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none font-bold shadow-inner">
+              <select [(ngModel)]="newTopicCategory" class="w-40 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-700 dark:text-gray-300 focus:ring-1 focus:ring-primary outline-none font-bold cursor-pointer shadow-inner">
+                <option>Research</option>
+                <option>Hardware</option>
+                <option>Software</option>
+                <option>General</option>
+              </select>
+            </div>
+            <textarea [(ngModel)]="newTopicContent" rows="4" placeholder="Describe your topic or question here..." class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none font-body resize-none shadow-inner"></textarea>
+            <div class="flex justify-end">
+              <button (click)="submitNewTopic()" class="glow-button bg-primary text-white dark:text-black font-bold px-6 py-2.5 rounded-lg text-sm border-none cursor-pointer">Publish Topic</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4" data-aos="fade-up" data-aos-delay="100">
+          <div *ngFor="let topic of topics" (click)="viewTopic(topic)" class="glass-panel bg-white/70 dark:bg-[#121212]/70 p-6 rounded-2xl border border-slate-200 dark:border-white/5 hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex-1 flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-1 bg-primary/10 text-primary dark:bg-primary/20 text-[10px] font-bold uppercase tracking-wider rounded border border-primary/20">{{ topic.category }}</span>
+                <span class="text-xs text-slate-400 dark:text-gray-500 font-body">Posted {{ topic.time }} by {{ topic.authorName }}</span>
+              </div>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">{{ topic.title }}</h2>
+              <p class="text-sm text-slate-500 dark:text-gray-400 line-clamp-2 font-body">{{ topic.content }}</p>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-black/30 px-4 py-2 rounded-xl border border-slate-100 dark:border-white/5 shrink-0">
+              <span class="material-symbols-outlined text-slate-400 text-[18px]">chat_bubble</span>
+              <span class="font-bold text-slate-700 dark:text-gray-300 text-sm">{{ topic.replies?.length || 0 }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="topics.length === 0" class="text-center py-12">
+            <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-white/10 mb-3">forum</span>
+            <p class="text-slate-500 font-medium">No topics found. Be the first to start a discussion!</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="activeTopic">
+
+        <div class="flex items-center gap-2 text-sm mb-2" data-aos="fade-in">
+          <button (click)="backToList()" class="flex items-center gap-1 text-slate-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary-dark transition-colors bg-transparent border-none cursor-pointer p-0 font-bold outline-none">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span> Back to Forums
+          </button>
+          <span class="text-slate-300 dark:text-gray-600">/</span>
+          <span class="text-slate-900 dark:text-white font-medium truncate">{{ activeTopic.category }}</span>
+        </div>
+
+        <div class="glass-panel bg-white/90 dark:bg-[#121212]/90 p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-white/10 shadow-lg relative overflow-hidden" data-aos="fade-up">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-[40px] pointer-events-none"></div>
+
+          <h1 class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white leading-tight mb-6">{{ activeTopic.title }}</h1>
+
+          <div class="flex gap-4">
+            <div class="shrink-0 relative">
+              <div class="w-12 h-12 rounded-full bg-cover bg-center ring-2 ring-primary/20 shadow-sm" [style.background-image]="'url(' + activeTopic.authorAvatar + ')'"></div>
+            </div>
+            <div class="flex-1 flex flex-col">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="font-bold text-slate-900 dark:text-white text-sm">{{ activeTopic.authorName }}</span>
+
+                <span [ngClass]="{
+                                    'text-primary bg-primary/10 border-primary/20': activeTopic.authorRole === 'Student',
+                                    'text-teal-600 dark:text-teal-400 bg-teal-500/10 border-teal-500/20': activeTopic.authorRole === 'Faculty',
+                                    'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20': activeTopic.authorRole === 'Alumni',
+                                    'text-slate-500 bg-slate-500/10 border-slate-500/20': !['Student', 'Faculty', 'Alumni'].includes(activeTopic.authorRole)
+                                }" class="text-[10px] px-2 py-0.5 rounded border font-bold uppercase tracking-wider">
+                                    {{ activeTopic.authorRole }}
+                                </span>
+
+                <span class="text-slate-400 text-xs ml-auto">{{ activeTopic.time }}</span>
+              </div>
+              <p class="text-slate-700 dark:text-gray-300 leading-relaxed font-body whitespace-pre-line text-base">{{ activeTopic.content }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4 relative pl-4 md:pl-8 border-l-2 border-slate-200 dark:border-[#224649] ml-4 md:ml-6 mt-4 mb-24" data-aos="fade-up" data-aos-delay="100">
+          <div *ngFor="let reply of activeTopic.replies" class="glass-panel bg-white/70 dark:bg-[rgba(22,42,45,0.4)] p-5 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-primary/30 transition-colors shadow-sm">
+            <div class="flex gap-4">
+              <div class="shrink-0 relative">
+                <div class="w-10 h-10 rounded-full bg-cover bg-center ring-1 ring-slate-200 dark:ring-gray-600" [style.background-image]="'url(' + reply.authorAvatar + ')'"></div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-bold text-slate-900 dark:text-white text-sm">{{ reply.authorName }}</span>
+
+                  <span [ngClass]="{
+                                        'text-primary bg-primary/10 border-primary/20': reply.authorRole === 'Student',
+                                        'text-teal-600 dark:text-teal-400 bg-teal-500/10 border-teal-500/20': reply.authorRole === 'Faculty',
+                                        'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20': reply.authorRole === 'Alumni',
+                                        'text-slate-500 bg-slate-500/10 border-slate-500/20': !['Student', 'Faculty', 'Alumni'].includes(reply.authorRole)
+                                    }" class="text-[10px] px-2 py-0.5 rounded border font-bold uppercase tracking-wider">
+                                        {{ reply.authorRole || 'Member' }}
+                                    </span>
+
+                  <span class="text-slate-400 text-xs font-medium ml-2">{{ reply.time }}</span>
+                </div>
+                <p class="text-slate-600 dark:text-gray-300 leading-relaxed font-body text-sm whitespace-pre-line">{{ reply.content }}</p>
+
+                <div *ngIf="reply.image" class="mt-4 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 max-w-sm bg-black/5">
+                  <img [src]="reply.image" alt="Attached File" class="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fixed bottom-6 left-0 right-0 w-full flex justify-center px-4 z-40 pointer-events-none">
+          <div class="w-full max-w-[900px] pointer-events-auto" data-aos="fade-up">
+            <div class="glass-panel bg-white/95 dark:bg-[#102123]/95 backdrop-blur-xl border border-slate-200 dark:border-primary/30 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 ring-1 ring-black/5 dark:ring-white/5 relative">
+
+              <div *ngIf="newReplyImage" class="absolute bottom-full left-0 mb-3 bg-white dark:bg-black/90 border border-slate-200 dark:border-white/10 rounded-xl p-2 shadow-lg flex items-start gap-2">
+                <img [src]="newReplyImage" class="h-20 w-auto rounded object-cover border border-slate-100 dark:border-white/5">
+                <button (click)="removeAttachedImage()" class="p-1 rounded-full bg-red-100 text-red-500 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/40 transition-colors border-none cursor-pointer outline-none flex items-center justify-center">
+                  <span class="material-symbols-outlined text-sm">close</span>
+                </button>
+              </div>
+
+              <div class="flex gap-2 items-end">
+                <input type="file" #fileInput accept="image/*" class="hidden" (change)="onImageSelected($event)">
+
+                <button (click)="fileInput.click()" title="Attach Photo" class="p-3 mb-0.5 rounded-xl text-slate-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-dark hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors border-none cursor-pointer outline-none bg-transparent flex shrink-0">
+                  <span class="material-symbols-outlined text-xl">image</span>
+                </button>
+
+                <textarea [(ngModel)]="newReplyText" rows="1" placeholder="Write your reply... (Markdown supported)" class="flex-1 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 rounded-xl px-4 py-3.5 focus:ring-1 focus:ring-primary outline-none font-body text-sm resize-y max-h-32 min-h-[50px] shadow-inner"></textarea>
+
+                <button (click)="postReply()" [disabled]="!newReplyText.trim() && !newReplyImage" [ngClass]="{'opacity-50 cursor-not-allowed': !newReplyText.trim() && !newReplyImage}" class="glow-button bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold px-6 py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-all border-none shrink-0 cursor-pointer h-full">
+                  <span class="hidden sm:inline">Post Reply</span>
+                  <span class="material-symbols-outlined text-lg">send</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </ng-container>
+    </div>
+  </main>
+</div>

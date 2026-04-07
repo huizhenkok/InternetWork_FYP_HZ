@@ -35,13 +35,20 @@
         <div class="flex p-1 bg-slate-200/50 dark:bg-black/40 rounded-xl mb-8 border border-slate-200 dark:border-white/5">
           <button type="button" (click)="regType = 'Student'"
                   [ngClass]="regType === 'Student' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
-                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none">
-            Student
+                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[16px] hidden sm:block">school</span> Student
           </button>
+
+          <button type="button" (click)="regType = 'Faculty'"
+                  [ngClass]="regType === 'Faculty' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
+                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[16px] hidden sm:block">local_library</span> Faculty
+          </button>
+
           <button type="button" (click)="regType = 'Alumni'"
-                  [ngClass]="regType === 'Alumni' ? 'bg-white dark:bg-white/10 text-accent-cyan shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
-                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none">
-            Alumni
+                  [ngClass]="regType === 'Alumni' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
+                  class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[16px] hidden sm:block">workspace_premium</span> Alumni
           </button>
         </div>
 
@@ -51,16 +58,21 @@
             <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Full Name</label>
             <div class="relative">
               <input [(ngModel)]="formData.fullName" name="fullName" type="text" placeholder="Your Full Name" required
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
               <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">badge</span>
             </div>
           </div>
 
-          <div *ngIf="regType === 'Student'" class="flex flex-col gap-2">
-            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Student ID</label>
+          <div class="flex flex-col gap-2">
+            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">
+              {{ regType === 'Student' ? 'Student ID' : (regType === 'Faculty' ? 'Staff ID' : 'Alumni ID') }}
+              <span *ngIf="regType === 'Alumni'" class="text-[10px] text-slate-400 dark:text-gray-500 lowercase normal-case ml-1">(Optional)</span>
+            </label>
             <div class="relative">
-              <input [(ngModel)]="formData.matricNumber" name="matricNumber" type="text" placeholder="Your Matric Number (e.g. 298068)" required
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <input [(ngModel)]="formData.matricNumber" name="matricNumber" type="text"
+                     [placeholder]="regType === 'Student' ? 'e.g. 298068' : (regType === 'Faculty' ? 'e.g. F1024' : 'Optional ID')"
+                     [required]="regType !== 'Alumni'"
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
               <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">pin</span>
             </div>
           </div>
@@ -68,8 +80,8 @@
           <div class="flex flex-col gap-2">
             <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Email</label>
             <div class="relative">
-              <input [(ngModel)]="formData.email" name="email" type="email" placeholder="" required
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+              <input [(ngModel)]="formData.email" name="email" type="email" placeholder="example@uum.edu.my" required
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
               <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">mail</span>
             </div>
           </div>
@@ -78,25 +90,25 @@
             <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Phone Number <span class="text-[10px] text-slate-400 dark:text-gray-500 lowercase normal-case ml-1">(Optional)</span></label>
             <div class="relative">
               <input [(ngModel)]="formData.phone" name="phone" type="tel" placeholder="e.g. 012-3456789"
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
               <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">call</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-2">
               <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Password</label>
               <input [(ngModel)]="formData.password" name="password" type="password" placeholder="••••••••" required
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
             </div>
             <div class="flex flex-col gap-2">
               <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Confirm Password</label>
               <input [(ngModel)]="formData.confirmPassword" name="confirmPassword" type="password" placeholder="••••••••" required
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body">
+                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
             </div>
           </div>
 
-          <button type="submit" class="glow-button mt-4 h-14 w-full rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold tracking-widest transition-all hover:scale-[1.02] cursor-pointer border-none">
+          <button type="submit" class="glow-button mt-4 h-14 w-full rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold tracking-widest transition-all hover:scale-[1.02] cursor-pointer border-none shadow-lg">
             REGISTER ACCOUNT
           </button>
 

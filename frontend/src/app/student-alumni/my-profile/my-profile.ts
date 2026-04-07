@@ -12,24 +12,22 @@ declare var AOS: any;
 })
 export class MyProfile implements OnInit, AfterViewInit {
 
-  // 🌟 控制当前是 View 模式还是 Edit 模式
   isEditMode: boolean = false;
+  newTagValue: string = ''; // 🌟 实时抓取你输入到一半的 Tag
 
-  // 用户的详细资料模型
   userProfile: any = {
     fullName: '',
     email: '',
     role: '',
-    matricNumber: '', // 学生才有
+    matricNumber: '',
     phone: '',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB0LswD0_6irjogIzA3SEKVww65eL9MDC5InK_ldo0TgrBDvcOlxglRnAHQap3CUDcsYblW9c8yug3byVje8c9h7svi3qK3Gx6PvFWJeBVPSGjSSC0DX7lN9ZjRCIgL2EpEdS1poq11nRv9VH-I90CYqx740GMVe1Ig4StAHOZRz3SphaRhNlOpTVhMChLa_iKqvy5nnfxOaRLwKc7rDI8slIvuHePon6eaKctGadtuI857f0fI74GvSCsWduEp0gWbP72OaeKera6z', // 默认头像
+    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB0LswD0_6irjogIzA3SEKVww65eL9MDC5InK_ldo0TgrBDvcOlxglRnAHQap3CUDcsYblW9c8yug3byVje8c9h7svi3qK3Gx6PvFWJeBVPSGjSSC0DX7lN9ZjRCIgL2EpEdS1poq11nRv9VH-I90CYqx740GMVe1Ig4StAHOZRz3SphaRhNlOpTVhMChLa_iKqvy5nnfxOaRLwKc7rDI8slIvuHePon6eaKctGadtuI857f0fI74GvSCsWduEp0gWbP72OaeKera6z',
     researchInterests: 'Currently focusing on IoT security protocols and machine learning applications in network defense.',
     focusAreas: ['Network Security', 'IoT Systems'],
-    jobTitle: '', // 校友才有
-    company: ''   // 校友才有
+    jobTitle: '',
+    company: ''
   };
 
-  // 🌟 粒子背景相关变量
   @ViewChild('particleCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D | null;
   private particles: any[] = [];
@@ -48,13 +46,11 @@ export class MyProfile implements OnInit, AfterViewInit {
     }
   }
 
-  // 🌟 1. 从数据库读取个人资料
   loadProfile() {
     try {
       const activeUserStr = localStorage.getItem('active_user');
       if (activeUserStr) {
         const activeUser = JSON.parse(activeUserStr);
-        // 把提取到的资料合并到默认的 userProfile 里
         this.userProfile = { ...this.userProfile, ...activeUser };
       }
     } catch (e) {
@@ -62,33 +58,33 @@ export class MyProfile implements OnInit, AfterViewInit {
     }
   }
 
-  // 🌟 2. 切换模式
   toggleEditMode(status: boolean) {
     this.isEditMode = status;
-    // 如果取消编辑，重新读取一遍资料，把未保存的改动覆盖掉
+    this.newTagValue = ''; // 清空未完成的输入
     if (!status) {
       this.loadProfile();
     }
     this.refreshAnimations();
   }
 
-  // 🌟 3. 保存资料（同步到全局）
+  // 🌟 修复后的智能保存逻辑
   saveProfile() {
-    // 检查名字不能为空
     if (!this.userProfile.fullName.trim()) {
       alert("Full Name cannot be empty.");
       return;
     }
 
+    // 🌟 防呆设计：如果用户打字打到一半忘记按 Enter 就按了 Save，系统自动帮他把 Tag 加进去！
+    if (this.newTagValue.trim()) {
+      this.addTag();
+    }
+
     try {
-      // A. 更新当前的 Active User
       localStorage.setItem('active_user', JSON.stringify(this.userProfile));
 
-      // B. 更新总数据库里的记录 (用 email 匹配)
       let users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
       const index = users.findIndex((u: any) => u.email === this.userProfile.email);
       if (index !== -1) {
-        // 找到了，更新数据库里的资料
         users[index] = { ...users[index], ...this.userProfile };
         localStorage.setItem('inwlab_users', JSON.stringify(users));
       }
@@ -103,32 +99,32 @@ export class MyProfile implements OnInit, AfterViewInit {
     }
   }
 
-  // 🌟 4. 处理头像上传 (模拟读取本地文件转成 Base64)
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.userProfile.avatar = e.target.result; // 把图片变成 Base64 代码存起来
+        this.userProfile.avatar = e.target.result;
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // 🌟 5. 处理 Focus Areas 标签
-  addTag(event: any) {
-    const value = event.target.value.trim();
+  // 🌟 修复后的 Tag 增加逻辑 (保证 Angular 100% 察觉到数据变化)
+  addTag() {
+    const value = this.newTagValue.trim();
     if (value && !this.userProfile.focusAreas.includes(value)) {
-      this.userProfile.focusAreas.push(value);
+      // 用扩展运算符 [...] 重新赋值数组，强制 Angular 刷新画面
+      this.userProfile.focusAreas = [...this.userProfile.focusAreas, value];
     }
-    event.target.value = ''; // 清空输入框
+    this.newTagValue = ''; // 添加完后清空输入框
   }
 
+  // 🌟 修复后的 Tag 移除逻辑
   removeTag(tag: string) {
     this.userProfile.focusAreas = this.userProfile.focusAreas.filter((t: string) => t !== tag);
   }
 
-  // 🌟 刷新动画 (因为切换模式时 DOM 改变了)
   refreshAnimations() {
     setTimeout(() => {
       if (typeof AOS !== 'undefined') {
@@ -139,9 +135,6 @@ export class MyProfile implements OnInit, AfterViewInit {
     }, 100);
   }
 
-  // ==========================================
-  // 🚀 Canvas 粒子背景 (同 Dashboard)
-  // ==========================================
   initParticles() {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d');

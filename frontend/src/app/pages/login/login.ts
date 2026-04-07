@@ -35,7 +35,7 @@ export class Login implements OnInit {
     }
   }
 
-  // 🌟 修复点 1：普通登录签发通行证
+  // 🌟 修复点 1：普通登录签发通行证 (加入 Faculty 路由)
   onLogin() {
     const email = this.loginData.email.toLowerCase().trim();
     const password = this.loginData.password;
@@ -54,23 +54,26 @@ export class Login implements OnInit {
       // 🌟 【核心魔法】保存当前登录的用户为 Active User
       localStorage.setItem('active_user', JSON.stringify(foundUser));
 
+      // 🌟 根据身份动态跳转到不同的 Dashboard
       if (foundUser.role === 'Student') {
         this.router.navigate(['/student']);
+      } else if (foundUser.role === 'Faculty') {
+        this.router.navigate(['/faculty']);
       } else {
         this.router.navigate(['/alumni']);
       }
     } else {
       if (email === 'admin@uum.edu.my') {
         // 万能后门测试账号
-        localStorage.setItem('active_user', JSON.stringify({ fullName: 'System Admin', role: 'Student' }));
-        this.router.navigate(['/student']);
+        localStorage.setItem('active_user', JSON.stringify({ fullName: 'System Admin', role: 'Faculty' }));
+        this.router.navigate(['/faculty']);
       } else {
         alert("Invalid Email or Password. Please Create an Account first.");
       }
     }
   }
 
-  // 🌟 修复点 2：SSO 模拟回传名字资料
+  // 🌟 修复点 2：SSO 模拟回传名字资料 (加入 Faculty 区分)
   loginWithUniversityId() {
     const ssoId = prompt("--- UUM PORTAL SIMULATION ---\n\n(Backend pending...)\nPlease enter your University ID to verify:\n- 6 digits (e.g. 299326) for Student\n- 4+ digits (e.g. 6003) for Alumni/Staff");
 
@@ -81,14 +84,21 @@ export class Login implements OnInit {
       setTimeout(() => {
         if (/^\d{6}$/.test(ssoId)) {
           alert("Identity Confirmed: UUM Student.\nRedirecting to Dashboard...");
-          // 🌟 签发 Student 通行证
           localStorage.setItem('active_user', JSON.stringify({ fullName: ssoName, role: 'Student' }));
           this.router.navigate(['/student']);
         } else if (ssoId.length >= 4) {
-          alert("Identity Confirmed: UUM Alumni/Staff.\nRedirecting to Dashboard...");
-          // 🌟 签发 Alumni 通行证
-          localStorage.setItem('active_user', JSON.stringify({ fullName: ssoName, role: 'Alumni' }));
-          this.router.navigate(['/alumni']);
+          // 简单区分一下 Staff 和 Alumni
+          const isFaculty = confirm("Click OK if you are a Faculty/Staff member, or Cancel if you are an Alumni.");
+          const assignedRole = isFaculty ? 'Faculty' : 'Alumni';
+
+          alert(`Identity Confirmed: UUM ${assignedRole}.\nRedirecting to Dashboard...`);
+          localStorage.setItem('active_user', JSON.stringify({ fullName: ssoName, role: assignedRole }));
+
+          if (assignedRole === 'Faculty') {
+            this.router.navigate(['/faculty']);
+          } else {
+            this.router.navigate(['/alumni']);
+          }
         } else {
           alert("UUM Portal Error: Invalid ID format.");
         }

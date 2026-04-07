@@ -118,7 +118,9 @@
                                 {{ tag }}
                               <span (click)="removeTag(tag)" class="material-symbols-outlined text-[14px] cursor-pointer hover:text-red-500 transition-colors">close</span>
                             </span>
-              <input (keyup.enter)="addTag($event)" class="bg-transparent border-none text-sm text-slate-700 dark:text-gray-300 focus:ring-0 p-0 h-6 w-32 placeholder-slate-400 dark:placeholder-gray-600 outline-none ml-2" placeholder="+ Add tag (Press Enter)" type="text"/>
+              <input [(ngModel)]="newTagValue" name="newTag" (keyup.enter)="addTag()"
+                     class="bg-transparent border-none text-sm text-slate-700 dark:text-gray-300 focus:ring-0 p-0 h-6 w-48 placeholder-slate-400 dark:placeholder-gray-600 outline-none ml-2"
+                     placeholder="+ Add tag (Press Enter)" type="text"/>
             </div>
           </div>
         </div>

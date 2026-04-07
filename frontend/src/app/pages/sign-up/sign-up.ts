@@ -12,7 +12,7 @@ declare var AOS: any;
   templateUrl: './sign-up.html'
 })
 export class SignUp implements OnInit {
-  regType: 'Student' | 'Alumni' = 'Student';
+  regType: 'Student' | 'Alumni' | 'Faculty' = 'Student'; // 🌟 加入 Faculty
 
   formData = {
     fullName: '',     // 用户的全名
@@ -53,11 +53,17 @@ export class SignUp implements OnInit {
       return;
     }
 
-    // 3. 验证学生ID
+    // 3. 验证 ID (根据身份不同验证不同)
     if (this.regType === 'Student') {
       const isIdValid = /^\d{6}$/.test(this.formData.matricNumber);
       if (!isIdValid) {
         alert("Student Matric Number must be exactly 6 digits (e.g., 298068).");
+        return;
+      }
+    } else if (this.regType === 'Faculty') {
+      // 🌟 教职员要求填写 Staff ID
+      if (!this.formData.matricNumber || this.formData.matricNumber.length < 4) {
+        alert("Staff ID must be at least 4 characters.");
         return;
       }
     }

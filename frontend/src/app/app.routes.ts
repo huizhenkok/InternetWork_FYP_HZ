@@ -61,6 +61,8 @@ export const routes: Routes = [
   // 🌟 学生/校友核心 Dashboard 路由
   { path: 'student', component: StudentAlumni, data: { role: 'Student' } },
   { path: 'alumni', component: StudentAlumni, data: { role: 'Alumni' } },
+  // 在你的 routes 数组里，找到 student 和 alumni 的地方，加上这一行：
+  { path: 'faculty', component: StudentAlumni, data: { role: 'Faculty' } },
 
   // 🌟 内部子系统路由
   { path: 'my-profile', component: MyProfile },

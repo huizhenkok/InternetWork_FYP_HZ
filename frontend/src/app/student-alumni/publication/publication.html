@@ -1,1 +1,91 @@
-<p>publication works!</p>
+<div class="relative min-h-screen flex flex-col w-full selection:bg-accent-cyan selection:text-black pb-20">
+
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
+    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/30 dark:bg-primary/20 rounded-full blur-[100px] animate-pulse z-20 pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-accent-teal/30 dark:bg-accent-teal/20 rounded-full blur-[120px] animate-pulse z-20 pointer-events-none" style="animation-duration: 3s;"></div>
+
+    <canvas *ngIf="canvasRef" #particleCanvas class="absolute inset-0 pointer-events-none z-[25] opacity-70 dark:opacity-50"></canvas>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] max-w-4xl h-48 bg-primary/40 dark:bg-primary/20 blur-[100px] animate-pulse z-[25] pointer-events-none"></div>
+  </div>
+
+  <main class="relative z-30 flex-1 flex flex-col max-w-[1280px] w-full mx-auto px-6 py-12 gap-8">
+
+    <section class="flex flex-col gap-2" data-aos="fade-right">
+      <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-primary dark:from-white dark:to-primary-dark tracking-tighter">
+        Import Publications
+      </h1>
+      <p class="text-lg text-slate-500 dark:text-gray-400 font-light max-w-2xl tracking-wide">
+        Upload new research papers, validate data integrity, and sync with the INWLab archive.
+      </p>
+    </section>
+
+    <div
+      class="relative rounded-2xl p-8 md:p-12 w-full flex flex-col items-center justify-center min-h-[350px] overflow-hidden group transition-all duration-300 glass-panel dark:bg-[#121212]/60"
+      [ngClass]="{'border-primary border-2 shadow-[0_0_30px_rgba(13,242,242,0.3)]': isDragging, 'border-slate-200 dark:border-white/10': !isDragging}"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      data-aos="fade-up"
+    >
+      <div class="absolute inset-4 border-2 border-dashed rounded-xl pointer-events-none transition-colors duration-300" [ngClass]="{'border-primary': isDragging, 'border-slate-300 dark:border-white/20': !isDragging}"></div>
+
+      <div class="relative z-10 flex flex-col items-center text-center gap-6 max-w-md">
+        <div class="size-20 rounded-2xl bg-white/80 dark:bg-white/5 border border-white/50 dark:border-white/10 flex items-center justify-center shadow-sm dark:shadow-[0_0_30px_rgba(13,242,242,0.1)] group-hover:scale-110 transition-transform duration-300 backdrop-blur-sm">
+          <span class="material-symbols-outlined text-4xl text-primary dark:text-primary-dark">cloud_upload</span>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white">
+            {{ isDragging ? 'Drop files here!' : 'Drag & Drop Publication Files' }}
+          </h3>
+          <p class="text-sm text-slate-600 dark:text-gray-400 font-body">Supported formats: PDF, BIB, XML. Max size 50MB.</p>
+        </div>
+
+        <input type="file" #fileUploader class="hidden" multiple accept=".pdf,.bib,.xml,.doc,.docx" (change)="onFileSelect($event)">
+
+        <div class="flex justify-center w-full">
+          <button (click)="fileUploader.click()" class="py-3 px-8 rounded-xl glow-button bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black text-sm font-bold flex items-center justify-center gap-2 shadow-lg dark:hover:shadow-[0_0_20px_rgba(13,242,242,0.4)] border-none cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">search</span> Browse Files
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-4" data-aos="fade-up" data-aos-delay="100">
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary dark:text-primary-dark">history</span>
+        Recent Imports
+      </h3>
+
+      <div class="flex flex-col gap-4">
+
+        <div *ngIf="recentImports.length === 0" class="glass-panel p-10 rounded-2xl flex flex-col items-center justify-center text-center bg-white/50 dark:bg-[#121212]/50 border border-slate-200 dark:border-white/5 shadow-sm">
+          <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-gray-600 mb-3">folder_open</span>
+          <p class="text-slate-500 dark:text-gray-400 font-medium">You haven't imported any publications yet.</p>
+        </div>
+
+        <div *ngFor="let record of recentImports" class="glass-panel p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 group bg-white/70 dark:bg-[#121212]/80 hover:border-primary/30 transition-all border border-slate-200 dark:border-white/10 shadow-sm">
+          <div class="flex items-center gap-4">
+            <div class="size-12 rounded-xl bg-teal-50 dark:bg-primary/10 flex items-center justify-center border border-teal-100 dark:border-primary/20 text-teal-600 dark:text-primary-dark shrink-0">
+              <span class="material-symbols-outlined text-2xl">description</span>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-[400px]">{{ record.fileName }}</h4>
+              <p class="text-xs text-slate-500 dark:text-gray-400 mt-1">Imported on {{ record.dateStr }}</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between md:justify-end gap-4 border-t md:border-none border-slate-100 dark:border-white/5 pt-3 md:pt-0">
+            <span class="text-xs font-bold text-green-600 dark:text-emerald-400 bg-green-100 dark:bg-emerald-400/10 px-3 py-1.5 rounded-full border border-green-200 dark:border-emerald-500/20 uppercase tracking-widest">{{ record.status }}</span>
+            <button class="text-slate-400 dark:text-gray-500 hover:text-primary dark:hover:text-white transition-colors bg-transparent border-none cursor-pointer outline-none p-1">
+              <span class="material-symbols-outlined">more_vert</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+</div>

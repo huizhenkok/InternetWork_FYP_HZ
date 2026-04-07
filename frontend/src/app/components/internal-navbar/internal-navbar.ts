@@ -18,12 +18,12 @@ export class InternalNavbar implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    // 🌟 如果当前网址包含 alumni，就把 Home 按钮指向 alumni
     if (this.router.url.includes('/alumni')) {
       this.homeLink = '/alumni';
+    } else if (this.router.url.includes('/faculty')) {
+      this.homeLink = '/faculty'; // 🌟 新增 Faculty 判断
     }
   }
-
   toggleTheme() {
     this.toggleThemeEvent.emit();
   }

@@ -36,9 +36,10 @@ export class App implements OnInit {
   }
 
   // 🌟 判断是否为内部系统页面 (显示专属 Navbar)
+  // 判断是否为内部系统页面 (显示专属 Navbar)
   get isInternalPage(): boolean {
     const url = this.router.url;
-    return url.includes('/student') || url.includes('/alumni') ||
+    return url.includes('/student') || url.includes('/alumni') || url.includes('/faculty') || // 🌟 加了 faculty
       url.includes('/my-profile') || url.includes('/booking') ||
       url.includes('/forum-activity') || url.includes('/publication');
   }
