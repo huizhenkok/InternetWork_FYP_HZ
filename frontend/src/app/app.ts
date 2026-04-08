@@ -3,14 +3,14 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterOutlet, Router } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
 import { Footer } from './footer/footer';
-import { InternalNavbar } from './components/internal-navbar/internal-navbar'; // 🌟 引入刚建好的专属 Navbar
+import { InternalNavbar } from './components/internal-navbar/internal-navbar';
 
 declare var AOS: any;
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Navbar, Footer, InternalNavbar], // 🌟 必须把它放进 imports 里
+  imports: [CommonModule, RouterOutlet, Navbar, Footer, InternalNavbar],
   templateUrl: './app.html'
 })
 export class App implements OnInit {
@@ -29,13 +29,17 @@ export class App implements OnInit {
     }
   }
 
-  // 判断是否为登录/注册验证页 (不显示任何 Navbar)
+  // 🌟 判断是否为无需 Navbar/Footer 的页面
+  // 注意：url.includes('/admin') 会自动拦截所有 /admin-dashboard, /admin-cms 等页面！
   get isAuthPage(): boolean {
     const url = this.router.url;
-    return url.includes('/login') || url.includes('/sign-up') || url.includes('/forget-password');
+    return url.includes('/login') ||
+      url.includes('/sign-up') ||
+      url.includes('/forget-password') ||
+      url.includes('/admin');
   }
 
-  // 🌟 判断是否为内部系统页面 (显示专属 Navbar)
+  // 🌟 判断是否为学生/教职员的内部系统页面 (显示专属的 Internal Navbar)
   get isInternalPage(): boolean {
     const url = this.router.url;
     return url.includes('/student') ||
@@ -45,7 +49,7 @@ export class App implements OnInit {
       url.includes('/booking') ||
       url.includes('/forum-activity') ||
       url.includes('/publication') ||
-      url.includes('/archive'); // 🌟 完美修复：把 archive 页面加入内部白名单
+      url.includes('/archive');
   }
 
   toggleTheme() {
@@ -65,6 +69,7 @@ export class App implements OnInit {
         localStorage.setItem('inwlab-theme', 'light');
       }
 
+      // 处理 AOS 动画的刷新
       if (triggerAnimation && typeof AOS !== 'undefined') {
         setTimeout(() => {
           const animatedElements = document.querySelectorAll('[data-aos]');

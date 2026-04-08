@@ -1,133 +1,84 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router'; // 🌟 核心修复：改为引入全面的 RouterModule
 
 declare var AOS: any;
-
-interface Resource {
-  id: string;
-  category: string;
-  type: string;
-  typeClass: string;
-  date: string;
-  title: string;
-  authors: string;
-  desc: string;
-  primaryBtnText: string;
-  primaryBtnIcon: string;
-  secondaryBtnText: string;
-  secondaryBtnIcon: string;
-}
 
 @Component({
   selector: 'app-resources',
   standalone: true,
-  imports: [CommonModule, RouterLink], // 🌟 搜索框删了，FormsModule 也就去掉了
+  imports: [CommonModule, RouterModule], // 🌟 核心修复：在这里注入 RouterModule
   templateUrl: './resources.html'
 })
 export class Resources implements OnInit {
   activeCategory: string = 'All';
-
-  allResources: Resource[] = [
-    {
-      id: 'paper-1', category: 'Cybersecurity', type: 'Research Paper',
-      typeClass: 'border-accent-teal/30 bg-accent-teal/10 text-accent-teal dark:text-accent-cyan',
-      date: 'Oct 2023', title: 'Zero-Trust Architecture in IoT Networks', authors: 'Dr. Sarah Chen, J. Doe, et al.',
-      desc: 'A comprehensive framework for implementing zero-trust security principles within resource-constrained Internet of Things environments. This paper proposes a novel authentication mechanism...',
-      primaryBtnText: 'Download PDF', primaryBtnIcon: 'download', secondaryBtnText: 'View Citation', secondaryBtnIcon: 'sticky_note_2'
-    },
-    {
-      id: 'report-1', category: 'AI / ML', type: 'Technical Report',
-      typeClass: 'border-purple-200 bg-purple-100 text-purple-600 dark:border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300',
-      date: 'Sep 2023', title: 'AI-Driven Intrusion Detection Systems', authors: 'A. Smith, Research Team Alpha',
-      desc: 'Evaluation of deep learning models for real-time anomaly detection in high-speed network traffic. We benchmark various architectures against the KDD Cup 99 dataset...',
-      primaryBtnText: 'Access Report', primaryBtnIcon: 'arrow_forward', secondaryBtnText: 'View Citation', secondaryBtnIcon: 'sticky_note_2'
-    },
-    {
-      id: 'data-1', category: 'Datasets', type: 'Dataset',
-      typeClass: 'border-blue-200 bg-blue-100 text-blue-600 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300',
-      date: 'Aug 2023', title: 'INW-23 Malware Traffic Analysis', authors: 'INWLab Data Team',
-      desc: 'A labeled dataset containing over 5TB of captured network traffic from a controlled malware detonation environment. Includes PCAP files and extracted features.',
-      primaryBtnText: 'Request Access', primaryBtnIcon: 'database', secondaryBtnText: 'Metadata', secondaryBtnIcon: 'info'
-    },
-    {
-      id: 'paper-2', category: 'Cybersecurity', type: 'Research Paper',
-      typeClass: 'border-accent-teal/30 bg-accent-teal/10 text-accent-teal dark:text-accent-cyan',
-      date: 'July 2023', title: 'Quantum-Resistant Cryptography', authors: 'Dr. M. Johnson, K. Lee',
-      desc: 'Exploring lattice-based cryptographic primitives for next-generation secure communications. This study focuses on performance optimization for embedded systems.',
-      primaryBtnText: 'Download PDF', primaryBtnIcon: 'download', secondaryBtnText: 'View Citation', secondaryBtnIcon: 'sticky_note_2'
-    }
-  ];
-
-  filteredResources: Resource[] = [...this.allResources];
+  allResources: any[] = [];
+  filteredResources: any[] = [];
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      this.loadRealPublications();
+
       setTimeout(() => {
         if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
+          AOS.init({ duration: 800, once: true, offset: 100 });
           AOS.refreshHard();
           window.scrollTo(0, 0);
+          window.dispatchEvent(new Event('scroll'));
         }
       }, 150);
     }
   }
 
+  loadRealPublications() {
+    if (isPlatformBrowser(this.platformId)) {
+      const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
+
+      this.allResources = allImports
+        .filter((doc: any) => doc.visibility === 'Public')
+        .sort((a: any, b: any) => b.timestamp - a.timestamp)
+        .map((doc: any) => {
+          let category = 'Cybersecurity';
+          const titleLower = doc.fileName.toLowerCase();
+          if (titleLower.includes('ai') || titleLower.includes('machine learning')) category = 'AI / ML';
+          if (titleLower.includes('network') || titleLower.includes('iot') || titleLower.includes('5g')) category = 'Network Protocol';
+          if (titleLower.includes('data') || titleLower.includes('dataset')) category = 'Datasets';
+
+          return {
+            category: category,
+            type: 'Publication',
+            typeClass: 'bg-primary/10 border-primary/20 text-primary dark:bg-accent-teal/20 dark:border-accent-teal/30 dark:text-accent-teal',
+            date: doc.dateStr.split(' ')[0],
+            title: doc.fileName,
+            authors: `${doc.authorName} (${doc.authorRole})`,
+            desc: `This document was uploaded and made public by ${doc.authorName} on ${doc.dateStr}. It is part of the INWLab secure archive.`,
+            primaryBtnText: 'Download',
+            primaryBtnIcon: 'download',
+            secondaryBtnText: 'View Details',
+            secondaryBtnIcon: 'info'
+          };
+        });
+
+      this.setCategory('All');
+    }
+  }
+
   setCategory(category: string) {
     this.activeCategory = category;
-    this.applyFilters();
-  }
-
-  // 🌟 纯净的分类过滤逻辑
-  applyFilters() {
-    if (this.activeCategory === 'All') {
-      this.filteredResources = [...this.allResources];
+    if (category === 'All') {
+      this.filteredResources = this.allResources;
     } else {
-      this.filteredResources = this.allResources.filter(res => res.category === this.activeCategory);
+      this.filteredResources = this.allResources.filter(res => res.category === category);
     }
-
-    setTimeout(() => {
-      if (typeof AOS !== 'undefined') AOS.refresh();
-    }, 50);
   }
 
-  // 🌟 核心升级：为按钮注入真正的功能
-  handleAction(actionType: string, resourceTitle: string) {
-    if (actionType === 'Download PDF' || actionType === 'Access Report') {
-      // 魔法 1：强行生成一个虚拟文件并触发下载
-      const fileContent = `This is a simulated downloaded document for:\n${resourceTitle}\n\nGenerated by INWLab System.`;
-      const blob = new Blob([fileContent], { type: 'text/plain' }); // 模拟文件格式
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = resourceTitle.replace(/\s+/g, '_') + '.txt'; // 文件名
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }
-
-    else if (actionType === 'Request Access') {
-      // 魔法 2：拉起邮件客户端，自动填入收件人、主题和正文
-      const email = "admin@inwlab.edu";
-      const subject = encodeURIComponent(`Access Request: ${resourceTitle}`);
-      const body = encodeURIComponent(`Hello INWLab Team,\n\nI would like to request access to the dataset titled: "${resourceTitle}".\n\nPlease let me know the requirements.\n\nThank you.`);
-      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    }
-
-    else if (actionType === 'View Citation') {
-      // 魔法 3：生成学术引用格式，并自动复制到剪贴板
-      const citation = `@article{inwlab2024,\n  title={${resourceTitle}},\n  author={INWLab Research Team},\n  journal={Journal of Advanced INW},\n  year={2024}\n}`;
-      navigator.clipboard.writeText(citation).then(() => {
-        alert(`✅ BibTeX Citation copied to clipboard!\n\n${citation}`);
-      });
-    }
-
-    else if (actionType === 'Metadata') {
-      // 魔法 4：弹出格式化的元数据面板
-      alert(`📊 Metadata for "${resourceTitle}"\n\n- Format: PCAP/CSV\n- Size: ~5.2 TB\n- License: Academic Research Only\n- Last Updated: 2 weeks ago\n- MD5 Checksum: a1b2c3d4e5f6g7h8`);
+  handleAction(actionType: string, title: string) {
+    if (actionType === 'Download') {
+      alert(`Initiating secure download for: ${title}`);
+    } else {
+      alert(`Viewing metadata details for: ${title}`);
     }
   }
 }

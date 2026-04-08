@@ -1,10 +1,10 @@
-<div class="absolute top-0 left-0 w-full z-40 pointer-events-none flex justify-center">
+<div class="absolute top-0 left-0 w-full z-0 pointer-events-none flex justify-center">
   <div class="absolute top-0 w-[40%] md:w-[20%] h-[1px] bg-gradient-to-r from-transparent via-white to-transparent opacity-80 animate-[pulse_3s_ease-in-out_infinite]"></div>
   <div class="absolute top-0 w-[70%] md:w-[40%] h-[4px] bg-gradient-to-r from-transparent via-primary to-transparent blur-[6px] opacity-70 animate-[pulse_3s_ease-in-out_infinite]"></div>
   <div class="absolute top-0 w-[100%] md:w-[70%] h-[80px] bg-gradient-to-b from-accent-cyan/10 to-transparent blur-[24px] opacity-50 animate-[pulse_3s_ease-in-out_infinite]"></div>
 </div>
 
-<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
   <div class="tech-square sq-1"></div>
   <div class="tech-square sq-2"></div>
   <div class="tech-square sq-3"></div>
@@ -13,9 +13,17 @@
 </div>
 
 <div class="relative min-h-screen flex flex-col w-full">
+
+  <div class="absolute top-0 left-0 w-full h-[85vh] z-10 pointer-events-none overflow-hidden">
+    <div *ngFor="let bg of bgImages; let i = index"
+         class="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"
+         [style.background-image]="'url(' + bg + ')'"
+         [ngClass]="i === currentBgIndex ? 'opacity-50 dark:opacity-50 z-10' : 'opacity-0 z-0'">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-slate-50/10 via-slate-50/70 to-slate-50 dark:from-[#050505]/10 dark:via-[#050505]/80 dark:to-[#050505] z-20"></div>
+  </div>
+
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
-    <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10 pointer-events-none"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20 pointer-events-none"></div>
     <div class="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-accent-teal rounded-full blur-[120px] opacity-10 dark:opacity-20 animate-pulse"></div>
     <div class="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-accent-cyan rounded-full blur-[140px] opacity-10 dark:opacity-10"></div>
   </div>
@@ -25,23 +33,25 @@
     <section class="w-full px-6 py-12 md:py-20 flex justify-center" data-aos="fade-up">
       <div class="max-w-[1200px] w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 flex flex-col gap-8 text-center lg:text-left">
+
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent-teal/30 bg-accent-teal/10 w-fit mx-auto lg:mx-0 backdrop-blur-sm">
             <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            <span class="text-xs font-medium tracking-wide uppercase text-accent-cyan">Leading Research Center</span>
+            <span class="text-xs font-medium tracking-wide uppercase text-accent-cyan">{{ cmsData.announcement }}</span>
           </div>
-          <h1 class="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight">
-            InterNetWorks <br/>
-            <span class="text-gradient">Research Laboratory</span>
+
+          <h1 class="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight text-slate-900 dark:text-white drop-shadow-md">
+            {{ cmsData.heading }}
           </h1>
-          <p class="text-lg md:text-xl text-slate-500 dark:text-gray-400 max-w-2xl mx-auto lg:mx-0 font-body leading-relaxed">
-            Advancing the frontiers of Cybersecurity, Data Science, and Digital Innovation. A centralized platform for academic collaboration and discovery.
+          <p class="text-lg md:text-xl text-slate-700 dark:text-gray-200 max-w-2xl mx-auto lg:mx-0 font-body leading-relaxed drop-shadow-sm">
+            {{ cmsData.subheading }}
           </p>
+
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-            <a routerLink="/research" class="glow-button flex items-center justify-center gap-2 bg-gradient-to-r from-accent-teal to-accent-cyan hover:to-primary text-white dark:text-black font-bold text-lg px-8 py-4 rounded-full min-w-[180px] transition-all duration-300 no-underline">
+            <a routerLink="/projects" class="glow-button flex items-center justify-center gap-2 bg-gradient-to-r from-accent-teal to-accent-cyan hover:to-primary text-white dark:text-black font-bold text-lg px-8 py-4 rounded-full min-w-[180px] transition-all duration-300 no-underline">
               <span>View Projects</span>
               <span class="material-symbols-outlined text-sm font-bold">arrow_forward</span>
             </a>
-            <a routerLink="/resources" class="secondary-button-border flex items-center justify-center gap-2 text-slate-700 hover:bg-slate-900/5 dark:text-white dark:hover:bg-white/5 font-bold text-lg px-8 py-4 rounded-full min-w-[180px] transition-colors duration-300 group no-underline">
+            <a routerLink="/resources" class="secondary-button-border flex items-center justify-center gap-2 text-slate-800 hover:bg-slate-900/10 dark:text-white dark:hover:bg-white/10 font-bold text-lg px-8 py-4 rounded-full min-w-[180px] transition-colors duration-300 group no-underline backdrop-blur-md bg-white/20 dark:bg-black/20 border border-slate-300 dark:border-white/20">
               <span>Our Publications</span>
               <span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform duration-300">description</span>
             </a>
@@ -49,7 +59,7 @@
         </div>
 
         <div class="lg:col-span-5 relative h-[400px] lg:h-[600px] flex items-center justify-center" style="perspective: 1000px;" data-aos="zoom-in" data-aos-delay="200">
-          <div class="relative w-64 h-80 md:w-80 md:h-96 glass-panel rounded-2xl transform rotate-y-12 rotate-x-6 hover:rotate-0 hover:rotate-y-0 transition-transform duration-700 ease-out flex flex-col items-center justify-center p-6 gap-4 group">
+          <div class="relative w-64 h-80 md:w-80 md:h-96 glass-panel bg-white/60 dark:bg-[#121212]/60 backdrop-blur-lg rounded-2xl transform rotate-y-12 rotate-x-6 hover:rotate-0 hover:rotate-y-0 transition-transform duration-700 ease-out flex flex-col items-center justify-center p-6 gap-4 group">
             <div class="absolute -top-10 -right-10 w-24 h-24 bg-primary rounded-full blur-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-300"></div>
             <div class="w-20 h-20 rounded-full bg-gradient-to-br from-accent-teal to-accent-cyan flex items-center justify-center shadow-[0_0_30px_rgba(23,198,186,0.5)]">
               <span class="material-symbols-outlined text-4xl text-white dark:text-black">science</span>
@@ -57,7 +67,7 @@
             <div class="text-center space-y-2">
               <h3 class="text-xl font-bold text-slate-900 dark:text-white">Lab Status</h3>
               <div class="text-4xl font-bold text-primary">Active</div>
-              <p class="text-xs text-slate-500 dark:text-gray-400">Open for Collaboration</p>
+              <p class="text-xs text-slate-600 dark:text-gray-400">Open for Collaboration</p>
             </div>
           </div>
           <div class="absolute inset-0 bg-gradient-to-tr from-accent-teal/20 to-transparent rounded-full blur-3xl -z-10"></div>
@@ -76,8 +86,7 @@
               <span class="text-xs font-bold tracking-widest uppercase">Upcoming Event</span>
             </div>
             <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white leading-snug">
-              The 7th International Conference on <br/>
-              <span class="text-gradient">Internet Applications, Protocols & Services</span>
+              {{ cmsData.upcomingEvent }}
             </h2>
             <p class="text-slate-500 dark:text-gray-400 font-body leading-relaxed text-justify md:text-left">
               NETAPPS2024 is a premier platform to promote greater engagement of network researchers from around the globe...
@@ -127,15 +136,15 @@
         <div class="glass-panel rounded-2xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-200 dark:divide-white/10">
           <div class="flex flex-col items-center justify-center gap-2 pt-4 md:pt-0">
             <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">Total Publications</p>
-            <h3 class="text-3xl font-bold text-slate-900 dark:text-white">500+</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white">{{ realPublications }}</h3>
           </div>
           <div class="flex flex-col items-center justify-center gap-2 pt-4 md:pt-0">
             <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">Research Projects</p>
-            <h3 class="text-3xl font-bold text-slate-900 dark:text-white">120+</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white">{{ realProjects }}</h3>
           </div>
           <div class="flex flex-col items-center justify-center gap-2 pt-4 md:pt-0">
             <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">Lab Members</p>
-            <h3 class="text-3xl font-bold text-slate-900 dark:text-white">50+</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white">{{ realMembers }}</h3>
           </div>
         </div>
       </div>
@@ -157,7 +166,7 @@
             <div class="w-14 h-14 rounded-xl card-stat-icon flex items-center justify-center mb-6">
               <span class="material-symbols-outlined text-3xl">article</span>
             </div>
-            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">1.2k+</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">{{ realPublications }}</h3>
             <p class="text-sm font-bold text-primary uppercase tracking-wider mb-3">Published Papers</p>
           </div>
           <div class="glass-card rounded-2xl p-8 flex flex-col items-center text-center group" data-aos="fade-up" data-aos-delay="100">

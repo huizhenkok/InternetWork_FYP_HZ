@@ -1,0 +1,148 @@
+<div class="flex h-screen w-full bg-slate-50 dark:bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] dark:from-[#121212] dark:via-[#080c0c] dark:to-black text-slate-900 dark:text-white font-display overflow-hidden selection:bg-primary selection:text-white">
+
+  <aside class="w-20 lg:w-64 flex-shrink-0 flex flex-col justify-between border-r border-slate-200 dark:border-white/5 bg-white dark:bg-black/20 dark:backdrop-blur-xl z-20 transition-all duration-300">
+    <div class="flex flex-col gap-8 p-6">
+      <div class="flex items-center gap-4">
+        <div class="size-8 text-primary dark:text-[#0df2f2] shrink-0">
+          <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+        </div>
+        <div class="hidden lg:flex flex-col">
+          <h1 class="text-slate-900 dark:text-white text-lg font-bold tracking-widest uppercase">INWLab</h1>
+          <p class="text-primary dark:text-[#0df2f2] text-xs font-bold tracking-wider uppercase">SYSTEM ADMIN</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-2 dark:gap-3">
+        <a routerLink="/admin-dashboard" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-white transition-colors">dashboard</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">Dashboard</span>
+        </a>
+        <a routerLink="/admin-cms" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">wysiwyg</span>
+          <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white transition-colors">CMS Engine</span>
+        </a>
+        <a routerLink="/admin-bookings" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">event_available</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:text-white transition-colors">Approvals</span>
+        </a>
+        <a routerLink="/admin-users" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full bg-cyan-50 border border-cyan-100 text-primary dark:bg-gradient-to-r dark:from-[#1F958D]/20 dark:to-[#0df2f2]/10 dark:border-[#0df2f2]/20 dark:shadow-[0_0_5px_rgba(13,242,242,0.5)] dark:text-[#0df2f2] group transition-all duration-300 no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">manage_accounts</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">User Mgt.</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-6">
+      <button (click)="logout()" class="flex w-full items-center justify-center gap-3 rounded-full h-12 border border-slate-200 text-slate-500 hover:text-red-600 dark:bg-transparent dark:border-white/10 dark:text-gray-400 dark:hover:border-[#0df2f2]/50 dark:hover:text-[#0df2f2] transition-all duration-300 group outline-none cursor-pointer">
+        <span class="material-symbols-outlined">logout</span>
+        <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white">LOGOUT</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-full overflow-y-auto relative p-6 lg:p-10 z-10">
+
+    <div class="absolute top-[20%] left-[30%] w-[500px] h-[500px] bg-cyan-100/50 dark:bg-[#1F958D]/20 rounded-full blur-[120px] pointer-events-none z-[-1]"></div>
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10" data-aos="fade-right">
+      <div>
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2 uppercase">User Directory</h1>
+        <p class="text-slate-500 dark:text-gray-400 max-w-xl text-lg">Manage access levels and monitor system users.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <label class="hidden md:flex items-center relative group">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="material-symbols-outlined text-slate-400 dark:text-gray-500">search</span>
+          </div>
+          <input [(ngModel)]="searchQuery" (input)="filterUsers()" class="bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm rounded-full focus:ring-1 focus:ring-primary block w-64 pl-10 py-2.5 outline-none shadow-sm dark:shadow-none transition-all" placeholder="Search by name or email..." type="text"/>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10" data-aos="fade-up">
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-primary dark:border-l-[#0df2f2] shadow-sm">
+        <div class="absolute right-4 top-4 p-2 rounded-lg bg-cyan-50 dark:bg-[#0df2f2]/10 text-primary dark:text-[#0df2f2]">
+          <span class="material-symbols-outlined text-2xl">group</span>
+        </div>
+        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Accounts</p>
+        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ totalUsers }}</h3>
+      </div>
+
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-emerald-400 dark:border-l-emerald-500 shadow-sm">
+        <div class="absolute right-4 top-4 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 dark:text-emerald-400">
+          <span class="material-symbols-outlined text-2xl">verified_user</span>
+        </div>
+        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Active Users</p>
+        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ activeUsers }}</h3>
+      </div>
+
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-red-400 dark:border-l-red-600 shadow-sm">
+        <div class="absolute right-4 top-4 p-2 rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400">
+          <span class="material-symbols-outlined text-2xl">block</span>
+        </div>
+        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Banned Users</p>
+        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ bannedUsers }}</h3>
+      </div>
+    </div>
+
+    <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
+      <div class="col-span-4">Identity / Email</div>
+      <div class="col-span-3">System Role</div>
+      <div class="col-span-3">Status</div>
+      <div class="col-span-2 text-right">Actions</div>
+    </div>
+
+    <div *ngIf="filteredUsers.length === 0" class="text-center py-20 bg-white/50 dark:bg-[#121212]/50 backdrop-blur rounded-2xl border border-slate-200 dark:border-white/10 mt-2">
+      <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">person_search</span>
+      <h3 class="text-xl font-bold text-slate-700 dark:text-white">No Users Found</h3>
+      <p class="text-slate-500 dark:text-gray-400 mt-2">Try adjusting your search query.</p>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-2 pb-10">
+      <div *ngFor="let user of filteredUsers; let i = index" class="group bg-white dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-4 transition-all hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm" [ngClass]="{'opacity-60 grayscale': user.status === 'Banned'}">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+
+          <div class="col-span-1 md:col-span-4 flex items-center gap-4">
+            <div class="size-12 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center font-bold text-lg text-slate-600 dark:text-gray-300 uppercase shrink-0">
+              {{ user.displayName.charAt(0).toUpperCase() }}
+            </div>
+            <div class="overflow-hidden">
+              <p class="text-slate-900 dark:text-white font-bold text-sm tracking-wide truncate" [ngClass]="{'line-through text-slate-500': user.status === 'Banned'}">{{ user.displayName }}</p>
+              <p class="text-xs text-slate-500 dark:text-gray-400 font-mono mt-0.5 truncate">{{ user.email }}</p>
+            </div>
+          </div>
+
+          <div class="col-span-1 md:col-span-3">
+            <span class="text-sm font-bold text-slate-600 dark:text-gray-300">{{ user.role }}</span>
+          </div>
+
+          <div class="col-span-1 md:col-span-3 flex items-center justify-start">
+                        <span *ngIf="user.status === 'Active'" class="inline-flex items-center px-3 py-1 rounded-md border text-xs font-bold uppercase tracking-wider bg-green-100 text-green-700 border-green-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20">
+                            Active
+                        </span>
+            <span *ngIf="user.status === 'Banned'" class="inline-flex items-center px-3 py-1 rounded-md border text-xs font-bold uppercase tracking-wider bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20">
+                            Banned
+                        </span>
+          </div>
+
+          <div class="col-span-1 md:col-span-2 flex items-center justify-end gap-3 pl-4">
+            <button (click)="toggleUserStatus(user)"
+                    [title]="user.status === 'Active' ? 'Ban User' : 'Unban User'"
+                    [ngClass]="user.status === 'Active' ? 'text-slate-400 dark:text-orange-500 hover:text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-500/10 border-slate-200 dark:border-white/10 hover:border-orange-200 dark:hover:border-orange-500' : 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30'"
+                    class="h-10 w-10 rounded-full border transition-all transform hover:scale-110 flex items-center justify-center cursor-pointer outline-none bg-white dark:bg-transparent">
+                            <span class="material-symbols-outlined text-2xl">
+                                {{ user.status === 'Active' ? 'block' : 'lock_open' }}
+                            </span>
+            </button>
+
+            <button (click)="deleteUser(i, user.displayName)" class="h-10 w-10 rounded-full text-slate-400 dark:text-red-500 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all transform hover:scale-110 flex items-center justify-center cursor-pointer bg-white dark:bg-transparent outline-none" title="Delete User">
+              <span class="material-symbols-outlined text-2xl">delete_forever</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

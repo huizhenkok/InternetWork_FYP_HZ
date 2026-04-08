@@ -1,0 +1,213 @@
+<div class="flex h-screen w-full bg-slate-50 dark:bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] dark:from-[#121212] dark:via-[#080c0c] dark:to-black text-slate-900 dark:text-white font-display overflow-hidden selection:bg-primary selection:text-white">
+
+  <aside class="w-20 lg:w-64 flex-shrink-0 flex flex-col justify-between border-r border-slate-200 dark:border-white/5 bg-white dark:bg-black/20 dark:backdrop-blur-xl z-20 transition-all duration-300">
+    <div class="flex flex-col gap-8 p-6">
+      <div class="flex items-center gap-4">
+        <div class="size-8 text-primary dark:text-[#0df2f2] shrink-0">
+          <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+        </div>
+        <div class="hidden lg:flex flex-col">
+          <h1 class="text-slate-900 dark:text-white text-lg font-bold tracking-widest uppercase">INWLab</h1>
+          <p class="text-primary dark:text-[#0df2f2] text-xs font-bold tracking-wider uppercase">SYSTEM ADMIN</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-2 dark:gap-3">
+        <a routerLink="/admin-dashboard" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full bg-cyan-50 border border-cyan-100 text-primary dark:bg-gradient-to-r dark:from-[#1F958D]/20 dark:to-[#0df2f2]/10 dark:border-[#0df2f2]/20 dark:shadow-[0_0_5px_rgba(13,242,242,0.5)] dark:text-[#0df2f2] group transition-all duration-300 cursor-pointer no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-white transition-colors">dashboard</span>
+          <span class="hidden lg:block text-sm font-bold tracking-wide dark:text-white">Dashboard</span>
+        </a>
+        <a routerLink="/admin-cms" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group cursor-pointer no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">dataset</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">CMS Engine</span>
+        </a>
+        <a routerLink="/admin-bookings" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group cursor-pointer no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">event_available</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">Approvals</span>
+        </a>
+        <a routerLink="/admin-users" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group cursor-pointer no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">manage_accounts</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">User Mgt.</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-6">
+      <button (click)="logout()" class="flex w-full items-center justify-center gap-3 rounded-full h-12 border border-slate-200 text-slate-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:bg-transparent dark:border-white/10 dark:text-gray-400 dark:hover:border-[#0df2f2]/50 dark:hover:bg-[#0df2f2]/10 dark:hover:text-[#0df2f2] dark:hover:shadow-[0_0_5px_rgba(13,242,242,0.5)] transition-all duration-300 group outline-none cursor-pointer">
+        <span class="material-symbols-outlined">logout</span>
+        <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white">LOGOUT</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+    <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyan-100/50 dark:bg-[#1F958D]/20 rounded-full blur-[120px] pointer-events-none z-[-1]"></div>
+    <div class="absolute bottom-[-10%] left-[10%] w-[400px] h-[400px] bg-teal-100/50 dark:bg-[#0df2f2]/10 rounded-full blur-[100px] pointer-events-none z-[-1]"></div>
+
+    <header class="flex items-center justify-between px-8 py-5 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-black/20 backdrop-blur-md z-20">
+      <div class="flex items-center gap-4">
+        <h2 class="text-slate-900 dark:text-white text-xl lg:text-2xl font-bold tracking-tight uppercase flex items-center gap-2">
+          <span class="text-primary dark:text-[#0df2f2]">///</span> Command Center
+        </h2>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 px-4 h-10 w-64 focus-within:border-primary dark:focus-within:border-[#0df2f2]/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+          <span class="material-symbols-outlined text-slate-400 text-[20px]">search</span>
+          <input [(ngModel)]="searchQuery" (input)="filterLogs()" class="bg-transparent border-none text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 focus:ring-0 w-full h-full font-medium dark:font-light outline-none ml-2" placeholder="Search logs..." type="text"/>
+        </div>
+
+        <div class="flex items-center gap-3">
+
+          <div class="relative">
+            <button (click)="toggleNotifications()" class="relative size-10 flex items-center justify-center rounded-full bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-[#0df2f2]/20 text-slate-600 dark:text-white transition-all border border-slate-200 dark:border-transparent dark:hover:border-[#0df2f2]/30 cursor-pointer outline-none">
+              <span class="material-symbols-outlined text-[20px]">notifications</span>
+              <span *ngIf="pendingCount > 0" class="absolute top-2 right-2 size-2.5 bg-red-500 dark:bg-[#0df2f2] rounded-full ring-2 ring-white dark:ring-black dark:shadow-[0_0_5px_rgba(13,242,242,0.8)] animate-pulse"></span>
+            </button>
+
+            <div *ngIf="showNotifications" class="absolute right-0 mt-3 w-80 bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden z-50 transform origin-top-right transition-all animate-in slide-in-from-top-2">
+              <div class="p-4 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-white/5">
+                <h3 class="font-bold text-slate-800 dark:text-white text-sm">Approvals Queue</h3>
+                <span *ngIf="pendingCount > 0" class="text-[10px] bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 px-2 py-0.5 rounded-full font-bold border border-red-200 dark:border-red-500/30">{{ pendingCount }} Pending</span>
+              </div>
+              <div class="max-h-64 overflow-y-auto">
+                <div *ngIf="pendingCount === 0" class="p-6 text-center text-slate-500 text-sm flex flex-col items-center">
+                  <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-gray-600 mb-2">done_all</span>
+                  You're all caught up!
+                </div>
+                <div *ngFor="let req of pendingBookings" class="p-4 border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer" routerLink="/admin-bookings">
+                  <p class="text-xs text-slate-400 dark:text-gray-500 mb-1 font-mono">{{ req.dateStr }}</p>
+                  <p class="text-sm font-bold text-slate-800 dark:text-white line-clamp-1"><span class="text-primary dark:text-[#0df2f2]">{{ req.userName }}</span> requested</p>
+                  <p class="text-xs text-slate-500 dark:text-gray-400 mt-1 font-medium">{{ req.roomName }}</p>
+                </div>
+              </div>
+              <div class="p-3 text-center border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-black/20 hover:bg-slate-100 dark:hover:bg-black/40 transition-colors">
+                <a routerLink="/admin-bookings" class="text-xs font-bold text-primary dark:text-[#0df2f2] hover:underline cursor-pointer no-underline uppercase tracking-wider">Review All Approvals</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-8 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
+
+          <div class="flex items-center gap-3 cursor-pointer">
+            <div class="hidden sm:block text-right">
+              <p class="text-xs font-bold text-slate-900 dark:text-white">{{ adminName }}</p>
+              <p class="text-[10px] text-primary dark:text-[#0df2f2] font-bold uppercase tracking-wider">Superuser</p>
+            </div>
+            <div class="size-10 rounded-full bg-gradient-to-br from-primary to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] flex items-center justify-center shadow-md dark:shadow-[0_0_10px_rgba(23,198,186,0.3)]">
+              <span class="text-white dark:text-black font-black text-xl">A</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth relative z-10">
+      <div class="max-w-[1600px] mx-auto flex flex-col gap-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white/80 dark:bg-[#121212]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-6 rounded-2xl relative overflow-hidden group shadow-sm hover:shadow-md transition-all" data-aos="fade-up" data-aos-delay="0">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-cyan-50 dark:bg-[#0df2f2]/20 rounded-full blur-xl group-hover:bg-cyan-100 dark:group-hover:bg-[#0df2f2]/30 transition-all pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-1">
+              <div class="flex justify-between items-start mb-2">
+                <p class="text-slate-500 dark:text-gray-400 text-sm font-bold dark:font-medium uppercase tracking-wider">Registered Users</p>
+                <span class="material-symbols-outlined text-primary dark:text-[#0df2f2]">group</span>
+              </div>
+              <h3 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-primary dark:group-hover:text-[#0df2f2] transition-colors">{{ totalUsers }}</h3>
+              <div class="flex items-center gap-2 mt-2">
+                                <span class="flex items-center text-emerald-600 dark:text-[#0df2f2] bg-emerald-50 dark:bg-[#0df2f2]/10 px-2 py-0.5 rounded text-xs font-bold border border-emerald-100 dark:border-[#0df2f2]/30">
+                                    Live Data
+                                </span>
+                <span class="text-slate-400 dark:text-gray-500 text-xs">from system DB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white/80 dark:bg-[#121212]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-6 rounded-2xl relative overflow-hidden group shadow-sm hover:shadow-md transition-all" data-aos="fade-up" data-aos-delay="100">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-teal-50 dark:bg-[#1F958D]/20 rounded-full blur-xl group-hover:bg-teal-100 dark:group-hover:bg-[#1F958D]/30 transition-all pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-1">
+              <div class="flex justify-between items-start mb-2">
+                <p class="text-slate-500 dark:text-gray-400 text-sm font-bold dark:font-medium uppercase tracking-wider">Active Bookings</p>
+                <span class="material-symbols-outlined text-teal-600 dark:text-[#1F958D]">event_note</span>
+              </div>
+              <h3 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-teal-600 dark:group-hover:text-[#1F958D] transition-colors">{{ activeBookings }}</h3>
+              <div class="flex items-center gap-2 mt-2">
+                                <span class="flex items-center text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-400/10 px-2 py-0.5 rounded text-xs font-bold border border-amber-100 dark:border-amber-400/30">
+                                    Requires Action
+                                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white/80 dark:bg-[#121212]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-6 rounded-2xl relative overflow-hidden group shadow-sm hover:shadow-md transition-all" data-aos="fade-up" data-aos-delay="200">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 dark:bg-indigo-500/20 rounded-full blur-xl group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/30 transition-all pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-1">
+              <div class="flex justify-between items-start mb-2">
+                <p class="text-slate-500 dark:text-gray-400 text-sm font-bold dark:font-medium uppercase tracking-wider">Forum Topics</p>
+                <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400">forum</span>
+              </div>
+              <h3 class="text-4xl font-bold text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{{ totalTopics }}</h3>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-slate-400 dark:text-gray-500 text-xs">Community Discussions</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="bg-white/80 dark:bg-[#121212]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="300">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-slate-900 dark:text-white text-lg font-bold tracking-wide flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary dark:text-[#0df2f2]">terminal</span> Live System Logs
+            </h3>
+          </div>
+
+          <div *ngIf="filteredLogs.length === 0" class="text-center py-12 border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
+            <p class="text-slate-500 dark:text-gray-400 font-medium">No logs match your search.</p>
+          </div>
+
+          <div class="overflow-x-auto" *ngIf="filteredLogs.length > 0">
+            <table class="w-full text-left border-collapse min-w-[700px]">
+              <thead>
+              <tr class="border-b border-slate-200 dark:border-white/10">
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Timestamp</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Event ID</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                <th class="py-3 px-4 text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+              </tr>
+              </thead>
+              <tbody class="text-sm">
+              <tr *ngFor="let log of filteredLogs" class="group hover:bg-slate-50 dark:hover:bg-white/5 transition-colors border-b border-slate-100 dark:border-white/5">
+                <td class="py-4 px-4 font-mono text-xs text-cyan-700 dark:text-[#0df2f2]/80">{{ log.time }}</td>
+                <td class="py-4 px-4 font-mono text-xs text-slate-600 dark:text-gray-400">{{ log.eventId }}</td>
+                <td class="py-4 px-4">
+                                        <span [ngClass]="{
+                                            'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20': log.status === 'SYSTEM',
+                                            'bg-green-100 text-green-700 border-green-200 dark:bg-[#0df2f2]/10 dark:text-[#0df2f2] dark:border-[#0df2f2]/20': log.status === 'APPROVED',
+                                            'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20': log.status === 'PENDING',
+                                            'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20': log.status === 'REJECTED'
+                                        }" class="px-2 py-1 rounded text-[10px] font-bold border">
+                                            {{ log.status }}
+                                        </span>
+                </td>
+                <td class="py-4 px-4 flex items-center gap-3">
+                  <div class="size-6 rounded-full bg-slate-200 dark:bg-gray-700 bg-cover border border-slate-300 dark:border-white/20" [style.background-image]="'url(' + log.avatar + ')'"></div>
+                  <span class="text-slate-700 dark:text-gray-200 font-bold text-xs">{{ log.user }}</span>
+                </td>
+                <td class="py-4 px-4 text-slate-600 dark:text-gray-300">
+                  {{ log.action }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mt-4 text-center text-xs text-slate-400 dark:text-gray-600 font-mono">
+          <p>INWLab Admin Console v4.0.0 // Encrypted Connection</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

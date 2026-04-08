@@ -10,6 +10,10 @@ import { Contact } from './pages/contact/contact';
 import { Login } from './pages/login/login';
 import { ForgetPassword } from './pages/forget-password/forget-password';
 import { SignUp } from './pages/sign-up/sign-up';
+import { Projects } from './pages/projects/projects';
+import { VisionMission } from './pages/about/vision-mission/vision-mission';
+import { Objective } from './pages/about/objective/objective';
+import { Philosophy } from './pages/about/philosophy/philosophy';
 
 // 🌟 Research 子页面
 import { Cybersecurity } from './pages/Research_explore/cybersecurity/cybersecurity';
@@ -28,8 +32,13 @@ import { MyProfile } from './student-alumni/my-profile/my-profile';
 import { Booking } from './student-alumni/booking/booking';
 import { ForumActivity } from './student-alumni/forum-activity/forum-activity';
 import { Publication } from './student-alumni/publication/publication';
-// 🌟 修复：把路径从 pages 改成了 student-alumni
 import { Archive } from './student-alumni/archive/archive';
+
+// 🌟 Admin 专属后台页面 (独立于 pages)
+import { AdminDashboard } from './admin/admin-dashboard/admin-dashboard';
+import { AdminCms } from './admin/admin-cms/admin-cms';
+import { AdminBookings } from './admin/admin-bookings/admin-bookings';
+import { AdminUsers } from './admin/admin-users/admin-users';
 
 // 注意：BookingModal 不需要在这里注册！
 
@@ -48,12 +57,16 @@ export const routes: Routes = [
 
   // 公共页面区域
   { path: 'resources', component: Resources },
+  { path: 'about/vision-mission', component: VisionMission },
+  { path: 'about/objective', component: Objective },
+  { path: 'about/philosophy', component: Philosophy },
   { path: 'people', component: People },
   { path: 'news', component: News },
   { path: 'forum', component: Forum },
   { path: 'forum/thread/:id', component: ThreadDetail },
   { path: 'contact', component: Contact },
   { path: 'conference', component: Conference },
+  { path: 'projects', component: Projects },
 
   // 身份验证区域
   { path: 'login', component: Login },
@@ -70,5 +83,11 @@ export const routes: Routes = [
   { path: 'booking', component: Booking },
   { path: 'forum-activity', component: ForumActivity },
   { path: 'publication', component: Publication },
-  { path: 'archive', component: Archive }, // 全局文献大厅
+  { path: 'archive', component: Archive },
+
+  // 🌟 Admin 专属后台路由
+  { path: 'admin-dashboard', component: AdminDashboard },
+  { path: 'admin-cms', component: AdminCms },
+  { path: 'admin-bookings', component: AdminBookings },
+  { path: 'admin-users', component: AdminUsers },
 ];

@@ -1,0 +1,205 @@
+<div class="flex h-screen w-full bg-slate-50 dark:bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] dark:from-[#121212] dark:via-[#080c0c] dark:to-black text-slate-900 dark:text-white font-display overflow-hidden selection:bg-primary selection:text-white">
+
+  <aside class="w-20 lg:w-64 flex-shrink-0 flex flex-col justify-between border-r border-slate-200 dark:border-white/5 bg-white dark:bg-black/20 dark:backdrop-blur-xl z-20 transition-all duration-300">
+    <div class="flex flex-col gap-8 p-6">
+      <div class="flex items-center gap-4">
+        <div class="size-8 text-primary dark:text-[#0df2f2] shrink-0">
+          <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+        </div>
+        <div class="hidden lg:flex flex-col">
+          <h1 class="text-slate-900 dark:text-white text-lg font-bold tracking-widest uppercase">INWLab</h1>
+          <p class="text-primary dark:text-[#0df2f2] text-xs font-bold tracking-wider uppercase">SYSTEM ADMIN</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-2 dark:gap-3">
+        <a routerLink="/admin-dashboard" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-white transition-colors">dashboard</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">Dashboard</span>
+        </a>
+        <a routerLink="/admin-cms" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full bg-cyan-50 border border-cyan-100 text-primary dark:bg-gradient-to-r dark:from-[#1F958D]/20 dark:to-[#0df2f2]/10 dark:border-[#0df2f2]/20 dark:shadow-[0_0_5px_rgba(13,242,242,0.5)] dark:text-[#0df2f2] group transition-all duration-300 no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">wysiwyg</span>
+          <span class="hidden lg:block text-sm font-bold tracking-wide dark:text-white">CMS Engine</span>
+        </a>
+        <a routerLink="/admin-bookings" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">event_available</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">Approvals</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-6">
+      <button (click)="logout()" class="flex w-full items-center justify-center gap-3 rounded-full h-12 border border-slate-200 text-slate-500 hover:text-red-600 dark:bg-transparent dark:border-white/10 dark:text-gray-400 dark:hover:border-[#0df2f2]/50 dark:hover:text-[#0df2f2] transition-all duration-300 group outline-none cursor-pointer">
+        <span class="material-symbols-outlined">logout</span>
+        <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white">LOGOUT</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-full overflow-y-auto relative">
+    <header class="flex items-center justify-between px-8 py-5 border-b border-slate-200 dark:border-white/5 bg-white/80 dark:bg-black/20 backdrop-blur-md z-10 sticky top-0">
+      <h2 class="text-slate-900 dark:text-white text-xl lg:text-2xl font-bold tracking-tight uppercase flex items-center gap-2">
+        <span class="text-primary dark:text-[#0df2f2]">///</span> Content Management
+      </h2>
+    </header>
+
+    <div class="p-6 md:p-8 max-w-[1600px] w-full mx-auto" data-aos="fade-up">
+      <div class="mb-8">
+        <p class="text-slate-500 dark:text-gray-400 text-lg">Select a module from the left to edit the database. Changes apply in real-time.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <div class="lg:col-span-3 flex flex-col gap-6 sticky top-28 h-[calc(100vh-200px)] overflow-y-auto pr-2 pb-10">
+
+          <div class="flex flex-col gap-2">
+            <p class="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-2 mb-2">Public Visitors</p>
+
+            <button *ngFor="let tab of [
+                            {id: 'home', icon: 'home', title: 'Home Page'},
+                            {id: 'research', icon: 'science', title: 'Research Area'},
+                            {id: 'resource', icon: 'school', title: 'Resources'},
+                            {id: 'people', icon: 'groups', title: 'People Directory'},
+                            {id: 'news', icon: 'newspaper', title: 'News & Events'},
+                            {id: 'conference', icon: 'event_seat', title: 'Conference'},
+                            {id: 'forum_info', icon: 'forum', title: 'Forum Info'},
+                            {id: 'contact', icon: 'contact_support', title: 'Contact Info'}
+                        ]" (click)="activeTab = tab.id"
+                    [ngClass]="activeTab === tab.id ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
+              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">{{tab.icon}}</span> {{tab.title}}</div>
+              <span *ngIf="activeTab === tab.id" class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <p class="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest pl-2 mb-2">Internal App</p>
+            <button (click)="activeTab = 'rooms'" [ngClass]="activeTab === 'rooms' ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
+              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">meeting_room</span> Lab Rooms</div>
+              <span *ngIf="activeTab === 'rooms'" class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+            <button (click)="activeTab = 'bulletins'" [ngClass]="activeTab === 'bulletins' ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
+              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">campaign</span> System Bulletins</div>
+              <span *ngIf="activeTab === 'bulletins'" class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+            <button (click)="activeTab = 'forum'" [ngClass]="activeTab === 'forum' ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
+              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">gavel</span> Forum Moderation</div>
+              <span *ngIf="activeTab === 'forum'" class="material-symbols-outlined text-[18px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-9 pb-10">
+          <div class="bg-white/80 dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 p-8 rounded-3xl shadow-lg min-h-[600px]">
+
+            <div *ngIf="activeTab === 'home'" class="animate-in fade-in duration-300">
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/10 pb-4">Home Page Editor</h2>
+
+              <div class="flex flex-col gap-6">
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Main Heading</label>
+                  <input type="text" [(ngModel)]="homeData.heading" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none font-bold text-lg">
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Subheading Details</label>
+                  <textarea [(ngModel)]="homeData.subheading" rows="3" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none resize-none"></textarea>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Top Banner Announcement</label>
+                  <input type="text" [(ngModel)]="homeData.announcement" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none">
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Upcoming Event Banner</label>
+                  <input type="text" [(ngModel)]="homeData.upcomingEvent" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none">
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 border-t border-slate-200 dark:border-white/10 pt-4">Data Statistics</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Total Publications</label>
+                    <input type="text" [(ngModel)]="homeData.stats.publications" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Research Projects</label>
+                    <input type="text" [(ngModel)]="homeData.stats.projects" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Lab Members</label>
+                    <input type="text" [(ngModel)]="homeData.stats.members" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Academic Excellence</label>
+                    <input type="text" [(ngModel)]="homeData.stats.excellence" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white outline-none">
+                  </div>
+                </div>
+
+                <div class="flex justify-end pt-4">
+                  <button (click)="saveHome()" class="glow-button px-8 py-3 rounded-xl bg-primary text-white font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer"><span class="material-symbols-outlined text-[18px]">save</span> Save Home</button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'research'" class="animate-in fade-in duration-300">
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/10 pb-4">Research Area Editor</h2>
+              <div class="flex flex-col gap-4">
+                <label class="text-xs font-bold text-slate-500 uppercase">Main Title</label>
+                <input type="text" [(ngModel)]="researchData.mainTitle" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none">
+                <button (click)="saveResearch()" class="self-end glow-button px-8 py-3 rounded-xl bg-primary text-white font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer"><span class="material-symbols-outlined">save</span> Save</button>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'contact'" class="animate-in fade-in duration-300">
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/10 pb-4">Contact Info</h2>
+              <div class="flex flex-col gap-6">
+                <input type="text" [(ngModel)]="contactData.email" placeholder="Email" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none">
+                <input type="text" [(ngModel)]="contactData.phone" placeholder="Phone" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none">
+                <textarea [(ngModel)]="contactData.address" rows="3" placeholder="Address" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none"></textarea>
+                <button (click)="saveContact()" class="self-end glow-button px-8 py-3 rounded-xl bg-primary text-white font-bold flex items-center gap-2 border-none cursor-pointer"><span class="material-symbols-outlined">save</span> Save Contact</button>
+              </div>
+            </div>
+
+            <div *ngIf="['resource', 'people', 'news', 'conference', 'forum_info', 'bulletins'].includes(activeTab)" class="animate-in fade-in duration-300 flex flex-col items-center justify-center text-center h-[400px]">
+              <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">construction</span>
+              <h3 class="text-xl font-bold text-slate-700 dark:text-white">Module Initialized in DB</h3>
+              <p class="text-slate-500 dark:text-gray-400 mt-2">Data structure created. Complex array editors can be expanded here.</p>
+            </div>
+
+            <div *ngIf="activeTab === 'rooms'" class="animate-in fade-in duration-300">
+              <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-6 mb-8">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                  <span class="material-symbols-outlined text-primary dark:text-[#0df2f2] text-3xl">meeting_room</span> Lab Facilities
+                </h2>
+                <button (click)="addNewRoom()" class="flex items-center gap-2 px-4 py-2 rounded-xl border border-primary text-primary dark:border-[#0df2f2] dark:text-[#0df2f2] text-sm font-bold hover:bg-primary/10 transition-colors bg-transparent cursor-pointer"><span class="material-symbols-outlined text-[18px]">add</span> Add Room</button>
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <div *ngFor="let room of rooms; let i = index" class="p-5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 flex flex-col gap-4 relative">
+                  <button (click)="deleteRoom(i)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer"><span class="material-symbols-outlined">delete</span></button>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1"><label class="text-[10px] uppercase font-bold text-slate-500">Room Name</label><input type="text" [(ngModel)]="room.name" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                    <div class="flex flex-col gap-1"><label class="text-[10px] uppercase font-bold text-slate-500">Capacity (Pax)</label><input type="number" [(ngModel)]="room.capacity" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                  </div>
+                </div>
+              </div>
+              <button (click)="saveRooms()" class="mt-6 glow-button px-8 py-3 rounded-xl bg-primary text-white font-bold flex items-center gap-2 border-none cursor-pointer float-right"><span class="material-symbols-outlined">save</span> Save Rooms</button>
+            </div>
+
+            <div *ngIf="activeTab === 'forum'" class="animate-in fade-in duration-300">
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/10 pb-4">Forum Moderation</h2>
+              <div class="flex flex-col gap-3">
+                <div *ngFor="let topic of topics; let i = index" class="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 flex items-center justify-between">
+                  <div>
+                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">{{ topic.title }}</h4>
+                    <p class="text-xs text-slate-500 mt-1">By {{ topic.authorName }} ({{ topic.replies?.length || 0 }} replies)</p>
+                  </div>
+                  <button (click)="deleteTopic(i)" class="flex items-center gap-1 px-3 py-1.5 rounded bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold border border-red-200 dark:border-red-500/20 hover:bg-red-200 transition-colors cursor-pointer border-none outline-none"><span class="material-symbols-outlined text-[14px]">delete</span> Delete</button>
+                </div>
+                <div *ngIf="topics.length === 0" class="text-center py-10 text-slate-500 font-medium">No topics exist.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

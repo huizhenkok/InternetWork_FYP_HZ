@@ -35,7 +35,7 @@ export class Login implements OnInit {
     }
   }
 
-  // 🌟 修复点 1：普通登录签发通行证 (加入 Faculty 路由)
+  // 🌟 修复点 1：普通登录签发通行证 (加入 Admin 专属通道与 Faculty 路由)
   onLogin() {
     const email = this.loginData.email.toLowerCase().trim();
     const password = this.loginData.password;
@@ -45,13 +45,30 @@ export class Login implements OnInit {
       return;
     }
 
+    // 🌟🌟🌟 核心新增：专属 Admin 超级通道 🌟🌟🌟
+    if (email === 'admintest@gmail.com' && password === '123') {
+      alert("Admin Authentication Successful! Accessing Command Center...");
+
+      // 签发最高权限通行证
+      localStorage.setItem('active_user', JSON.stringify({
+        fullName: 'System Admin',
+        email: 'admintest@gmail.com',
+        role: 'Admin'
+      }));
+
+      // 直接跳转到 Admin 控制台
+      this.router.navigate(['/admin-dashboard']);
+      return; // 结束函数，不再往下执行普通用户的验证
+    }
+
+    // ===== 以下为普通用户 (Student/Alumni/Faculty) 的验证逻辑 =====
     const users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
     const foundUser = users.find((u: any) => u.email === email && u.password === password);
 
     if (foundUser) {
       alert("Authentication Successful! Welcome back.");
 
-      // 🌟 【核心魔法】保存当前登录的用户为 Active User
+      // 🌟 保存当前登录的用户为 Active User
       localStorage.setItem('active_user', JSON.stringify(foundUser));
 
       // 🌟 根据身份动态跳转到不同的 Dashboard
@@ -63,13 +80,7 @@ export class Login implements OnInit {
         this.router.navigate(['/alumni']);
       }
     } else {
-      if (email === 'admin@uum.edu.my') {
-        // 万能后门测试账号
-        localStorage.setItem('active_user', JSON.stringify({ fullName: 'System Admin', role: 'Faculty' }));
-        this.router.navigate(['/faculty']);
-      } else {
-        alert("Invalid Email or Password. Please Create an Account first.");
-      }
+      alert("Invalid Email or Password. Please Create an Account first.");
     }
   }
 

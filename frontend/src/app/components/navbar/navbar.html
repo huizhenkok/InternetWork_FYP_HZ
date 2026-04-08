@@ -1,9 +1,9 @@
 <div class="z-50 w-full px-6 pt-6 flex justify-center relative">
-  <nav class="glass-panel w-full max-w-[1200px] rounded-full px-8 py-4 flex items-center justify-between transition-all duration-300">
+  <nav class="glass-panel w-full max-w-[1200px] rounded-full px-8 py-4 flex items-center justify-between transition-all duration-300 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md border border-slate-200 dark:border-white/10 shadow-sm">
 
     <div class="flex items-center gap-3">
-      <a routerLink="/home" class="flex items-center gap-3 no-underline">
-        <div class="size-8 text-primary">
+      <a routerLink="/home" class="flex items-center gap-3 no-underline outline-none">
+        <div class="size-8 text-primary dark:text-[#0df2f2]">
           <svg class="w-full h-full drop-shadow-[0_0_8px_rgba(8,145,178,0.45)] dark:drop-shadow-[0_0_8px_rgba(13,242,242,0.8)]" fill="currentColor" viewBox="0 0 48 48">
             <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill-rule="evenodd"></path>
           </svg>
@@ -13,25 +13,47 @@
     </div>
 
     <div class="hidden lg:flex items-center gap-6 justify-center flex-1 mx-4">
-      <a routerLink="/home" routerLinkActive="!text-primary !font-bold" [routerLinkActiveOptions]="{exact: true}" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Home</a>
+      <a routerLink="/home" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" [routerLinkActiveOptions]="{exact: true}" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Home</a>
 
-      <a routerLink="/research" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Research Area</a>
-      <a routerLink="/resources" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Academic Resource</a>
-      <a routerLink="/people" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">People</a>
-      <a routerLink="/news" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">News&Events</a>
+      <a routerLink="/research" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Research Area</a>
 
-      <a routerLink="/conference" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Conference</a>
+      <a routerLink="/resources" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Publication</a>
 
-      <a routerLink="/forum" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Forum</a>
-      <a routerLink="/contact" routerLinkActive="!text-primary !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline">Contact</a>
+      <div class="relative group">
+        <button class="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 py-2 outline-none border-none bg-transparent cursor-pointer">
+          About Us
+          <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:rotate-180">arrow_drop_down</span>
+        </button>
+
+        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden flex flex-col p-2 text-left">
+          <a routerLink="/about/vision-mission" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">Vision & Mission</a>
+          <a routerLink="/about/objective" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">Objective</a>
+          <a routerLink="/about/philosophy" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">Philosophy</a>
+
+          <div class="h-[1px] w-full bg-slate-100 dark:bg-white/10 my-1"></div>
+
+          <a routerLink="/people" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline flex items-center justify-between outline-none">
+            Leadership
+            <span class="material-symbols-outlined text-[16px]">groups</span>
+          </a>
+        </div>
+      </div>
+
+      <a routerLink="/news" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">News&Events</a>
+
+      <a routerLink="/conference" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Conference</a>
+
+      <a routerLink="/forum" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Forum</a>
+
+      <a routerLink="/contact" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Contact</a>
     </div>
 
     <div class="hidden md:flex items-center gap-3">
-      <button (click)="onToggleTheme()" class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm transition-all duration-300 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-primary dark:hover:bg-white/10 cursor-pointer">
+      <button (click)="onToggleTheme()" class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm transition-all duration-300 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-[#0df2f2] dark:hover:bg-white/10 cursor-pointer outline-none">
         <span *ngIf="!isDarkMode" class="material-symbols-outlined text-[22px]">dark_mode</span>
         <span *ngIf="isDarkMode" class="material-symbols-outlined text-[22px]">light_mode</span>
       </button>
-      <a routerLink="/login" class="glow-button inline-flex items-center justify-center bg-gradient-to-r from-accent-teal to-accent-cyan hover:to-primary text-white dark:text-black text-sm font-bold px-6 py-2.5 rounded-full transition-all duration-300 transform hover:scale-105 no-underline">
+      <a routerLink="/login" class="glow-button inline-flex items-center justify-center bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] hover:to-primary text-white dark:text-black text-sm font-bold px-6 py-2.5 rounded-full transition-all duration-300 transform hover:scale-105 no-underline outline-none">
         Login
       </a>
     </div>

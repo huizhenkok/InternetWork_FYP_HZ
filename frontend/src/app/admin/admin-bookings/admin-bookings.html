@@ -1,0 +1,156 @@
+<div class="flex h-screen w-full bg-slate-50 dark:bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] dark:from-[#121212] dark:via-[#080c0c] dark:to-black text-slate-900 dark:text-white font-display overflow-hidden selection:bg-primary selection:text-white">
+
+  <aside class="w-20 lg:w-64 flex-shrink-0 flex flex-col justify-between border-r border-slate-200 dark:border-white/5 bg-white dark:bg-black/20 dark:backdrop-blur-xl z-20 transition-all duration-300">
+    <div class="flex flex-col gap-8 p-6">
+      <div class="flex items-center gap-4">
+        <div class="size-8 text-primary dark:text-[#0df2f2] shrink-0">
+          <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
+        </div>
+        <div class="hidden lg:flex flex-col">
+          <h1 class="text-slate-900 dark:text-white text-lg font-bold tracking-widest uppercase">INWLab</h1>
+          <p class="text-primary dark:text-[#0df2f2] text-xs font-bold tracking-wider uppercase">SYSTEM ADMIN</p>
+        </div>
+      </div>
+
+      <nav class="flex flex-col gap-2 dark:gap-3">
+        <a routerLink="/admin-dashboard" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-white transition-colors">dashboard</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">Dashboard</span>
+        </a>
+        <a routerLink="/admin-cms" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">wysiwyg</span>
+          <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white transition-colors">CMS Engine</span>
+        </a>
+        <a routerLink="/admin-bookings" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full bg-cyan-50 border border-cyan-100 text-primary dark:bg-gradient-to-r dark:from-[#1F958D]/20 dark:to-[#0df2f2]/10 dark:border-[#0df2f2]/20 dark:shadow-[0_0_5px_rgba(13,242,242,0.5)] dark:text-[#0df2f2] group transition-all duration-300 no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">event_available</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:text-white transition-colors">Approvals</span>
+        </a>
+        <a routerLink="/admin-users" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
+          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">manage_accounts</span>
+          <span class="hidden lg:block text-sm font-medium tracking-wide dark:group-hover:text-white transition-colors">User Mgt.</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-6">
+      <button (click)="logout()" class="flex w-full items-center justify-center gap-3 rounded-full h-12 border border-slate-200 text-slate-500 hover:text-red-600 dark:bg-transparent dark:border-white/10 dark:text-gray-400 dark:hover:border-[#0df2f2]/50 dark:hover:text-[#0df2f2] transition-all duration-300 group outline-none cursor-pointer">
+        <span class="material-symbols-outlined">logout</span>
+        <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white">LOGOUT</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col h-full overflow-y-auto relative p-6 lg:p-10 z-10">
+
+    <div class="absolute top-[-10%] right-[10%] w-[500px] h-[500px] bg-cyan-100/50 dark:bg-[#1F958D]/20 rounded-full blur-[120px] pointer-events-none z-[-1]"></div>
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div>
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2 uppercase">Booking Requests Queue</h1>
+        <p class="text-slate-500 dark:text-gray-400 max-w-xl text-lg">Manage high-priority lab reservations in real-time.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <label class="hidden md:flex items-center relative group">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="material-symbols-outlined text-slate-400 dark:text-gray-500">search</span>
+          </div>
+          <input [(ngModel)]="searchQuery" (input)="filterBookings()" class="bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm rounded-full focus:ring-1 focus:ring-primary block w-64 pl-10 py-2.5 outline-none shadow-sm dark:shadow-none transition-all" placeholder="Search ID, Asset or User..." type="text"/>
+        </label>
+        <button (click)="exportLog()" class="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-sm font-bold text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-[#0df2f2] shadow-sm transition cursor-pointer outline-none">
+          <span class="material-symbols-outlined text-[18px]">download</span> Export Log
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-primary dark:border-l-[#0df2f2] shadow-sm">
+        <div class="absolute right-4 top-4 p-2 rounded-lg bg-cyan-50 dark:bg-[#0df2f2]/10 text-primary dark:text-[#0df2f2]">
+          <span class="material-symbols-outlined text-2xl">pending_actions</span>
+        </div>
+        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Pending Approval</p>
+        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ pendingCount }}</h3>
+      </div>
+
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-orange-400 dark:border-l-orange-500 shadow-sm">
+        <div class="absolute right-4 top-4 p-2 rounded-lg bg-orange-50 dark:bg-orange-500/10 text-orange-500 dark:text-orange-400">
+          <span class="material-symbols-outlined text-2xl">warning</span>
+        </div>
+        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Conflicts Detected</p>
+        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ conflictCount }}</h3>
+      </div>
+    </div>
+
+    <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
+      <div class="col-span-3">User / Role</div>
+      <div class="col-span-3">Asset / Location</div>
+      <div class="col-span-2">Schedule</div>
+      <div class="col-span-2">Status</div>
+      <div class="col-span-2 text-right">Decision</div>
+    </div>
+
+    <div *ngIf="filteredBookings.length === 0" class="text-center py-20 bg-white/50 dark:bg-[#121212]/50 backdrop-blur rounded-2xl border border-slate-200 dark:border-white/10 mt-2">
+      <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">event_busy</span>
+      <h3 class="text-xl font-bold text-slate-700 dark:text-white">No Bookings Found</h3>
+      <p class="text-slate-500 dark:text-gray-400 mt-2">There are no reservation requests matching your criteria.</p>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-2 pb-10">
+      <div *ngFor="let booking of filteredBookings" class="group bg-white dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-4 transition-all hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm" [ngClass]="{'opacity-60 grayscale': booking.status === 'Rejected'}">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+
+          <div class="col-span-1 md:col-span-3 flex items-center gap-4">
+            <div class="relative">
+              <div class="size-12 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center font-bold text-lg text-slate-600 dark:text-gray-300 uppercase">{{ booking.safeName.charAt(0) }}</div>
+            </div>
+            <div>
+              <p class="text-slate-900 dark:text-white font-bold text-sm tracking-wide">{{ booking.safeName }}</p>
+              <p class="text-xs text-primary dark:text-[#0df2f2] font-bold mt-0.5">ID: #{{ booking.safeId.substring(0,6) }}</p>
+            </div>
+          </div>
+
+          <div class="col-span-1 md:col-span-3">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="material-symbols-outlined text-primary dark:text-[#0df2f2] text-[18px]">developer_board</span>
+              <span class="text-slate-700 dark:text-gray-200 text-sm font-bold truncate max-w-[150px]">{{ booking.safeRoom }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded">Lab Sector</span>
+            </div>
+          </div>
+
+          <div class="col-span-1 md:col-span-2">
+            <p class="text-slate-900 dark:text-white text-sm font-bold">{{ booking.startTime || '00:00' }} - {{ booking.endTime || '00:00' }}</p>
+            <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5 font-mono">{{ booking.safeDate.split(' ')[0] }}</p>
+          </div>
+
+          <div class="col-span-1 md:col-span-2 flex items-center justify-start">
+                        <span [ngClass]="{
+                            'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20': booking.status === 'Pending',
+                            'bg-green-100 text-green-700 border-green-200 dark:bg-[#0df2f2]/10 dark:text-[#0df2f2] dark:border-[#0df2f2]/20': booking.status === 'Approved',
+                            'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20': booking.status === 'Rejected'
+                        }" class="inline-flex items-center px-3 py-1 rounded-md border text-xs font-bold uppercase tracking-wider">
+                            {{ booking.status }}
+                        </span>
+          </div>
+
+          <div class="col-span-1 md:col-span-2 flex items-center justify-end gap-3 pl-4">
+            <ng-container *ngIf="booking.status === 'Pending'">
+              <button (click)="approveBooking(booking)" class="h-10 w-10 rounded-full bg-gradient-to-r from-teal-600 to-primary dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black shadow-md hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(23,198,186,0.5)] hover:scale-105 transition-all flex items-center justify-center cursor-pointer border-none outline-none" title="Approve">
+                <span class="material-symbols-outlined text-[20px]">check</span>
+              </button>
+              <button (click)="rejectBooking(booking)" class="h-10 w-10 rounded-full text-slate-400 dark:text-red-500 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all transform hover:scale-110 flex items-center justify-center cursor-pointer bg-white dark:bg-transparent outline-none" title="Reject">
+                <span class="material-symbols-outlined text-2xl">close</span>
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="booking.status !== 'Pending'">
+              <span class="text-xs font-bold text-slate-400 dark:text-gray-500 italic">Action Taken</span>
+            </ng-container>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
