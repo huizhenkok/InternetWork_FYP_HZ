@@ -1,11 +1,10 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // 🌟 引入表单模块，激活双向绑定
+import { FormsModule } from '@angular/forms';
 
 declare var AOS: any;
 
-// 🌟 定义卡片的数据结构
 interface ResearchArea {
   id: string;
   title: string;
@@ -17,14 +16,18 @@ interface ResearchArea {
 @Component({
   selector: 'app-research',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule], // 🌟 装载 FormsModule
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './research.html'
 })
 export class Research implements OnInit {
 
-  searchTerm: string = ''; // 绑定的搜索词
+  searchTerm: string = '';
 
-  // 🌟 这里是我们的“虚拟数据库” (无需后端！)
+  cmsData: any = {
+    mainTitle: 'Research Areas',
+    subTitle: 'Our laboratory focuses on critical advancements in network security, digital forensics, and intelligent systems. We bridge the gap between theoretical models and real-world application.'
+  };
+
   allAreas: ResearchArea[] = [
     { id: 'cyber', title: 'Cybersecurity & Defense', desc: 'Advanced threat detection, penetration testing, and securing critical network infrastructures against modern cyber attacks.', icon: 'security', link: '/research/cybersecurity' },
     { id: 'forensics', title: 'Digital Forensics', desc: 'Recovery and investigation of material found in digital devices, focusing on cybercrime evidence analysis.', icon: 'manage_search', link: '/research/forensics' },
@@ -34,13 +37,36 @@ export class Research implements OnInit {
     { id: 'network', title: 'Next-Gen Networking', desc: 'Research into 5G/6G technologies, software-defined networking (SDN), and edge computing solutions.', icon: 'cell_tower', link: '/research/network' }
   ];
 
-  // 当前显示在页面上的数组（一开始等于全部）
-  filteredAreas: ResearchArea[] = [...this.allAreas];
+  filteredAreas: ResearchArea[] = [];
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+
+      const savedData = localStorage.getItem('inwlab_cms_research');
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          this.cmsData.mainTitle = parsed.mainTitle || this.cmsData.mainTitle;
+          this.cmsData.subTitle = parsed.subTitle || this.cmsData.subTitle;
+
+          if (parsed.domains && parsed.domains.cyber && parsed.domains.cyber.title) {
+            const d = parsed.domains;
+            this.allAreas = [
+              { id: 'cyber', title: d.cyber.title, desc: d.cyber.shortDesc, icon: 'security', link: '/research/cybersecurity' },
+              { id: 'forensics', title: d.forensics.title, desc: d.forensics.shortDesc, icon: 'manage_search', link: '/research/forensics' },
+              { id: 'iot', title: d.iot.title, desc: d.iot.shortDesc, icon: 'router', link: '/research/iot' },
+              { id: 'ai', title: d.ai.title, desc: d.ai.shortDesc, icon: 'psychology', link: '/research/ai' },
+              { id: 'cloud', title: d.cloud.title, desc: d.cloud.shortDesc, icon: 'cloud', link: '/research/cloud' },
+              { id: 'network', title: d.network.title, desc: d.network.shortDesc, icon: 'cell_tower', link: '/research/network' }
+            ];
+          }
+        } catch(e) { console.error(e); }
+      }
+
+      this.filteredAreas = [...this.allAreas];
+
       setTimeout(() => {
         if (typeof AOS !== 'undefined') {
           AOS.init({ duration: 800, once: true, offset: 50 });
@@ -51,22 +77,28 @@ export class Research implements OnInit {
     }
   }
 
-  // 🌟 实时搜索过滤魔法
   onSearch() {
     const term = this.searchTerm.toLowerCase();
     this.filteredAreas = this.allAreas.filter(area =>
       area.title.toLowerCase().includes(term) ||
       area.desc.toLowerCase().includes(term)
     );
-    // 每次搜索后刷新一下动画
-    setTimeout(() => {
-      if (typeof AOS !== 'undefined') AOS.refresh();
-    }, 50);
   }
 
-  // 🌟 Filter 按钮：目前我们先让它充当“重置/清除”搜索的功能
   clearSearch() {
     this.searchTerm = '';
     this.onSearch();
+  }
+
+  get titleFirstPart(): string {
+    const words = this.cmsData.mainTitle.trim().split(' ');
+    if (words.length <= 1) return this.cmsData.mainTitle;
+    return words.slice(0, -1).join(' ');
+  }
+
+  get titleLastPart(): string {
+    const words = this.cmsData.mainTitle.trim().split(' ');
+    if (words.length <= 1) return '';
+    return words[words.length - 1];
   }
 }

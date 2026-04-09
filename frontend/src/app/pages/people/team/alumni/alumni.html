@@ -1,32 +1,22 @@
 <div class="w-full">
   <div *ngFor="let group of filteredYears" class="mb-16">
-
     <div class="flex items-center gap-4 mb-8" data-aos="fade-right">
-      <div class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 dark:bg-primary/20">
-        <span class="material-symbols-outlined text-primary">workspace_premium</span>
-      </div>
-      <h2 class="text-3xl font-bold text-slate-800 dark:text-white">
-        Class of {{ group.year }}
-      </h2>
+      <div class="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 dark:bg-primary/20"><span class="material-symbols-outlined text-primary">workspace_premium</span></div>
+      <h2 class="text-3xl font-bold text-slate-800 dark:text-white">Class of {{ group.year }}</h2>
     </div>
 
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      <div *ngFor="let member of group.members; let i = index"
-           data-aos="fade-up" [attr.data-aos-delay]="(i % 3) * 100"
-           class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:hover:border-primary/80 dark:hover:shadow-[0_0_30px_rgba(13,242,242,0.15)]">
+      <div *ngFor="let member of group.members; let i = index" data-aos="fade-up" [attr.data-aos-delay]="(i % 3) * 100" class="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:hover:border-primary/80 dark:hover:shadow-[0_0_30px_rgba(13,242,242,0.15)]">
 
         <div class="flex items-center gap-4 mb-4 border-b border-slate-100 dark:border-white/10 pb-4">
           <div class="shrink-0 h-16 w-16 overflow-hidden rounded-full border-2 border-primary/30 bg-slate-50 flex items-center justify-center transition-transform duration-500 group-hover:scale-105 group-hover:border-primary dark:border-primary/60 dark:bg-[#121212] shadow-sm">
-            <span class="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-500">person</span>
+            <img *ngIf="member.avatar" [src]="member.avatar" [alt]="member.name" class="h-full w-full object-cover">
+            <span *ngIf="!member.avatar" class="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-500">person</span>
           </div>
 
           <div class="flex-1">
-            <h3 class="text-xl font-bold text-slate-900 transition-colors group-hover:text-primary dark:text-white dark:group-hover:text-primary mb-1">
-              {{ member.name }}
-            </h3>
-            <p class="text-xs font-bold uppercase tracking-wide text-primary dark:text-accent-cyan">
-              {{ member.designation }}
-            </p>
+            <h3 class="text-xl font-bold text-slate-900 transition-colors group-hover:text-primary dark:text-white dark:group-hover:text-primary mb-1">{{ member.name }}</h3>
+            <p class="text-xs font-bold uppercase tracking-wide text-primary dark:text-accent-cyan">{{ member.designation }}</p>
           </div>
         </div>
 
@@ -39,9 +29,7 @@
   </div>
 
   <div *ngIf="filteredYears.length === 0" class="text-center py-12">
-    <div class="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-      <span class="material-symbols-outlined text-slate-400 text-3xl">search_off</span>
-    </div>
+    <div class="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4"><span class="material-symbols-outlined text-slate-400 text-3xl">search_off</span></div>
     <h3 class="text-lg font-bold text-slate-700 dark:text-white mb-1">No Alumni Found</h3>
     <p class="text-slate-500 dark:text-gray-400">Try searching for a different name, university, or year.</p>
   </div>

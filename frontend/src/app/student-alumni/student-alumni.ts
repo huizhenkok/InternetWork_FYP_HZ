@@ -12,7 +12,7 @@ declare var AOS: any;
 })
 export class StudentAlumni implements OnInit, AfterViewInit {
 
-  userRole: string = 'Researcher';
+  userRole: string = 'Student'; // 默认角色
   userName: string = 'User';
 
   // 🌟 获取 HTML 里的 Canvas 元素
@@ -57,7 +57,7 @@ export class StudentAlumni implements OnInit, AfterViewInit {
       if (activeUserStr) {
         const activeUser = JSON.parse(activeUserStr);
         if (activeUser && activeUser.fullName) {
-          this.userName = activeUser.fullName.split(' ')[0];
+          this.userName = activeUser.fullName.split(' ')[0]; // 只取名字的第一部分
           if (activeUser.role) this.userRole = activeUser.role;
         }
       }
@@ -89,15 +89,15 @@ export class StudentAlumni implements OnInit, AfterViewInit {
 
   createParticles() {
     const canvas = this.canvasRef.nativeElement;
-    const particleCount = window.innerWidth < 768 ? 40 : 80; // 手机端少一点，电脑端多一点
+    const particleCount = window.innerWidth < 768 ? 40 : 80;
     this.particles = [];
 
     for (let i = 0; i < particleCount; i++) {
       this.particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.8, // 移动速度 (X轴)
-        vy: (Math.random() - 0.5) * 0.8, // 移动速度 (Y轴)
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
         radius: Math.random() * 2 + 1
       });
     }
@@ -112,7 +112,7 @@ export class StudentAlumni implements OnInit, AfterViewInit {
 
     // 判断当前是黑夜还是白昼，决定连线的颜色
     const isDark = document.documentElement.classList.contains('dark');
-    const rgb = isDark ? '13, 242, 242' : '8, 145, 178'; // 青色 / 深蓝色
+    const rgb = isDark ? '13, 242, 242' : '8, 145, 178';
 
     // 更新粒子位置并画点
     for (let i = 0; i < this.particles.length; i++) {
@@ -129,25 +129,24 @@ export class StudentAlumni implements OnInit, AfterViewInit {
       this.ctx.fillStyle = `rgba(${rgb}, 0.5)`;
       this.ctx.fill();
 
-      // 🌟 画连线：如果两个粒子距离足够近，就画一条线
+      // 画连线
       for (let j = i + 1; j < this.particles.length; j++) {
         let p2 = this.particles[j];
         let dx = p.x - p2.x;
         let dy = p.y - p2.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < 120) { // 连线触发距离
+        if (dist < 120) {
           this.ctx.beginPath();
           this.ctx.moveTo(p.x, p.y);
           this.ctx.lineTo(p2.x, p2.y);
-          this.ctx.strokeStyle = `rgba(${rgb}, ${1 - dist / 120})`; // 距离越远线越淡
+          this.ctx.strokeStyle = `rgba(${rgb}, ${1 - dist / 120})`;
           this.ctx.lineWidth = 0.5;
           this.ctx.stroke();
         }
       }
     }
 
-    // 循环动画
     this.animationFrameId = requestAnimationFrame(() => this.animateParticles());
   }
 }

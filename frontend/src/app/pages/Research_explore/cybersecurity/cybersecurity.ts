@@ -11,16 +11,17 @@ declare var AOS: any;
   templateUrl: './cybersecurity.html'
 })
 export class Cybersecurity implements OnInit {
+  labData: any = {};
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const savedData = localStorage.getItem('inwlab_cms_research');
+      if (savedData) this.labData = JSON.parse(savedData).domains?.cyber || {};
+
       setTimeout(() => {
-        if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
-          AOS.refreshHard();
-          window.scrollTo(0, 0); // 每次进来都在最顶端
-        }
+        if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); }
       }, 150);
     }
   }

@@ -1,13 +1,13 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule } from '@angular/router'; // 🌟 核心修复：改为引入全面的 RouterModule
+import { RouterModule } from '@angular/router';
 
 declare var AOS: any;
 
 @Component({
   selector: 'app-resources',
   standalone: true,
-  imports: [CommonModule, RouterModule], // 🌟 核心修复：在这里注入 RouterModule
+  imports: [CommonModule, RouterModule],
   templateUrl: './resources.html'
 })
 export class Resources implements OnInit {
@@ -15,10 +15,29 @@ export class Resources implements OnInit {
   allResources: any[] = [];
   filteredResources: any[] = [];
 
+  // 🌟 核心：为 CMS 数据提供默认值，防止由于没访问过 CMS 而报错
+  cmsData: any = {
+    mainTitle: 'Public Publications',
+    subTitle: 'Explore research papers, datasets, and technical reports publicly shared by INWLab members.',
+    filterTitle: 'Select a category to filter our repository of publications, reports, and datasets.'
+  };
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+
+      // 🌟 加载 CMS 里填写的文案
+      const savedCms = localStorage.getItem('inwlab_cms_resource');
+      if (savedCms) {
+        try {
+          const parsed = JSON.parse(savedCms);
+          this.cmsData.mainTitle = parsed.mainTitle || this.cmsData.mainTitle;
+          this.cmsData.subTitle = parsed.subTitle || this.cmsData.subTitle;
+          this.cmsData.filterTitle = parsed.filterTitle || this.cmsData.filterTitle;
+        } catch(e) {}
+      }
+
       this.loadRealPublications();
 
       setTimeout(() => {
@@ -80,5 +99,18 @@ export class Resources implements OnInit {
     } else {
       alert(`Viewing metadata details for: ${title}`);
     }
+  }
+
+  // 🌟 和 Research 一样的智能拆分文字函数，用来保留渐变色彩效果
+  get titleFirstPart(): string {
+    const words = this.cmsData.mainTitle.trim().split(' ');
+    if (words.length <= 1) return this.cmsData.mainTitle;
+    return words.slice(0, -1).join(' ');
+  }
+
+  get titleLastPart(): string {
+    const words = this.cmsData.mainTitle.trim().split(' ');
+    if (words.length <= 1) return '';
+    return words[words.length - 1];
   }
 }

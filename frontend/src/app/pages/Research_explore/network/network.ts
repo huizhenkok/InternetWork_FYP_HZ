@@ -8,19 +8,20 @@ declare var AOS: any;
   selector: 'app-network',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './network.html' // 相对路径
+  templateUrl: './network.html'
 })
 export class Network implements OnInit {
+  labData: any = {};
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const savedData = localStorage.getItem('inwlab_cms_research');
+      if (savedData) this.labData = JSON.parse(savedData).domains?.network || {};
+
       setTimeout(() => {
-        if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
-          AOS.refreshHard();
-          window.scrollTo(0, 0); // 确保每次进入页面都在最顶部
-        }
+        if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); }
       }, 150);
     }
   }

@@ -1,75 +1,52 @@
-<div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
-  <div class="tech-square sq-3"></div><div class="tech-square sq-5"></div>
-</div>
-
+<div class="absolute inset-0 overflow-hidden pointer-events-none z-10"><div class="tech-square sq-3"></div><div class="tech-square sq-5"></div></div>
 <div class="relative min-h-screen flex flex-col w-full">
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
     <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
     <div class="absolute top-[-10%] right-[10%] w-[500px] h-[500px] bg-sky-400/20 rounded-full blur-[150px] opacity-20 dark:opacity-30 animate-pulse"></div>
   </div>
-
   <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
     <main class="relative w-full max-w-[1200px] px-6 pb-20 pt-6 md:pt-10 mx-auto">
-
       <div class="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-gray-400 mb-8" data-aos="fade-right">
         <a routerLink="/research" class="hover:text-primary transition-colors no-underline">Research Areas</a>
         <span class="material-symbols-outlined text-[16px]">chevron_right</span>
-        <span class="text-slate-900 dark:text-white">Cloud Computing</span>
+        <span class="text-slate-900 dark:text-white">{{ labData.title }}</span>
       </div>
-
       <div class="flex flex-col lg:flex-row gap-12 items-center mb-24" data-aos="fade-up">
         <div class="flex-1 flex flex-col gap-6">
           <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-400 flex items-center justify-center shadow-[0_0_30px_rgba(56,189,248,0.4)]">
             <span class="material-symbols-outlined text-4xl text-white">cloud</span>
           </div>
-          <h1 class="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white">
-            Cloud <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-blue-400">Computing Lab</span>
-          </h1>
-          <p class="text-lg text-slate-500 dark:text-gray-400 font-body leading-relaxed max-w-xl">
-            Driving the evolution of scalable infrastructure. Our research focuses on high-performance virtualization, serverless architectures, and secure multi-cloud synchronization.
-          </p>
+          <h1 class="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-blue-400">{{ labData.labTitle }}</h1>
+          <p class="text-lg text-slate-500 dark:text-gray-400 font-body leading-relaxed max-w-xl">{{ labData.longDesc }}</p>
         </div>
-
         <div class="w-full lg:w-[400px] glass-card rounded-3xl p-8 border-l-4 border-l-sky-500" data-aos="zoom-in" data-aos-delay="200">
           <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6">Lab Overview</h3>
           <div class="space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4">
-              <span class="text-slate-500 dark:text-gray-400 font-body">Lead Researcher</span>
-              <span class="font-bold text-slate-900 dark:text-white">Dr. Cloud Strife</span>
-            </div>
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4">
-              <span class="text-slate-500 dark:text-gray-400 font-body">Storage Managed</span>
-              <span class="font-bold text-sky-500 text-xl">2.5 PB</span>
-            </div>
-            <div class="flex justify-between items-center pb-2">
-              <span class="text-slate-500 dark:text-gray-400 font-body">Uptime Standard</span>
-              <span class="font-bold text-slate-900 dark:text-white">99.99% Reliability</span>
-            </div>
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4"><span class="text-slate-500 dark:text-gray-400 font-body">Lead Researcher</span><span class="font-bold text-slate-900 dark:text-white">{{ labData.lead }}</span></div>
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-4"><span class="text-slate-500 dark:text-gray-400 font-body">{{ labData.stat1Name }}</span><span class="font-bold text-sky-500 text-xl">{{ labData.stat1Value }}</span></div>
+            <div class="flex justify-between items-center pb-2"><span class="text-slate-500 dark:text-gray-400 font-body">{{ labData.stat2Name }}</span><span class="font-bold text-slate-900 dark:text-white">{{ labData.stat2Value }}</span></div>
           </div>
         </div>
       </div>
-
       <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-8" data-aos="fade-up">Core Focus Areas</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
         <div class="glass-panel rounded-2xl p-6 border-t-2 border-t-sky-400 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="0">
-          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Containerization</h4>
-          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">Optimizing Docker and Kubernetes workflows to ensure seamless deployment across heterogeneous environments.</p>
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">{{ labData.focus1Title }}</h4>
+          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">{{ labData.focus1Desc }}</p>
         </div>
         <div class="glass-panel rounded-2xl p-6 border-t-2 border-t-sky-500 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="100">
-          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Serverless Computing</h4>
-          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">Reducing cold-start times and improving resource allocation in Function-as-a-Service (FaaS) models.</p>
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">{{ labData.focus2Title }}</h4>
+          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">{{ labData.focus2Desc }}</p>
         </div>
         <div class="glass-panel rounded-2xl p-6 border-t-2 border-t-blue-400 hover:-translate-y-2 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
-          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Cloud Security</h4>
-          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">Implementing advanced IAM (Identity Access Management) and encryption for data-at-rest in the cloud.</p>
+          <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-3">{{ labData.focus3Title }}</h4>
+          <p class="text-sm text-slate-500 dark:text-gray-400 font-body">{{ labData.focus3Desc }}</p>
         </div>
       </div>
-
       <div class="text-center pt-8 border-t border-slate-200 dark:border-white/10" data-aos="fade-in">
         <a routerLink="/research" class="glow-button inline-flex items-center justify-center gap-2 bg-gradient-to-r from-sky-500 to-blue-400 hover:to-sky-600 text-white font-bold text-sm px-8 py-3 rounded-full transition-all duration-300 no-underline">
-          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-          Back to All Areas
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span> Back to All Areas
         </a>
       </div>
     </main>

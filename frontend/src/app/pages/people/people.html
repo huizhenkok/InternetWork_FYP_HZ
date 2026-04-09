@@ -16,8 +16,8 @@
 
       <div class="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end" data-aos="fade-right">
         <div class="max-w-2xl">
-          <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white">
-            Our Researchers & Scholars
+          <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white uppercase">
+            Leadership & Team
           </h1>
           <p class="max-w-xl text-lg font-light leading-relaxed text-slate-500 dark:text-slate-400 font-body">
             A dedicated team of academic professionals, post-graduate researchers, and alumni advancing the field of network intelligence.
@@ -37,8 +37,8 @@
         <div class="flex flex-wrap gap-3">
           <button *ngFor="let tab of tabs"
                   (click)="setTab(tab)"
-                  [ngClass]="activeTab === tab ? 'border-primary bg-primary/10 text-primary dark:border-primary/50 dark:shadow-[0_0_15px_rgba(13,242,242,0.15)]' : 'border-slate-200 bg-slate-100 text-slate-600 hover:border-slate-300 hover:bg-slate-200 dark:border-white/5 dark:bg-white/5 dark:text-slate-400 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white'"
-                  class="rounded-full border px-5 py-2.5 text-sm font-semibold shadow-sm transition-all cursor-pointer">
+                  [ngClass]="activeTab === tab ? 'border-primary bg-primary/10 text-primary dark:text-[#0df2f2] dark:border-primary/50 dark:shadow-[0_0_15px_rgba(13,242,242,0.15)]' : 'border-slate-200 bg-slate-100 text-slate-600 hover:border-slate-300 hover:bg-slate-200 dark:border-white/5 dark:bg-white/5 dark:text-slate-400 dark:hover:border-white/20 dark:hover:bg-white/10 dark:hover:text-white'"
+                  class="rounded-full border px-5 py-2.5 text-sm font-semibold shadow-sm transition-all cursor-pointer outline-none">
             {{ tab }}
           </button>
         </div>
@@ -46,10 +46,8 @@
 
       <div class="w-full min-h-[500px]">
         <app-our-team *ngIf="activeTab === 'Our Team'" [searchTerm]="searchTerm"></app-our-team>
-        <app-directory *ngIf="activeTab === 'Directory of Expert'" [searchTerm]="searchTerm"></app-directory>
-        <app-active-student *ngIf="activeTab === 'Active Student'" [searchTerm]="searchTerm"></app-active-student>
         <app-alumni *ngIf="activeTab === 'Alumni'" [searchTerm]="searchTerm"></app-alumni>
-        <app-conference-team *ngIf="activeTab === 'Conference Team'" [searchTerm]="searchTerm"></app-conference-team>
+        <app-active-student *ngIf="activeTab === 'Student'" [searchTerm]="searchTerm"></app-active-student>
       </div>
 
     </main>

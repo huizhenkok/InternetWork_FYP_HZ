@@ -65,7 +65,8 @@ export const routes: Routes = [
   { path: 'forum', component: Forum },
   { path: 'forum/thread/:id', component: ThreadDetail },
   { path: 'contact', component: Contact },
-  { path: 'conference', component: Conference },
+  { path: 'conference', redirectTo: 'conference/2026', pathMatch: 'full' },
+  { path: 'conference/:year', component: Conference },
   { path: 'projects', component: Projects },
 
   // 身份验证区域

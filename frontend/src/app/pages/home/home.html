@@ -89,16 +89,18 @@
               {{ cmsData.upcomingEvent }}
             </h2>
             <p class="text-slate-500 dark:text-gray-400 font-body leading-relaxed text-justify md:text-left">
-              NETAPPS2024 is a premier platform to promote greater engagement of network researchers from around the globe...
+              {{ cmsData.upcomingEventDesc }}
             </p>
-            <a routerLink="/conference/2024" class="glow-button w-fit mx-auto lg:mx-0 bg-slate-900 dark:bg-white text-white dark:text-black font-bold text-sm px-8 py-3 rounded-full transition-transform hover:-translate-y-1 no-underline">
+            <a routerLink="/conference/2026" class="glow-button w-fit mx-auto lg:mx-0 bg-slate-900 dark:bg-white text-white dark:text-black font-bold text-sm px-8 py-3 rounded-full transition-transform hover:-translate-y-1 no-underline">
               Explore Conference
             </a>
           </div>
 
           <div class="flex flex-col items-center justify-center p-8 bg-white/50 dark:bg-black/30 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 shadow-lg">
             <h3 class="text-xl font-bold text-slate-800 dark:text-gray-200 mb-2">Conference Commences In:</h3>
-            <p class="text-lg font-bold text-primary mb-8 tracking-widest">6 & 7 NOV 2024</p>
+            <p class="text-lg font-bold text-primary mb-8 tracking-widest">
+              {{ cmsData.conferenceDate | date:'dd MMM yyyy' | uppercase }}
+            </p>
 
             <div class="flex gap-3 md:gap-6">
               <div class="flex flex-col items-center">
@@ -173,21 +175,21 @@
             <div class="w-14 h-14 rounded-xl card-stat-icon flex items-center justify-center mb-6">
               <span class="material-symbols-outlined text-3xl">groups</span>
             </div>
-            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">85+</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">{{ cmsData.stats.activePhds }}</h3>
             <p class="text-sm font-bold text-primary uppercase tracking-wider mb-3">Active PhDs</p>
           </div>
           <div class="glass-card rounded-2xl p-8 flex flex-col items-center text-center group" data-aos="fade-up" data-aos-delay="200">
             <div class="w-14 h-14 rounded-xl card-stat-icon flex items-center justify-center mb-6">
               <span class="material-symbols-outlined text-3xl">award_star</span>
             </div>
-            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">42</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">{{ cmsData.stats.globalAwards }}</h3>
             <p class="text-sm font-bold text-primary uppercase tracking-wider mb-3">Global Awards</p>
           </div>
           <div class="glass-card rounded-2xl p-8 flex flex-col items-center text-center group" data-aos="fade-up" data-aos-delay="300">
             <div class="w-14 h-14 rounded-xl card-stat-icon flex items-center justify-center mb-6">
               <span class="material-symbols-outlined text-3xl">hub</span>
             </div>
-            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">200+</h3>
+            <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-2">{{ cmsData.stats.industryPartners }}</h3>
             <p class="text-sm font-bold text-primary uppercase tracking-wider mb-3">Industry Partners</p>
           </div>
         </div>

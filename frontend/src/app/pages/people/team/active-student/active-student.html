@@ -1,9 +1,31 @@
-<div class="w-full animate-fade-in py-20 flex flex-col items-center justify-center text-center">
-  <div class="w-24 h-24 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
-    <span class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-500">school</span>
+<div class="w-full">
+  <div *ngIf="filteredStudents.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-16">
+    <div *ngFor="let student of filteredStudents; let i = index" data-aos="fade-up" [attr.data-aos-delay]="(i % 4) * 100" class="group relative flex flex-col items-center rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:hover:border-primary/50 dark:hover:shadow-[0_0_30px_rgba(13,242,242,0.15)]">
+
+      <div class="relative mb-6">
+        <div class="relative z-10 h-28 w-28 overflow-hidden rounded-full border-[3px] border-primary/30 bg-slate-100 shadow-[0_0_10px_rgba(8,145,178,0.12)] flex items-center justify-center transition-transform duration-500 group-hover:scale-105 group-hover:border-primary dark:border-primary/50 dark:bg-[#121212] dark:shadow-[0_0_15px_rgba(13,242,242,0.3)]">
+          <img *ngIf="student.avatar" [src]="student.avatar" [alt]="student.name" class="h-full w-full object-cover">
+          <span *ngIf="!student.avatar" class="material-symbols-outlined text-5xl text-slate-400">school</span>
+        </div>
+        <div class="absolute inset-0 rounded-full bg-primary opacity-0 blur-[40px] transition-opacity group-hover:opacity-20 dark:group-hover:opacity-30"></div>
+      </div>
+
+      <div class="z-10 space-y-1 text-center">
+        <h3 class="text-xl font-bold text-slate-900 transition-colors group-hover:text-primary dark:text-white dark:group-hover:text-primary">{{ student.name }}</h3>
+        <p class="text-sm font-medium uppercase tracking-wide text-primary opacity-90 dark:text-accent-cyan dark:font-bold">{{ student.department }}</p>
+      </div>
+
+      <div class="mt-6 flex translate-y-2 gap-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100">
+        <a *ngIf="student.email" [href]="'mailto:' + student.email" class="text-slate-400 transition-colors hover:text-primary dark:text-slate-500 dark:hover:text-primary cursor-pointer border-none bg-transparent no-underline" title="Send Email">
+          <span class="material-symbols-outlined text-lg">alternate_email</span>
+        </a>
+      </div>
+    </div>
   </div>
-  <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-3">No Active Students Currently</h2>
-  <p class="text-slate-500 dark:text-gray-400 max-w-md font-body leading-relaxed">
-    The list of active MSc and PhD students is currently being updated. Please check back later or contact the lab administration for more details.
-  </p>
+
+  <div *ngIf="filteredStudents.length === 0" class="w-full animate-fade-in py-20 flex flex-col items-center justify-center text-center">
+    <div class="w-24 h-24 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mb-6 shadow-inner"><span class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-500">school</span></div>
+    <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-3">No Active Students Currently</h2>
+    <p class="text-slate-500 dark:text-gray-400 max-w-md font-body leading-relaxed">The list of active MSc and PhD students is currently being updated, or your search didn't match any enrolled students.</p>
+  </div>
 </div>

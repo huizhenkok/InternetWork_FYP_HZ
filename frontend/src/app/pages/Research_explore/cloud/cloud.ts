@@ -8,19 +8,20 @@ declare var AOS: any;
   selector: 'app-cloud',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './cloud.html' // 相对路径，只要 html 文件和 ts 在同一个文件夹就不需要改
+  templateUrl: './cloud.html'
 })
 export class Cloud implements OnInit {
+  labData: any = {};
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      const savedData = localStorage.getItem('inwlab_cms_research');
+      if (savedData) this.labData = JSON.parse(savedData).domains?.cloud || {};
+
       setTimeout(() => {
-        if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
-          AOS.refreshHard();
-          window.scrollTo(0, 0); // 确保每次进入页面都在最顶部
-        }
+        if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); }
       }, 150);
     }
   }
