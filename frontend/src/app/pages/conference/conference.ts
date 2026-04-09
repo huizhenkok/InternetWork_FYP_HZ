@@ -1,9 +1,8 @@
 import { Component, OnInit, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute } from '@angular/router'; // 引入路由工具来获取年份
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-// 🌟 引入我们刚才从 People 页面移过来的 Team 组件
 import { ConferenceTeam } from '../people/team/conference-team/conference-team';
 
 declare var AOS: any;
@@ -11,36 +10,31 @@ declare var AOS: any;
 @Component({
   selector: 'app-conference',
   standalone: true,
-  imports: [CommonModule, ConferenceTeam], // 🌟 注册 ConferenceTeam
+  imports: [CommonModule, ConferenceTeam],
   templateUrl: './conference.html'
 })
 export class Conference implements OnInit, OnDestroy {
-  // 🌟 新增：加入 CONFERENCE TEAM 选项
   tabs: string[] = ['HOME', 'CALL FOR PAPER', 'REGISTRATION', 'PROGRAM BOOK', 'CONFERENCE TEAM'];
   activeTab: string = 'HOME';
 
-  // 🌟 新增：动态年份处理
   currentYear: string = '2026';
   routeSub!: Subscription;
 
-  // 倒计时
+  confData: any = null;
+
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private route: ActivatedRoute
-  ) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private route: ActivatedRoute) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // 🌟 监听路由里传入的年份参数
       this.routeSub = this.route.paramMap.subscribe(params => {
         const yearParam = params.get('year');
         if (yearParam) {
           this.currentYear = yearParam;
-          this.activeTab = 'HOME'; // 切换年份时自动回到 HOME 标签
-          this.setCountdownForYear(this.currentYear);
+          this.activeTab = 'HOME';
+          this.loadConferenceData(this.currentYear);
         }
       });
 
@@ -54,6 +48,45 @@ export class Conference implements OnInit, OnDestroy {
     }
   }
 
+  loadConferenceData(year: string) {
+    if (isPlatformBrowser(this.platformId)) {
+      const savedConfs = localStorage.getItem('inwlab_cms_conferences');
+      let allConferences = [];
+      if (savedConfs) {
+        allConferences = JSON.parse(savedConfs);
+      }
+
+      const foundConf = allConferences.find((c: any) => c.year === year);
+
+      if (foundConf) {
+        this.confData = foundConf;
+      } else {
+        this.confData = {
+          year: year,
+          title: 'The International Conference on Internet Applications, Protocols and Services',
+          shortName: 'NETAPPS',
+          home: {
+            paragraph1: `The International Conference on Internet Applications, Protocols and Services (NETAPPS ${year}) is a no-frills conference in the area of Internet communications and networking.`,
+            paragraph2: `The main goal of this conference is to serve as an affordable platform to promote greater engagement of network researchers from around the globe...`,
+            confDate: `6 & 7 November ${year}`,
+            targetDate: `${year}-11-06T00:00:00`,
+            date1: `August 15, ${year}`,
+            date2: `Sept 30, ${year}`,
+            fee1: 'RM 1,000',
+            fee2: 'RM 800'
+          },
+          cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.',
+          reg: 'Registration & Final Submission details to be announced.',
+          imageUrl: '',
+          pdfUrl: '',
+          team: []
+        };
+      }
+
+      this.setCountdownForDate(this.confData.home.targetDate);
+    }
+  }
+
   ngOnDestroy() {
     if (this.timer) clearInterval(this.timer);
     if (this.routeSub) this.routeSub.unsubscribe();
@@ -61,16 +94,12 @@ export class Conference implements OnInit, OnDestroy {
 
   setTab(tab: string) {
     this.activeTab = tab;
-    setTimeout(() => {
-      if (typeof AOS !== 'undefined') AOS.refreshHard();
-    }, 50);
+    setTimeout(() => { if (typeof AOS !== 'undefined') AOS.refreshHard(); }, 50);
   }
 
-  setCountdownForYear(year: string) {
+  setCountdownForDate(targetDateStr: string) {
     if (this.timer) clearInterval(this.timer);
-
-    // 假设每年的会议都在当年的 11 月 6 日
-    const confDate = new Date(`${year}-11-06T00:00:00`);
+    const confDate = new Date(targetDateStr);
 
     this.timer = setInterval(() => {
       const now = new Date().getTime();
@@ -88,6 +117,10 @@ export class Conference implements OnInit, OnDestroy {
   }
 
   downloadProgramBook() {
-    alert(`Downloading Official Program Book for NetApp ${this.currentYear}...`);
+    if (this.confData && this.confData.pdfUrl && this.confData.pdfUrl.trim() !== '') {
+      window.open(this.confData.pdfUrl, '_blank');
+    } else {
+      alert(`The Official Program Book for ${this.confData.shortName} ${this.currentYear} is not available yet. Please check back later.`);
+    }
   }
 }

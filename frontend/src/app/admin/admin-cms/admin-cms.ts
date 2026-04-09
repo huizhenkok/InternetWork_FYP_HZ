@@ -14,10 +14,14 @@ declare var AOS: any;
 export class AdminCms implements OnInit {
 
   adminName: string = 'System Admin';
-  activeTab: string = 'news'; // 🌟 默认打开 News 方便测试
+  activeTab: string = 'conference'; // 🌟 默认打开 Conference 方便测试
   editingLab: string = '';
   activeAboutTab: string = 'vision';
   activeTeamTab: string = 'team';
+
+  // 🌟 Conference 编辑器专属状态
+  editingConfIndex: number | null = null;
+  activeConfTab: string = 'home';
 
   // ==============================
   // 🗄️ 全局数据库映射
@@ -27,51 +31,50 @@ export class AdminCms implements OnInit {
   resourceData: any = { mainTitle: 'Public Publications', subTitle: '...', filterTitle: '...', projects: [] };
   aboutData: any = { visionMission: {}, objective: {}, philosophy: {} };
   teamData: any = { mainTitle: 'Leadership & Team', subTitle: '...', ourTeam: [], alumni: [], students: [] };
+  newsAndEventsData: any = { mainTitle: 'NEWS', mainTitleHighlight: '& EVENTS', subTitle: '...', flagship: {}, gatheringsTitle: '...', gatherings: [], quickUpdatesTitle: '...', quickUpdates: [], quoteText: '...', quoteAuthor: '...' };
 
-  // 🌟 核心新增：News & Events 数据结构
-  newsAndEventsData: any = {
-    mainTitle: 'NEWS',
-    mainTitleHighlight: '& EVENTS',
-    subTitle: 'Stay synchronized with our latest research breakthroughs, lab upgrades, and upcoming academic gatherings.',
-
-    // 旗舰主推活动
-    flagship: {
-      badge: 'Flagship Event',
-      date: 'NOV 6-7, 2026',
-      location: 'ALOR SETAR',
-      title: 'NETAPPS 2026 Summit',
-      desc: 'Join us for an immersive discussion on the next horizon of decentralized protocols and network defense strategies.',
-      icon: 'hub'
-    },
-
-    // 即将到来的活动列表
-    gatheringsTitle: 'INCOMING GATHERINGS',
-    gatherings: [
-      {
-        date: 'NOV 12', location: 'LAB A', title: 'Cyber Forensics Workshop',
-        desc: 'Advanced techniques in digital evidence recovery and analysis for next-gen networks.', icon: 'security'
+  // 🌟 核心新增：Conference 数据结构 (数组格式，支持多年份)
+  conferences: any[] = [
+    {
+      year: '2026',
+      title: 'The International Conference on Internet Applications, Protocols and Services',
+      shortName: 'NETAPPS',
+      home: {
+        paragraph1: 'The International Conference on Internet Applications, Protocols and Services (NETAPPS 2026) is a no-frills conference in the area of Internet communications and networking.',
+        paragraph2: 'The main goal of this conference is to serve as an affordable platform to promote greater engagement of network researchers from around the globe...',
+        confDate: '6 & 7 November 2026',
+        targetDate: '2026-11-06T00:00:00',
+        date1: 'August 15, 2026',
+        date2: 'Sept 30, 2026',
+        fee1: 'RM 1,000',
+        fee2: 'RM 800'
       },
-      {
-        date: 'DEC 05', location: 'VIRTUAL', title: 'PhD Thesis Defense: AI Ethics',
-        desc: 'Defending the framework for ethical decision making in autonomous network agents.', icon: 'psychology'
-      }
-    ],
+      cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.\n\nPaper format guidelines...',
+      reg: 'Registration & Final Submission details to be announced.',
+      imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop', // 🌟 新增：默认的极客风背景图
+      pdfUrl: '', // 🌟 新增：PDF 链接
+      team: [
+        {
+          title: 'Executive Chairs',
+          members: [
+            { name: 'Prof. Dr. Suhaidi Hassan', org: 'Universiti Utara Malaysia', role: 'Advisor' },
+            { name: 'Prof. Dr. Osman Ghazali', org: 'Universiti Utara Malaysia', role: 'General Chair' }
+          ]
+        },
+        {
+          title: 'Secretariat',
+          members: [
+            { name: 'Dr. Nur Suhaili Mansor', org: 'Universiti Utara Malaysia', role: '' }
+          ]
+        }
+      ]
+    }
+  ];
 
-    // 侧边栏快速更新与名言
-    quickUpdatesTitle: 'QUICK UPDATES',
-    quickUpdates: [
-      { tag: 'NEXT WEEK', text: 'Lab server maintenance scheduled.' },
-      { tag: 'REMINDER', text: 'Call for papers deadline extended to Nov 1.' }
-    ],
-    quoteText: '"Innovation in networking is not just about speed, but securing the foundation of tomorrow\'s digital society."',
-    quoteAuthor: 'INWLab Vision'
-  };
-
-  conferenceData: any = { mainTitle: 'INWLab Annual Conference 2026', subTitle: '...', dates: '...', registerFee: '...' };
-  forumVisitorData: any = { mainTitle: 'INWLab Community Forum', subTitle: '...', newsTitle: '...' };
+  forumVisitorData: any = { mainTitle: 'INWLab Community Forum', subTitle: 'Join the discussion, share ideas, and solve problems.', newsTitle: 'Forum Guidelines Updated' };
   contactData: any = { mainTitle: 'Get In Touch', email: 'contact@inwlab.edu', phone: '+1 (555) 123-4567', address: 'Engineering Building...' };
 
-  rooms: any[] = []; topics: any[] = [];
+  rooms: any[] = []; topics: any[] = []; bulletins: any[] = [];
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone, private router: Router) {}
 
@@ -93,27 +96,28 @@ export class AdminCms implements OnInit {
       };
 
       this.homeData = loadOrInit('inwlab_cms_home', this.homeData);
-
       const savedResearch = localStorage.getItem('inwlab_cms_research');
-      if (savedResearch) {
-        let parsed = JSON.parse(savedResearch);
-        if (Array.isArray(parsed.domains) || !parsed.domains?.cyber) { parsed.domains = this.researchData.domains; }
-        this.researchData = { ...this.researchData, ...parsed };
-      } else {
-        localStorage.setItem('inwlab_cms_research', JSON.stringify(this.researchData));
-      }
-
+      if (savedResearch) { let parsed = JSON.parse(savedResearch); if (Array.isArray(parsed.domains) || !parsed.domains?.cyber) { parsed.domains = this.researchData.domains; } this.researchData = { ...this.researchData, ...parsed }; } else { localStorage.setItem('inwlab_cms_research', JSON.stringify(this.researchData)); }
       this.resourceData = loadOrInit('inwlab_cms_resource', this.resourceData);
       const legacyProjects = localStorage.getItem('inwlab_projects');
       if (legacyProjects && this.resourceData.projects.length === 2) { try { const parsedLegacy = JSON.parse(legacyProjects); if (parsedLegacy && parsedLegacy.length > 0) { this.resourceData.projects = parsedLegacy; } } catch(e) {} }
-
       this.aboutData = loadOrInit('inwlab_cms_about', this.aboutData);
       this.teamData = loadOrInit('inwlab_cms_team', this.teamData);
-
-      // 🌟 加载 News 数据
       this.newsAndEventsData = loadOrInit('inwlab_cms_news_events', this.newsAndEventsData);
 
-      this.conferenceData = loadOrInit('inwlab_cms_conference', this.conferenceData);
+      // 🌟 加载 Conference 数组数据，并强制按年份降序排列
+      const savedConfs = localStorage.getItem('inwlab_cms_conferences');
+      if (savedConfs) {
+        try {
+          const parsed = JSON.parse(savedConfs);
+          if (parsed && parsed.length > 0) {
+            this.conferences = parsed.sort((a: any, b: any) => parseInt(b.year) - parseInt(a.year));
+          }
+        } catch(e) {}
+      } else {
+        localStorage.setItem('inwlab_cms_conferences', JSON.stringify(this.conferences));
+      }
+
       this.forumVisitorData = loadOrInit('inwlab_cms_forum_visitor', this.forumVisitorData);
       this.contactData = loadOrInit('inwlab_cms_contact', this.contactData);
 
@@ -132,18 +136,77 @@ export class AdminCms implements OnInit {
   saveResource() { this.saveModule('inwlab_cms_resource', this.resourceData, 'Publication & Projects'); if (isPlatformBrowser(this.platformId)) { localStorage.setItem('inwlab_projects', JSON.stringify(this.resourceData.projects)); } }
   saveAbout() { this.saveModule('inwlab_cms_about', this.aboutData, 'About Us Information'); }
   saveTeam() { this.saveModule('inwlab_cms_team', this.teamData, 'Team & Leadership Directory'); }
-
-  // 🌟 保存 News 数据
   saveNews() { this.saveModule('inwlab_cms_news_events', this.newsAndEventsData, 'News & Events'); }
 
-  // 🌟 News 管理方法
-  addGathering() { this.newsAndEventsData.gatherings.push({ date: 'DATE', location: 'LOCATION', title: 'New Event Title', desc: 'Event description.', icon: 'event' }); }
-  deleteGathering(index: number) { if (confirm("Remove this gathering?")) this.newsAndEventsData.gatherings.splice(index, 1); }
+  // ==========================================
+  // 🌟 Conference 管理核心逻辑
+  // ==========================================
+  saveConferences() {
+    // 保存前强制重新排序，确保 Navbar 和列表永远是最新的在上面
+    this.conferences.sort((a: any, b: any) => parseInt(b.year) - parseInt(a.year));
+    this.saveModule('inwlab_cms_conferences', this.conferences, 'Conference Databases');
+  }
 
-  addQuickUpdate() { this.newsAndEventsData.quickUpdates.push({ tag: 'NEW TAG', text: 'New update text here.' }); }
-  deleteQuickUpdate(index: number) { if (confirm("Remove this update?")) this.newsAndEventsData.quickUpdates.splice(index, 1); }
+  addNewConference() {
+    const nextYear = (new Date().getFullYear() + 1).toString();
+    this.conferences.unshift({
+      year: nextYear,
+      title: 'The International Conference on Internet Applications, Protocols and Services',
+      shortName: 'NETAPPS',
+      home: { paragraph1: 'Conference description here...', paragraph2: 'Goals and objectives...', confDate: `November ${nextYear}`, targetDate: `${nextYear}-11-06T00:00:00`, date1: `August 15, ${nextYear}`, date2: `Sept 30, ${nextYear}`, fee1: 'RM 1,000', fee2: 'RM 800' },
+      cfp: 'Call for paper guidelines...',
+      reg: 'Registration details...',
+      imageUrl: '', // 🌟 新增
+      pdfUrl: '',   // 🌟 新增
+      team: []
+    });
+    this.saveConferences();
+  }
+
+  deleteConference(index: number) {
+    if (confirm(`Are you sure you want to completely delete the conference for year ${this.conferences[index].year}?`)) {
+      this.conferences.splice(index, 1);
+      this.saveConferences();
+    }
+  }
+
+  openConferenceEditor(index: number) {
+    this.editingConfIndex = index;
+    this.activeConfTab = 'home';
+  }
+
+  closeConferenceEditor() {
+    this.editingConfIndex = null;
+    this.saveConferences(); // 退出时自动保存一次
+  }
+
+  // 🌟 Conference Team 管理逻辑 (仅针对当前编辑的会议)
+  addConfCommittee() {
+    if (this.editingConfIndex !== null) {
+      this.conferences[this.editingConfIndex].team.push({ title: 'New Committee', members: [] });
+    }
+  }
+  deleteConfCommittee(cIndex: number) {
+    if (this.editingConfIndex !== null && confirm("Delete this entire committee?")) {
+      this.conferences[this.editingConfIndex].team.splice(cIndex, 1);
+    }
+  }
+  addConfMember(cIndex: number) {
+    if (this.editingConfIndex !== null) {
+      this.conferences[this.editingConfIndex].team[cIndex].members.push({ name: 'Member Name', org: 'University / Org', role: '' });
+    }
+  }
+  deleteConfMember(cIndex: number, mIndex: number) {
+    if (this.editingConfIndex !== null && confirm("Remove this member?")) {
+      this.conferences[this.editingConfIndex].team[cIndex].members.splice(mIndex, 1);
+    }
+  }
 
   // ... (保留其他原有的增删代码) ...
+  addGathering() { this.newsAndEventsData.gatherings.push({ date: 'DATE', location: 'LOCATION', title: 'New Event Title', desc: 'Event description.', icon: 'event' }); }
+  deleteGathering(index: number) { if (confirm("Remove this gathering?")) this.newsAndEventsData.gatherings.splice(index, 1); }
+  addQuickUpdate() { this.newsAndEventsData.quickUpdates.push({ tag: 'NEW TAG', text: 'New update text here.' }); }
+  deleteQuickUpdate(index: number) { if (confirm("Remove this update?")) this.newsAndEventsData.quickUpdates.splice(index, 1); }
   addTeamSection() { this.teamData.ourTeam.push({ title: 'New Department', members: [] }); }
   deleteTeamSection(index: number) { if (confirm("Delete this entire department?")) this.teamData.ourTeam.splice(index, 1); }
   addTeamMember(sectionIndex: number) { this.teamData.ourTeam[sectionIndex].members.push({ name: 'New Member', role: 'Role', email: '', socialLink: '', avatar: '' }); }

@@ -530,7 +530,149 @@
                 <button (click)="saveNews()" class="glow-button px-8 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save All News</button>
               </div>
             </div>
-            <div *ngIf="[ 'conference', 'forum_info', 'bulletins'].includes(activeTab)" class="animate-in fade-in duration-300 flex flex-col items-center justify-center text-center h-[400px]">
+            <div *ngIf="activeTab === 'conference'" class="animate-in fade-in duration-300">
+
+              <ng-container *ngIf="editingConfIndex === null">
+                <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                  <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Conference Databases</h2>
+                  <button (click)="addNewConference()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none">
+                    <span class="material-symbols-outlined text-[18px]">add</span> Add New Year
+                  </button>
+                </div>
+
+                <p class="text-sm text-slate-500 dark:text-gray-400 mb-6">Select a conference year below to edit its specific details, call for papers, and committee members. Newest years automatically appear at the top of the visitor navigation bar.</p>
+
+                <div class="flex flex-col gap-4">
+                  <div *ngFor="let conf of conferences; let i = index" class="flex items-center justify-between p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl group transition-all hover:border-primary/50">
+                    <div class="flex items-center gap-4">
+                      <div class="h-12 w-12 rounded-xl bg-primary/10 text-primary dark:bg-primary/20 flex items-center justify-center font-bold text-lg border border-primary/20">
+                        {{ conf.year }}
+                      </div>
+                      <div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">{{ conf.shortName }} {{ conf.year }}</h3>
+                        <p class="text-xs text-slate-500 dark:text-gray-400 mt-1 truncate max-w-md">{{ conf.title }}</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button (click)="openConferenceEditor(i)" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white text-sm font-bold hover:bg-primary hover:text-white transition-colors cursor-pointer border-none outline-none">
+                        Edit Data
+                      </button>
+                      <button (click)="deleteConference(i)" class="h-9 w-9 flex items-center justify-center rounded-lg bg-red-100 dark:bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors cursor-pointer border-none outline-none">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="conferences.length === 0" class="text-center py-10 text-slate-500 font-medium">No conferences found. Click "Add New Year" to create one.</div>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="editingConfIndex !== null && conferences[editingConfIndex]">
+                <div class="flex items-center gap-4 mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                  <button (click)="closeConferenceEditor()" class="flex items-center justify-center size-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-white transition-colors border-none cursor-pointer outline-none">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                  </button>
+                  <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex-1">
+                    Editing: <span class="text-primary dark:text-[#0df2f2]">{{ conferences[editingConfIndex].shortName }} {{ conferences[editingConfIndex].year }}</span>
+                  </h2>
+                  <button (click)="saveConferences()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none">
+                    <span class="material-symbols-outlined text-[18px]">save</span> Save Changes
+                  </button>
+                </div>
+
+                <div class="flex flex-wrap border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5 mb-8">
+                  <button (click)="activeConfTab = 'home'" [ngClass]="activeConfTab === 'home' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Basic & Home</button>
+                  <button (click)="activeConfTab = 'cfp'" [ngClass]="activeConfTab === 'cfp' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Call For Paper</button>
+                  <button (click)="activeConfTab = 'reg'" [ngClass]="activeConfTab === 'reg' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Registration</button>
+                  <button (click)="activeConfTab = 'team'" [ngClass]="activeConfTab === 'team' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Conf. Team</button>
+                </div>
+
+                <div class="p-6 flex flex-col gap-8 bg-slate-50/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl">
+
+                  <div *ngIf="activeConfTab === 'home'" class="animate-in fade-in flex flex-col gap-6">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Global Settings</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Conference Year</label><input type="text" [(ngModel)]="conferences[editingConfIndex].year" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none"></div>
+                      <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Short Name (e.g. NETAPPS)</label><input type="text" [(ngModel)]="conferences[editingConfIndex].shortName" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Countdown Target (YYYY-MM-DDTHH:mm:ss)</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.targetDate" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-primary font-mono outline-none"></div>
+                    </div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Full Conference Title</label><input type="text" [(ngModel)]="conferences[editingConfIndex].title" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none"></div>
+
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 mt-4">Home Page Content</h3>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Paragraph 1</label><textarea [(ngModel)]="conferences[editingConfIndex].home.paragraph1" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Paragraph 2</label><textarea [(ngModel)]="conferences[editingConfIndex].home.paragraph2" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                      <div class="p-4 bg-white dark:bg-black/30 rounded-xl border border-slate-200 dark:border-white/10 flex flex-col gap-3">
+                        <h4 class="text-[10px] font-bold text-primary uppercase border-b border-slate-200 dark:border-white/10 pb-1">Important Dates</h4>
+                        <div class="flex flex-col gap-1"><label class="text-[9px] text-slate-500">Conference Date Display</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.confDate" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none"></div>
+                        <div class="flex flex-col gap-1"><label class="text-[9px] text-slate-500">Paper Submission</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.date1" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none"></div>
+                        <div class="flex flex-col gap-1"><label class="text-[9px] text-slate-500">Notification of Acceptance</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.date2" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none"></div>
+                      </div>
+                      <div class="p-4 bg-white dark:bg-black/30 rounded-xl border border-slate-200 dark:border-white/10 flex flex-col gap-3">
+                        <h4 class="text-[10px] font-bold text-accent-cyan uppercase border-b border-slate-200 dark:border-white/10 pb-1">Registration Fees</h4>
+                        <div class="flex flex-col gap-1"><label class="text-[9px] text-slate-500">Presenter Fee</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.fee1" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none"></div>
+                        <div class="flex flex-col gap-1"><label class="text-[9px] text-slate-500">Student / IEEE Member Fee</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.fee2" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none"></div>
+                      </div>
+                    </div>
+
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 mt-6">Media & Downloads (URLs)</h3>
+                    <div class="flex flex-col gap-4">
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[10px] font-bold text-primary uppercase">Conference Poster / Banner (Image URL)</label>
+                        <input type="text" [(ngModel)]="conferences[editingConfIndex].imageUrl" placeholder="https://... (.jpg, .png)" class="w-full bg-white dark:bg-black/40 border border-primary/30 dark:border-[#0df2f2]/30 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary">
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <label class="text-[10px] font-bold text-accent-cyan uppercase">Program Book (PDF Download URL)</label>
+                        <input type="text" [(ngModel)]="conferences[editingConfIndex].pdfUrl" placeholder="https://... (.pdf or Drive Link)" class="w-full bg-white dark:bg-black/40 border border-accent-cyan/30 dark:border-[#0df2f2]/30 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-accent-cyan">
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div *ngIf="activeConfTab === 'cfp'" class="animate-in fade-in flex flex-col gap-4">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Submission Guidelines Content</label>
+                    <textarea [(ngModel)]="conferences[editingConfIndex].cfp" rows="12" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                  </div>
+
+                  <div *ngIf="activeConfTab === 'reg'" class="animate-in fade-in flex flex-col gap-4">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Registration & Final Submission Content</label>
+                    <textarea [(ngModel)]="conferences[editingConfIndex].reg" rows="12" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                  </div>
+
+                  <div *ngIf="activeConfTab === 'team'" class="animate-in fade-in flex flex-col gap-8">
+                    <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2">
+                      <h3 class="text-sm font-bold text-slate-900 dark:text-white">Conference Committee Database</h3>
+                      <button (click)="addConfCommittee()" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">add_circle</span> Add Committee Group</button>
+                    </div>
+
+                    <div *ngFor="let committee of conferences[editingConfIndex].team; let cIndex = index" class="p-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative group">
+                      <button (click)="deleteConfCommittee(cIndex)" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+
+                      <div class="flex flex-col gap-1 mb-4 w-64">
+                        <label class="text-[9px] font-bold text-primary uppercase">Committee Title</label>
+                        <input type="text" [(ngModel)]="committee.title" class="w-full bg-transparent border-b border-slate-200 dark:border-white/10 px-1 py-1 text-sm font-bold text-slate-900 dark:text-white outline-none">
+                      </div>
+
+                      <div class="flex flex-col gap-2 pl-3 border-l-2 border-slate-200 dark:border-white/10">
+                        <div *ngFor="let member of committee.members; let mIndex = index" class="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-50 dark:bg-black/30 p-2 rounded-lg border border-slate-200 dark:border-white/5 relative pr-8">
+                          <button (click)="deleteConfMember(cIndex, mIndex)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">close</span></button>
+                          <input type="text" [(ngModel)]="member.name" placeholder="Name" class="bg-white dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded px-2 py-1 text-xs text-slate-900 dark:text-white outline-none">
+                          <input type="text" [(ngModel)]="member.org" placeholder="Organization" class="bg-white dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded px-2 py-1 text-xs text-slate-900 dark:text-white outline-none">
+                          <input type="text" [(ngModel)]="member.role" placeholder="Role (Optional)" class="bg-white dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded px-2 py-1 text-xs text-amber-600 dark:text-amber-500 outline-none">
+                        </div>
+                        <button (click)="addConfMember(cIndex)" class="self-start text-[10px] font-bold text-slate-500 hover:text-primary transition-colors mt-1 bg-transparent border-none cursor-pointer outline-none">+ Add Member</button>
+                      </div>
+                    </div>
+
+                    <div *ngIf="conferences[editingConfIndex].team.length === 0" class="text-center py-6 text-sm text-slate-500">No committees added yet.</div>
+                  </div>
+
+                </div>
+              </ng-container>
+            </div>
+
+
+            <div *ngIf="[  'forum_info', 'bulletins'].includes(activeTab)" class="animate-in fade-in duration-300 flex flex-col items-center justify-center text-center h-[400px]">
               <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">construction</span>
               <h3 class="text-xl font-bold text-slate-700 dark:text-white">Module Initialized in DB</h3>
               <p class="text-slate-500 dark:text-gray-400 mt-2">Data structure created. Complex array editors can be expanded here.</p>
