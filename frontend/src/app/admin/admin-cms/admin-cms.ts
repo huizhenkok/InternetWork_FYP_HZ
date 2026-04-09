@@ -14,7 +14,7 @@ declare var AOS: any;
 export class AdminCms implements OnInit {
 
   adminName: string = 'System Admin';
-  activeTab: string = 'conference'; // 🌟 默认打开 Conference 方便测试
+  activeTab: string = 'contact'; // 🌟 默认打开 Contact 方便测试
   editingLab: string = '';
   activeAboutTab: string = 'vision';
   activeTeamTab: string = 'team';
@@ -33,7 +33,7 @@ export class AdminCms implements OnInit {
   teamData: any = { mainTitle: 'Leadership & Team', subTitle: '...', ourTeam: [], alumni: [], students: [] };
   newsAndEventsData: any = { mainTitle: 'NEWS', mainTitleHighlight: '& EVENTS', subTitle: '...', flagship: {}, gatheringsTitle: '...', gatherings: [], quickUpdatesTitle: '...', quickUpdates: [], quoteText: '...', quoteAuthor: '...' };
 
-  // 🌟 核心新增：Conference 数据结构 (数组格式，支持多年份)
+  // 🌟 Conference 数据结构 (数组格式，支持多年份)
   conferences: any[] = [
     {
       year: '2026',
@@ -51,8 +51,8 @@ export class AdminCms implements OnInit {
       },
       cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.\n\nPaper format guidelines...',
       reg: 'Registration & Final Submission details to be announced.',
-      imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop', // 🌟 新增：默认的极客风背景图
-      pdfUrl: '', // 🌟 新增：PDF 链接
+      imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
+      pdfUrl: '',
       team: [
         {
           title: 'Executive Chairs',
@@ -71,10 +71,19 @@ export class AdminCms implements OnInit {
     }
   ];
 
-  forumVisitorData: any = { mainTitle: 'INWLab Community Forum', subTitle: 'Join the discussion, share ideas, and solve problems.', newsTitle: 'Forum Guidelines Updated' };
-  contactData: any = { mainTitle: 'Get In Touch', email: 'contact@inwlab.edu', phone: '+1 (555) 123-4567', address: 'Engineering Building...' };
+  // 🌟 核心升级：Contact 数据结构 (彻底移除了 Forum 变量)
+  contactData: any = {
+    mainTitle: 'Get in Touch.',
+    subTitle: 'Initiate a secure inquiry. Our team is ready to discuss research collaborations, industry partnerships, and academic opportunities.',
+    emailLabel: 'General Inquiries',
+    email: 'netapps@internetworks.my',
+    addressLabel: 'Base of Operations',
+    address: 'School of Computing,\nUniversiti Utara Malaysia,\n06010 Sintok, Kedah.',
+    social1: '#', // Primary Social Link URL
+    social2: '#'  // Secondary Website URL
+  };
 
-  rooms: any[] = []; topics: any[] = []; bulletins: any[] = [];
+  rooms: any[] = []; bulletins: any[] = [];
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone, private router: Router) {}
 
@@ -105,7 +114,6 @@ export class AdminCms implements OnInit {
       this.teamData = loadOrInit('inwlab_cms_team', this.teamData);
       this.newsAndEventsData = loadOrInit('inwlab_cms_news_events', this.newsAndEventsData);
 
-      // 🌟 加载 Conference 数组数据，并强制按年份降序排列
       const savedConfs = localStorage.getItem('inwlab_cms_conferences');
       if (savedConfs) {
         try {
@@ -118,12 +126,12 @@ export class AdminCms implements OnInit {
         localStorage.setItem('inwlab_cms_conferences', JSON.stringify(this.conferences));
       }
 
-      this.forumVisitorData = loadOrInit('inwlab_cms_forum_visitor', this.forumVisitorData);
+      // 🌟 加载 Contact 数据 (移除了 Forum 数据加载)
       this.contactData = loadOrInit('inwlab_cms_contact', this.contactData);
 
       const savedRooms = localStorage.getItem('inwlab_rooms');
       if (savedRooms) { this.rooms = JSON.parse(savedRooms); } else { this.rooms = [ { id: '#101', name: 'Discussion Room A', capacity: 6, status: 'Available' } ]; localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms)); }
-      this.topics = JSON.parse(localStorage.getItem('inwlab_forum_topics') || '[]');
+      this.bulletins = JSON.parse(localStorage.getItem('inwlab_bulletins') || '[]');
     }
   }
 
@@ -142,7 +150,6 @@ export class AdminCms implements OnInit {
   // 🌟 Conference 管理核心逻辑
   // ==========================================
   saveConferences() {
-    // 保存前强制重新排序，确保 Navbar 和列表永远是最新的在上面
     this.conferences.sort((a: any, b: any) => parseInt(b.year) - parseInt(a.year));
     this.saveModule('inwlab_cms_conferences', this.conferences, 'Conference Databases');
   }
@@ -156,8 +163,8 @@ export class AdminCms implements OnInit {
       home: { paragraph1: 'Conference description here...', paragraph2: 'Goals and objectives...', confDate: `November ${nextYear}`, targetDate: `${nextYear}-11-06T00:00:00`, date1: `August 15, ${nextYear}`, date2: `Sept 30, ${nextYear}`, fee1: 'RM 1,000', fee2: 'RM 800' },
       cfp: 'Call for paper guidelines...',
       reg: 'Registration details...',
-      imageUrl: '', // 🌟 新增
-      pdfUrl: '',   // 🌟 新增
+      imageUrl: '',
+      pdfUrl: '',
       team: []
     });
     this.saveConferences();
@@ -177,10 +184,9 @@ export class AdminCms implements OnInit {
 
   closeConferenceEditor() {
     this.editingConfIndex = null;
-    this.saveConferences(); // 退出时自动保存一次
+    this.saveConferences();
   }
 
-  // 🌟 Conference Team 管理逻辑 (仅针对当前编辑的会议)
   addConfCommittee() {
     if (this.editingConfIndex !== null) {
       this.conferences[this.editingConfIndex].team.push({ title: 'New Committee', members: [] });
@@ -202,7 +208,6 @@ export class AdminCms implements OnInit {
     }
   }
 
-  // ... (保留其他原有的增删代码) ...
   addGathering() { this.newsAndEventsData.gatherings.push({ date: 'DATE', location: 'LOCATION', title: 'New Event Title', desc: 'Event description.', icon: 'event' }); }
   deleteGathering(index: number) { if (confirm("Remove this gathering?")) this.newsAndEventsData.gatherings.splice(index, 1); }
   addQuickUpdate() { this.newsAndEventsData.quickUpdates.push({ tag: 'NEW TAG', text: 'New update text here.' }); }
@@ -219,11 +224,15 @@ export class AdminCms implements OnInit {
   deleteStudent(index: number) { if (confirm("Remove this student?")) this.teamData.students.splice(index, 1); }
   addProject() { this.resourceData.projects.unshift({ id: new Date().getTime(), title: 'New Research Project', name: 'Researcher Name', date: new Date().toISOString().split('T')[0], summary: 'Enter project description here.' }); }
   deleteProject(index: number) { if (confirm("Delete this project permanently?")) { this.resourceData.projects.splice(index, 1); } }
+
   saveContact() { this.saveModule('inwlab_cms_contact', this.contactData, 'Contact Info'); }
+
   saveRooms() { if (isPlatformBrowser(this.platformId)) { localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms)); alert("✅ Lab Facilities updated!"); } }
   addNewRoom() { this.rooms.push({ id: '#'+Math.floor(Math.random()*900+100), name: 'New Room', capacity: 10, status: 'Available' }); }
   deleteRoom(index: number) { if (confirm("Delete this facility?")) this.rooms.splice(index, 1); }
-  deleteTopic(index: number) { if (confirm("Delete this topic?")) { this.topics.splice(index, 1); if (isPlatformBrowser(this.platformId)) localStorage.setItem('inwlab_forum_topics', JSON.stringify(this.topics)); } }
+
+  // 🚨 已彻底移除 deleteTopic
+
   logout() { if (confirm("Are you sure you want to logout?")) { localStorage.removeItem('active_user'); this.router.navigate(['/login']); } }
   goToLabEditor(labId: string) { this.editingLab = labId; }
   backToResearchMain() { this.editingLab = ''; }

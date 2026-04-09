@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // 🌟 引入表单模块以抓取数据
+import { FormsModule } from '@angular/forms';
 
 declare var AOS: any;
 
@@ -11,6 +11,18 @@ declare var AOS: any;
   templateUrl: './contact.html'
 })
 export class Contact implements OnInit {
+
+  // 🌟 核心：默认展示数据，如果数据库是空的就显示这些保底数据
+  cmsData: any = {
+    mainTitle: 'Get in Touch.',
+    subTitle: 'Initiate a secure inquiry. Our team is ready to discuss research collaborations, industry partnerships, and academic opportunities.',
+    emailLabel: 'General Inquiries',
+    email: 'netapps@internetworks.my',
+    addressLabel: 'Base of Operations',
+    address: 'School of Computing,\nUniversiti Utara Malaysia,\n06010 Sintok, Kedah.',
+    social1: '#',
+    social2: '#'
+  };
 
   // 表单数据模型
   formData = {
@@ -28,6 +40,16 @@ export class Contact implements OnInit {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+
+      // 🌟 加载 Admin 在后台填写的联系方式数据
+      const savedCms = localStorage.getItem('inwlab_cms_contact');
+      if (savedCms) {
+        try {
+          const parsed = JSON.parse(savedCms);
+          this.cmsData = { ...this.cmsData, ...parsed };
+        } catch(e) {}
+      }
+
       setTimeout(() => {
         if (typeof AOS !== 'undefined') {
           AOS.init({ duration: 800, once: true, offset: 50 });
@@ -38,23 +60,19 @@ export class Contact implements OnInit {
     }
   }
 
-  // 🌟 模拟发送表单的过程
+  // 模拟发送表单的过程
   sendMessage() {
-    // 简单验证：确保必填项不为空
     if (!this.formData.name || !this.formData.email || !this.formData.message) {
       alert("Please fill in all required fields before sending.");
       return;
     }
 
-    // 触发发送中状态
     this.isSending = true;
 
-    // 模拟网络延迟 (1.5秒后显示成功)
     setTimeout(() => {
       this.isSending = false;
       this.isSent = true;
 
-      // 成功后，清空表单
       this.formData = {
         name: '',
         email: '',
@@ -62,7 +80,6 @@ export class Contact implements OnInit {
         message: ''
       };
 
-      // 3秒后恢复按钮的原始状态
       setTimeout(() => {
         this.isSent = false;
       }, 3000);

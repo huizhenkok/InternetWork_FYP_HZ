@@ -15,20 +15,21 @@ export class Navbar implements OnInit {
   isNetappsMenuOpen = false;
   isMobileMenuOpen = false;
 
-  // 🌟 默认显示的年份，如果没有 CMS 数据就用这个保底
-  conferenceYears: string[] = ['2026', '2025', '2024', '2023', '2022'];
+  // 🌟 默认空白，一切以 CMS 数据库为准
+  conferenceYears: string[] = [];
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // 🌟 动态读取 CMS 里的会议年份，并从大到小排序 (最新年份在最上面)
+      // 🌟 核心：强制且唯一地从 CMS 读取年份列表！
       const savedConfs = localStorage.getItem('inwlab_cms_conferences');
       if (savedConfs) {
         try {
           const parsed = JSON.parse(savedConfs);
           if (parsed && parsed.length > 0) {
-            this.conferenceYears = parsed.map((c: any) => c.year).sort((a: any, b: any) => b - a);
+            // 安全的字符串排序，确保 "2028", "2027", "test" 都能按顺序排好
+            this.conferenceYears = parsed.map((c: any) => String(c.year)).sort((a: any, b: string) => b.localeCompare(a));
           }
         } catch(e) {}
       }
@@ -36,5 +37,4 @@ export class Navbar implements OnInit {
   }
 
   onToggleTheme() { this.toggleThemeEvent.emit(); }
-  toggleNetappsMenu() { this.isNetappsMenuOpen = !this.isNetappsMenuOpen; }
 }

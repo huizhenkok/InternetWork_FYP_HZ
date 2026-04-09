@@ -63,7 +63,6 @@
                             {id: 'people', icon: 'groups', title: 'Leadership Directory'},
                             {id: 'news', icon: 'newspaper', title: 'News & Events'},
                             {id: 'conference', icon: 'event_seat', title: 'Conference'},
-                            {id: 'forum_info', icon: 'forum', title: 'Forum Info'},
                             {id: 'contact', icon: 'contact_support', title: 'Contact Info'}
                         ]" (click)="activeTab = tab.id"
                     [ngClass]="activeTab === tab.id ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
@@ -81,10 +80,6 @@
             <button (click)="activeTab = 'bulletins'" [ngClass]="activeTab === 'bulletins' ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
               <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">campaign</span> System Bulletins</div>
               <span *ngIf="activeTab === 'bulletins'" class="material-symbols-outlined text-[18px]">chevron_right</span>
-            </button>
-            <button (click)="activeTab = 'forum'" [ngClass]="activeTab === 'forum' ? 'bg-white dark:bg-white/10 text-primary dark:text-[#0df2f2] border-primary dark:border-[#0df2f2] shadow-sm' : 'border-transparent text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5'" class="flex items-center justify-between w-full text-left px-4 py-3.5 rounded-xl border transition-all font-semibold outline-none cursor-pointer">
-              <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">gavel</span> Forum Moderation</div>
-              <span *ngIf="activeTab === 'forum'" class="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
           </div>
         </div>
@@ -437,14 +432,48 @@
             </div>
 
             <div *ngIf="activeTab === 'contact'" class="animate-in fade-in duration-300">
-              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/10 pb-4">Contact Info</h2>
-              <div class="flex flex-col gap-6">
-                <input type="text" [(ngModel)]="contactData.email" placeholder="Email" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none">
-                <input type="text" [(ngModel)]="contactData.phone" placeholder="Phone" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none">
-                <textarea [(ngModel)]="contactData.address" rows="3" placeholder="Address" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none"></textarea>
-                <button (click)="saveContact()" class="self-end glow-button px-8 py-3 rounded-xl bg-primary text-white font-bold flex items-center gap-2 border-none cursor-pointer"><span class="material-symbols-outlined">save</span> Save Contact</button>
+              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Contact Page Editor</h2>
+                <button (click)="saveContact()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save Changes</button>
+              </div>
+
+              <div class="flex flex-col gap-8 max-w-4xl">
+                <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Page Headers</h3>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-primary uppercase">Main Title</label>
+                    <input type="text" [(ngModel)]="contactData.mainTitle" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-lg text-slate-900 dark:text-white font-bold outline-none focus:border-primary">
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Subtitle Description</label>
+                    <textarea [(ngModel)]="contactData.subTitle" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">mail</span> Official Email</h3>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Label (e.g. General Inquiries)</label><input type="text" [(ngModel)]="contactData.emailLabel" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Email Address</label><input type="text" [(ngModel)]="contactData.email" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                  </div>
+
+                  <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 flex items-center gap-2"><span class="material-symbols-outlined text-accent-teal text-[18px]">location_on</span> Physical Address</h3>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Label (e.g. Base of Operations)</label><input type="text" [(ngModel)]="contactData.addressLabel" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Full Address (Use Enter for new lines)</label><textarea [(ngModel)]="contactData.address" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea></div>
+                  </div>
+                </div>
+
+                <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Social & External Links</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">share</span> Primary Social Link URL</label><input type="text" [(ngModel)]="contactData.social1" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">public</span> Secondary Website URL</label><input type="text" [(ngModel)]="contactData.social2" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                  </div>
+                </div>
               </div>
             </div>
+
             <div *ngIf="activeTab === 'news'" class="animate-in fade-in duration-300">
               <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white">News & Events Editor</h2>
@@ -530,6 +559,7 @@
                 <button (click)="saveNews()" class="glow-button px-8 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save All News</button>
               </div>
             </div>
+
             <div *ngIf="activeTab === 'conference'" class="animate-in fade-in duration-300">
 
               <ng-container *ngIf="editingConfIndex === null">
@@ -671,11 +701,10 @@
               </ng-container>
             </div>
 
-
-            <div *ngIf="[  'forum_info', 'bulletins'].includes(activeTab)" class="animate-in fade-in duration-300 flex flex-col items-center justify-center text-center h-[400px]">
+            <div *ngIf="activeTab === 'bulletins'" class="animate-in fade-in duration-300 flex flex-col items-center justify-center text-center h-[400px]">
               <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">construction</span>
-              <h3 class="text-xl font-bold text-slate-700 dark:text-white">Module Initialized in DB</h3>
-              <p class="text-slate-500 dark:text-gray-400 mt-2">Data structure created. Complex array editors can be expanded here.</p>
+              <h3 class="text-xl font-bold text-slate-700 dark:text-white">No data to be edit </h3>
+              <p class="text-slate-500 dark:text-gray-400 mt-2">Data structure created. </p>
             </div>
 
             <div *ngIf="activeTab === 'rooms'" class="animate-in fade-in duration-300">
@@ -695,20 +724,6 @@
                 </div>
               </div>
               <button (click)="saveRooms()" class="mt-6 glow-button px-8 py-3 rounded-xl bg-primary text-white font-bold flex items-center gap-2 border-none cursor-pointer float-right"><span class="material-symbols-outlined">save</span> Save Rooms</button>
-            </div>
-
-            <div *ngIf="activeTab === 'forum'" class="animate-in fade-in duration-300">
-              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-6 border-b border-slate-200 dark:border-white/10 pb-4">Forum Moderation</h2>
-              <div class="flex flex-col gap-3">
-                <div *ngFor="let topic of topics; let i = index" class="p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 flex items-center justify-between">
-                  <div>
-                    <h4 class="font-bold text-slate-900 dark:text-white text-sm">{{ topic.title }}</h4>
-                    <p class="text-xs text-slate-500 mt-1">By {{ topic.authorName }} ({{ topic.replies?.length || 0 }} replies)</p>
-                  </div>
-                  <button (click)="deleteTopic(i)" class="flex items-center gap-1 px-3 py-1.5 rounded bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold border border-red-200 dark:border-red-500/20 hover:bg-red-200 transition-colors cursor-pointer border-none outline-none"><span class="material-symbols-outlined text-[14px]">delete</span> Delete</button>
-                </div>
-                <div *ngIf="topics.length === 0" class="text-center py-10 text-slate-500 font-medium">No topics exist.</div>
-              </div>
             </div>
 
           </div>

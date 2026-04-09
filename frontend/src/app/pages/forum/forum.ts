@@ -1,23 +1,9 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // 🌟 引入表单模块以支持双向搜索
+import { FormsModule } from '@angular/forms';
 
 declare var AOS: any;
-
-interface ForumThread {
-  id: string;
-  author: string;
-  role: string;
-  tag: string;
-  timeAgo: string;
-  title: string;
-  excerpt: string;
-  views: string;
-  category: string; // 'Most Recent' | 'Top Rated' | 'Trending'
-  isOfficial: boolean;
-  icon: string;
-}
 
 @Component({
   selector: 'app-forum',
@@ -28,71 +14,16 @@ interface ForumThread {
 export class Forum implements OnInit {
   searchTerm: string = '';
   activeFilter: string = 'Most Recent';
-  filters: string[] = ['Most Recent', 'Top Rated', 'Trending'];
+  filters: string[] = ['Most Recent']; // 🌟 核心修改：只保留 Most Recent
 
-  // 🌟 UUM 专属的贴切数据
-  allThreads: ForumThread[] = [
-    {
-      id: 'uum-wifi-upgrade',
-      author: '@UUM_IT_Admin',
-      role: 'Lab Admin',
-      tag: 'Official',
-      timeAgo: '2 hours ago',
-      title: 'Notice: SOC Server Maintenance & UUM-WiFi Upgrade',
-      excerpt: 'Scheduled downtime for the School of Computing data center. UUM-WiFi in the INWLab will be intermittently affected from 2AM to 4AM this weekend.',
-      views: '1.2k views',
-      category: 'Most Recent',
-      isOfficial: true,
-      icon: 'campaign'
-    },
-    {
-      id: 'netapps-2024-latex',
-      author: '@Dr_Alex',
-      role: 'Tech Lead',
-      tag: 'Conference',
-      timeAgo: '5 hours ago',
-      title: 'NETAPPS 2024: IEEE Paper LaTeX & Word Formatting Guidelines',
-      excerpt: 'For those from UUM submitting to NETAPPS this November, here are the common formatting issues encountered and how to fix them in your templates.',
-      views: '850 views',
-      category: 'Trending',
-      isOfficial: false,
-      icon: 'code'
-    },
-    {
-      id: 'iot-equipment-booking',
-      author: '@Postgrad_Ahmad',
-      role: 'MSc Student',
-      tag: 'General',
-      timeAgo: '1 day ago',
-      title: 'Booking IoT Sensors at Awang Had Salleh Graduate School',
-      excerpt: 'Verified procedures for booking and utilizing the high-fidelity environmental sensors for master and PhD thesis experiments.',
-      views: '3.4k views',
-      category: 'Top Rated',
-      isOfficial: false,
-      icon: 'school'
-    },
-    {
-      id: 'smart-campus-dataset',
-      author: '@Data_Scientist_01',
-      role: 'Researcher',
-      tag: 'Dataset',
-      timeAgo: '2 days ago',
-      title: 'Released: UUM Sintok Smart Campus Traffic Dataset (2023)',
-      excerpt: 'We have just published the anonymized network traffic dataset captured across Sintok campus for ML-based intrusion detection research.',
-      views: '5.6k views',
-      category: 'Top Rated',
-      isOfficial: false,
-      icon: 'database'
-    }
-  ];
-
-  filteredThreads: ForumThread[] = [];
+  allThreads: any[] = [];
+  filteredThreads: any[] = [];
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
-    this.applyFilters();
     if (isPlatformBrowser(this.platformId)) {
+      this.loadForumData();
       setTimeout(() => {
         if (typeof AOS !== 'undefined') {
           AOS.init({ duration: 800, once: true, offset: 50 });
@@ -103,31 +34,73 @@ export class Forum implements OnInit {
     }
   }
 
+  loadForumData() {
+    const savedTopics = localStorage.getItem('inwlab_forum_topics');
+    if (savedTopics) {
+      this.allThreads = JSON.parse(savedTopics);
+    }
+
+    // 🌟 如果 CMS 数据库是空的，自动填充默认的学术讨论数据，防止白屏
+    if (!this.allThreads || this.allThreads.length === 0) {
+      this.allThreads = [
+        {
+          id: 'zkp-iot-networks',
+          title: 'Discussion: Implementing Zero-Knowledge Proofs in IoT Networks',
+          authorName: 'Prof. Alan Turing',
+          role: 'FACULTY',
+          tag: 'Cryptography',
+          timeAgo: '2 hours ago',
+          content: 'I\'ve been working on reducing computational overhead on edge devices for secure communications. Does anyone see potential optimizations for memory usage?',
+          views: '342 views',
+          isOfficial: true,
+          icon: 'lock',
+          replies: [
+            {
+              id: 1,
+              authorName: 'Sarah_PhD',
+              role: 'STUDENT',
+              timeAgo: '1 hr ago',
+              content: 'I tried this implementation on the Raspberry Pi cluster, but latency increased by 15% compared to the standard library. We might need to prune the hash tree.',
+              icon: 'school'
+            }
+          ]
+        },
+        {
+          id: 'sdn-routing-optimization',
+          authorName: 'Dr_Network',
+          role: 'ALUMNI',
+          tag: 'SDN',
+          timeAgo: '1 day ago',
+          title: 'Paper Review: Machine Learning for SDN Routing',
+          content: 'Just published our recent findings on applying Reinforcement Learning to optimize packet routing in Software-Defined Networks. The dataset is attached below.',
+          views: '1.2k views',
+          isOfficial: false,
+          icon: 'route',
+          replies: []
+        }
+      ];
+      localStorage.setItem('inwlab_forum_topics', JSON.stringify(this.allThreads));
+    }
+
+    this.applyFilters();
+  }
+
   setFilter(filter: string) {
     this.activeFilter = filter;
     this.applyFilters();
   }
 
-  // 🌟 全新升级的超级搜索与过滤逻辑
   applyFilters() {
     const term = this.searchTerm.toLowerCase().trim();
 
     this.filteredThreads = this.allThreads.filter(thread => {
-      // 1. 🌟 关键修改：如果搜索框里有字，就进行“全局搜索”（无视当前分类）
-      //    如果搜索框是空的，才严格按照当前点击的按钮（Most Recent/Top Rated等）来显示
-      const matchCategory = term ? true : thread.category === this.activeFilter;
-
-      // 2. 🌟 扩展搜索范围：现在可以搜标题、作者、标签，甚至是帖子摘要（excerpt）里的内容！
-      const matchSearch = !term ||
-        thread.title.toLowerCase().includes(term) ||
-        thread.author.toLowerCase().includes(term) ||
+      if (!term) return true;
+      return thread.title.toLowerCase().includes(term) ||
+        thread.authorName.toLowerCase().includes(term) ||
         thread.tag.toLowerCase().includes(term) ||
-        thread.excerpt.toLowerCase().includes(term);
-
-      return matchCategory && matchSearch;
+        thread.content.toLowerCase().includes(term);
     });
 
-    // 重新触发动画，让搜索结果顺滑地飘出来
     setTimeout(() => {
       if (typeof AOS !== 'undefined') AOS.refreshHard();
     }, 50);
