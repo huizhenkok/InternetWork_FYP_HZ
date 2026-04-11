@@ -11,15 +11,14 @@ declare var AOS: any;
   templateUrl: './resources.html'
 })
 export class Resources implements OnInit {
-  activeCategory: string = 'All';
-  allResources: any[] = [];
-  filteredResources: any[] = [];
 
-  // 🌟 核心：为 CMS 数据提供默认值，防止由于没访问过 CMS 而报错
+  allResources: any[] = [];
+
+  // 🌟 核心：为 CMS 数据提供默认值
   cmsData: any = {
     mainTitle: 'Public Publications',
     subTitle: 'Explore research papers, datasets, and technical reports publicly shared by INWLab members.',
-    filterTitle: 'Select a category to filter our repository of publications, reports, and datasets.'
+    filterTitle: 'Repository of publications, reports, and datasets.' // 稍微精简了这句
   };
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
@@ -55,18 +54,12 @@ export class Resources implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
 
+      // 🌟 核心修改：不再做任何分类，直接拉取所有 Public 文件并按时间排序
       this.allResources = allImports
         .filter((doc: any) => doc.visibility === 'Public')
         .sort((a: any, b: any) => b.timestamp - a.timestamp)
         .map((doc: any) => {
-          let category = 'Cybersecurity';
-          const titleLower = doc.fileName.toLowerCase();
-          if (titleLower.includes('ai') || titleLower.includes('machine learning')) category = 'AI / ML';
-          if (titleLower.includes('network') || titleLower.includes('iot') || titleLower.includes('5g')) category = 'Network Protocol';
-          if (titleLower.includes('data') || titleLower.includes('dataset')) category = 'Datasets';
-
           return {
-            category: category,
             type: 'Publication',
             typeClass: 'bg-primary/10 border-primary/20 text-primary dark:bg-accent-teal/20 dark:border-accent-teal/30 dark:text-accent-teal',
             date: doc.dateStr.split(' ')[0],
@@ -79,17 +72,6 @@ export class Resources implements OnInit {
             secondaryBtnIcon: 'info'
           };
         });
-
-      this.setCategory('All');
-    }
-  }
-
-  setCategory(category: string) {
-    this.activeCategory = category;
-    if (category === 'All') {
-      this.filteredResources = this.allResources;
-    } else {
-      this.filteredResources = this.allResources.filter(res => res.category === category);
     }
   }
 
@@ -101,7 +83,7 @@ export class Resources implements OnInit {
     }
   }
 
-  // 🌟 和 Research 一样的智能拆分文字函数，用来保留渐变色彩效果
+  // 🌟 和 Research 一样的智能拆分文字函数
   get titleFirstPart(): string {
     const words = this.cmsData.mainTitle.trim().split(' ');
     if (words.length <= 1) return this.cmsData.mainTitle;

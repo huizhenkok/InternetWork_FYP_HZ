@@ -2,7 +2,7 @@
   <div class="tech-square sq-1"></div><div class="tech-square sq-3"></div><div class="tech-square sq-5"></div>
 </div>
 
-<div class="relative min-h-screen flex flex-col w-full">
+<div class="relative min-h-screen flex flex-col w-full pb-10">
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
     <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
@@ -13,7 +13,7 @@
   <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
     <main class="w-full max-w-7xl mx-auto flex flex-col gap-12 pt-4 pb-20 px-6">
 
-      <div class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-slate-200 pb-8 dark:border-white/5" data-aos="fade-down">
+      <div class="flex flex-col justify-between items-start gap-6 border-b border-slate-200 pb-8 dark:border-white/5" data-aos="fade-down">
         <div class="flex flex-col gap-2">
           <div class="flex items-center gap-2 text-primary mb-2">
             <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
@@ -26,15 +26,9 @@
             {{ cmsData.subTitle }}
           </p>
         </div>
-
-        <div class="glass-panel p-1 rounded-full flex flex-wrap items-center">
-          <button (click)="setTab('UPCOMING')" [ngClass]="activeTab === 'UPCOMING' ? 'bg-gradient-primary text-black dark:text-black shadow-[0_0_15px_rgba(13,242,242,0.2)]' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/5 dark:hover:bg-white/10'" class="px-6 py-2 rounded-full font-bold text-sm transition-all cursor-pointer border-none outline-none">UPCOMING</button>
-          <button (click)="setTab('LATEST NEWS')" [ngClass]="activeTab === 'LATEST NEWS' ? 'bg-gradient-primary text-black dark:text-black shadow-[0_0_15px_rgba(13,242,242,0.2)]' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/5 dark:hover:bg-white/10'" class="px-6 py-2 rounded-full font-bold text-sm transition-all cursor-pointer border-none outline-none">LATEST NEWS</button>
-          <button (click)="setTab('ARCHIVE')" [ngClass]="activeTab === 'ARCHIVE' ? 'bg-gradient-primary text-black dark:text-black shadow-[0_0_15px_rgba(13,242,242,0.2)]' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/5 dark:hover:bg-white/10'" class="px-6 py-2 rounded-full font-bold text-sm transition-all cursor-pointer border-none outline-none">ARCHIVE</button>
-        </div>
       </div>
 
-      <div *ngIf="activeTab === 'UPCOMING'" class="animate-fade-in flex flex-col gap-12 w-full">
+      <div class="animate-fade-in flex flex-col gap-12 w-full">
 
         <section class="w-full">
           <div class="flex items-center gap-4 mb-6">
@@ -67,11 +61,11 @@
                   {{ cmsData.flagship.desc }}
                 </p>
                 <div class="flex items-center gap-4">
-                  <button (click)="handleRSVP(cmsData.flagship.title)" class="glow-button h-12 px-8 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-sm tracking-widest hover:-translate-y-1 transition-all duration-300 transform flex items-center gap-2 cursor-pointer border-none">
+                  <button (click)="handleRSVP(cmsData.flagship.title)" class="glow-button h-12 px-8 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-sm tracking-widest hover:-translate-y-1 transition-all duration-300 transform flex items-center gap-2 cursor-pointer border-none outline-none">
                     <span>RSVP NOW</span>
                     <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </button>
-                  <button (click)="shareEvent(cmsData.flagship.title)" class="h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 flex items-center justify-center text-slate-900 dark:text-white transition-all cursor-pointer">
+                  <button (click)="shareEvent(cmsData.flagship.title)" class="h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 flex items-center justify-center text-slate-900 dark:text-white transition-all cursor-pointer outline-none">
                     <span class="material-symbols-outlined">share</span>
                   </button>
                 </div>
@@ -104,7 +98,7 @@
                   {{ g.desc }}
                 </p>
                 <div class="mt-auto flex justify-center sm:justify-start">
-                  <button (click)="handleRSVP(g.title)" class="glow-button h-9 px-6 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-xs tracking-wider opacity-90 hover:opacity-100 hover:shadow-[0_0_30px_rgba(13,242,242,0.35)] transition-all cursor-pointer border-none">
+                  <button (click)="handleRSVP(g.title)" class="glow-button h-9 px-6 rounded-full bg-gradient-primary text-white dark:text-black font-bold text-xs tracking-wider opacity-90 hover:opacity-100 hover:shadow-[0_0_30px_rgba(13,242,242,0.35)] transition-all cursor-pointer border-none outline-none">
                     RSVP
                   </button>
                 </div>
@@ -147,19 +141,76 @@
           </div>
         </div>
       </div>
-
-      <div *ngIf="activeTab === 'LATEST NEWS'" class="animate-fade-in w-full text-center py-20">
-        <div class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner"><span class="material-symbols-outlined text-5xl text-primary animate-pulse">campaign</span></div>
-        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Latest Research News</h2>
-        <p class="text-slate-500 dark:text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">Our editorial team is currently compiling the latest publications and achievements. Check back shortly for major announcements regarding our network security breakthroughs.</p>
-      </div>
-
-      <div *ngIf="activeTab === 'ARCHIVE'" class="animate-fade-in w-full text-center py-20">
-        <div class="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner"><span class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-600">inventory_2</span></div>
-        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Historical Archives</h2>
-        <p class="text-slate-500 dark:text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">Accessing legacy records and past conference proceedings. The digital archive is currently undergoing index optimization.</p>
-      </div>
-
     </main>
+  </div>
+
+  <div *ngIf="isRsvpModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
+    <div class="absolute inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" (click)="!isSubmittingRsvp && !isRsvpSuccess ? closeRsvpModal() : null"></div>
+
+    <div class="relative w-full max-w-md glass-panel bg-white/95 dark:bg-[#121212]/95 rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-white/10 animate-fade-in">
+      <button *ngIf="!isSubmittingRsvp && !isRsvpSuccess" (click)="closeRsvpModal()" class="absolute top-6 right-6 text-slate-400 hover:text-red-500 cursor-pointer bg-transparent border-none outline-none transition-colors">
+        <span class="material-symbols-outlined text-2xl">close</span>
+      </button>
+
+      <div class="flex flex-col gap-2 mb-6">
+        <div class="flex items-center gap-3 text-primary mb-2">
+          <span class="material-symbols-outlined text-3xl">how_to_reg</span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white">Event RSVP</h2>
+        </div>
+        <p class="text-slate-500 dark:text-gray-400 text-sm font-medium leading-snug">Registering for: <span class="text-primary font-bold">{{ rsvpEventName }}</span></p>
+      </div>
+
+      <ng-container *ngIf="!isRsvpSuccess">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase font-bold text-slate-500">Full Name</label>
+            <input type="text" [(ngModel)]="rsvpData.name" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-primary transition-colors" placeholder="e.g. John Doe">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase font-bold text-slate-500">Email Address</label>
+            <input type="email" [(ngModel)]="rsvpData.email" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-primary transition-colors" placeholder="john@example.com">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase font-bold text-slate-500">Participant Role</label>
+            <div class="relative">
+              <select [(ngModel)]="rsvpData.role" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-primary appearance-none cursor-pointer transition-colors">
+                <option value="UUM Student">UUM Student</option>
+                <option value="Faculty">Faculty / Staff</option>
+                <option value="Alumni">Alumni</option>
+                <option value="Public Visitor">Public Visitor / Guest</option>
+              </select>
+              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-[10px] uppercase font-bold text-slate-500">Additional Messages (Optional)</label>
+            <textarea [(ngModel)]="rsvpData.message" rows="2" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary transition-colors" placeholder="Dietary restrictions, questions..."></textarea>
+          </div>
+
+          <button (click)="submitRSVP()" [disabled]="isSubmittingRsvp" class="glow-button w-full mt-4 bg-gradient-primary text-black font-bold px-6 py-3.5 rounded-xl text-sm hover:-translate-y-1 transition-all cursor-pointer border-none flex items-center justify-center gap-2 outline-none">
+            <ng-container *ngIf="!isSubmittingRsvp">
+              <span>Submit Registration</span>
+              <span class="material-symbols-outlined text-[18px]">send</span>
+            </ng-container>
+            <ng-container *ngIf="isSubmittingRsvp">
+              <span>Processing...</span>
+              <span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span>
+            </ng-container>
+          </button>
+        </div>
+      </ng-container>
+
+      <div *ngIf="isRsvpSuccess" class="flex flex-col items-center justify-center text-center py-6 animate-in zoom-in duration-300">
+        <div class="size-20 bg-green-100 text-green-500 dark:bg-green-500/20 dark:text-green-400 rounded-full flex items-center justify-center mb-4">
+          <span class="material-symbols-outlined text-4xl">check_circle</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Submitted!</h3>
+        <p class="text-slate-500 dark:text-gray-400 text-sm">Your RSVP has been sent to the admin. You will be notified upon approval.</p>
+      </div>
+
+    </div>
   </div>
 </div>

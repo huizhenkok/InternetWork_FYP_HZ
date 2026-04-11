@@ -21,9 +21,15 @@
           <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">wysiwyg</span>
           <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white transition-colors">CMS Engine</span>
         </a>
-        <a routerLink="/admin-bookings" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full bg-cyan-50 border border-cyan-100 text-primary dark:bg-gradient-to-r dark:from-[#1F958D]/20 dark:to-[#0df2f2]/10 dark:border-[#0df2f2]/20 dark:shadow-[0_0_5px_rgba(13,242,242,0.5)] dark:text-[#0df2f2] group transition-all duration-300 no-underline cursor-pointer">
-          <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">event_available</span>
-          <span class="hidden lg:block text-sm font-medium tracking-wide dark:text-white transition-colors">Approvals</span>
+        <a routerLink="/admin-bookings" class="relative flex items-center justify-between px-4 py-3 rounded-xl dark:rounded-full bg-cyan-50 border border-cyan-100 text-primary dark:bg-gradient-to-r dark:from-[#1F958D]/20 dark:to-[#0df2f2]/10 dark:border-[#0df2f2]/20 dark:shadow-[0_0_5px_rgba(13,242,242,0.5)] dark:text-[#0df2f2] group transition-all duration-300 no-underline cursor-pointer">
+          <div class="flex items-center gap-4">
+            <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">event_available</span>
+            <span class="hidden lg:block text-sm font-medium tracking-wide dark:text-white transition-colors">Approvals</span>
+          </div>
+          <span *ngIf="(pendingCount + pendingRsvpCount + unreadMessageCount) > 0" class="hidden lg:flex h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold items-center justify-center shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse">
+            {{ pendingCount + pendingRsvpCount + unreadMessageCount }}
+          </span>
+          <span *ngIf="(pendingCount + pendingRsvpCount + unreadMessageCount) > 0" class="lg:hidden absolute top-2 right-3 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse"></span>
         </a>
         <a routerLink="/admin-users" class="flex items-center gap-4 px-4 py-3 rounded-xl dark:rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-transparent dark:hover:bg-white/5 dark:text-gray-400 dark:hover:border-white/10 transition-all duration-300 group no-underline cursor-pointer">
           <span class="material-symbols-outlined dark:group-hover:text-[#0df2f2] transition-colors">manage_accounts</span>
@@ -33,7 +39,7 @@
     </div>
 
     <div class="p-6">
-      <button (click)="logout()" class="flex w-full items-center justify-center gap-3 rounded-full h-12 border border-slate-200 text-slate-500 hover:text-red-600 dark:bg-transparent dark:border-white/10 dark:text-gray-400 dark:hover:border-[#0df2f2]/50 dark:hover:text-[#0df2f2] transition-all duration-300 group outline-none cursor-pointer">
+      <button (click)="logout()" class="flex w-full items-center justify-center gap-3 rounded-full h-12 border border-slate-200 text-slate-500 hover:text-red-600 dark:bg-transparent dark:border-white/10 dark:text-gray-400 dark:hover:border-[#0df2f2]/50 dark:hover:text-[#0df2f2] transition-all duration-300 group outline-none cursor-pointer border-none">
         <span class="material-symbols-outlined">logout</span>
         <span class="hidden lg:block text-sm font-bold tracking-wide dark:group-hover:text-white">LOGOUT</span>
       </button>
@@ -44,112 +50,223 @@
 
     <div class="absolute top-[-10%] right-[10%] w-[500px] h-[500px] bg-cyan-100/50 dark:bg-[#1F958D]/20 rounded-full blur-[120px] pointer-events-none z-[-1]"></div>
 
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
       <div>
-        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2 uppercase">Booking Requests Queue</h1>
-        <p class="text-slate-500 dark:text-gray-400 max-w-xl text-lg">Manage high-priority lab reservations in real-time.</p>
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-2 uppercase">Requests & Inbox</h1>
+        <p class="text-slate-500 dark:text-gray-400 max-w-xl text-lg">Manage approvals, RSVPs, and user inquiries.</p>
       </div>
+
       <div class="flex items-center gap-4">
         <label class="hidden md:flex items-center relative group">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span class="material-symbols-outlined text-slate-400 dark:text-gray-500">search</span>
           </div>
-          <input [(ngModel)]="searchQuery" (input)="filterBookings()" class="bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm rounded-full focus:ring-1 focus:ring-primary block w-64 pl-10 py-2.5 outline-none shadow-sm dark:shadow-none transition-all" placeholder="Search ID, Asset or User..." type="text"/>
+          <input [(ngModel)]="searchQuery" (input)="filterData()" class="bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm rounded-full focus:ring-1 focus:ring-primary block w-64 pl-10 py-2.5 outline-none shadow-sm dark:shadow-none transition-all" placeholder="Search..." type="text"/>
         </label>
-        <button (click)="exportLog()" class="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-sm font-bold text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-[#0df2f2] shadow-sm transition cursor-pointer outline-none">
+        <button (click)="exportLog()" *ngIf="activeTab !== 'messages'" class="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-sm font-bold text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-[#0df2f2] shadow-sm transition cursor-pointer outline-none border-none">
           <span class="material-symbols-outlined text-[18px]">download</span> Export Log
         </button>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-primary dark:border-l-[#0df2f2] shadow-sm">
-        <div class="absolute right-4 top-4 p-2 rounded-lg bg-cyan-50 dark:bg-[#0df2f2]/10 text-primary dark:text-[#0df2f2]">
-          <span class="material-symbols-outlined text-2xl">pending_actions</span>
-        </div>
-        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Pending Approval</p>
-        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ pendingCount }}</h3>
+    <div class="flex items-center gap-4 overflow-x-auto pt-6 px-2 pb-4 mb-8 border-b border-slate-200 dark:border-white/10" style="scrollbar-width: none;">
+
+      <button (click)="setTab('bookings')" [ngClass]="activeTab === 'bookings' ? 'bg-primary text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10'" class="relative flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all border-none outline-none cursor-pointer whitespace-nowrap mt-2">
+        <span class="material-symbols-outlined text-[18px]">meeting_room</span> Lab Room Bookings
+        <span *ngIf="pendingCount > 0" class="absolute -top-3 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[11px] text-white shadow-[0_0_10px_rgba(239,68,68,0.5)] border-2 border-white dark:border-[#121212]">{{ pendingCount }}</span>
+      </button>
+
+      <button (click)="setTab('rsvps')" [ngClass]="activeTab === 'rsvps' ? 'bg-primary text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10'" class="relative flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all border-none outline-none cursor-pointer whitespace-nowrap mt-2">
+        <span class="material-symbols-outlined text-[18px]">how_to_reg</span> Event RSVPs
+        <span *ngIf="pendingRsvpCount > 0" class="absolute -top-3 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[11px] text-white shadow-[0_0_10px_rgba(239,68,68,0.5)] border-2 border-white dark:border-[#121212]">{{ pendingRsvpCount }}</span>
+      </button>
+
+      <button (click)="setTab('messages')" [ngClass]="activeTab === 'messages' ? 'bg-primary text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10'" class="relative flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all border-none outline-none cursor-pointer whitespace-nowrap mt-2">
+        <span class="material-symbols-outlined text-[18px]">mark_email_unread</span> Contact Inbox
+        <span *ngIf="unreadMessageCount > 0" class="absolute -top-3 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[11px] text-white shadow-[0_0_10px_rgba(239,68,68,0.5)] border-2 border-white dark:border-[#121212]">{{ unreadMessageCount }}</span>
+      </button>
+
+    </div>
+    <div *ngIf="activeTab === 'bookings'" class="animate-in fade-in duration-300">
+
+      <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
+        <div class="col-span-3">User / Role</div>
+        <div class="col-span-3">Asset / Location</div>
+        <div class="col-span-2">Schedule</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2 text-right">Decision</div>
       </div>
 
-      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-xl p-6 rounded-2xl relative overflow-hidden border border-slate-200 dark:border-white/10 border-l-4 border-l-orange-400 dark:border-l-orange-500 shadow-sm">
-        <div class="absolute right-4 top-4 p-2 rounded-lg bg-orange-50 dark:bg-orange-500/10 text-orange-500 dark:text-orange-400">
-          <span class="material-symbols-outlined text-2xl">warning</span>
+      <div *ngIf="filteredBookings.length === 0" class="text-center py-20 bg-white/50 dark:bg-[#121212]/50 backdrop-blur rounded-2xl border border-slate-200 dark:border-white/10 mt-2">
+        <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">event_busy</span>
+        <h3 class="text-xl font-bold text-slate-700 dark:text-white">No Bookings Found</h3>
+        <p class="text-slate-500 dark:text-gray-400 mt-2">There are no reservation requests matching your criteria.</p>
+      </div>
+
+      <div class="flex flex-col gap-4 mt-2 pb-10">
+        <div *ngFor="let booking of filteredBookings" class="group bg-white dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-4 transition-all hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm" [ngClass]="{'opacity-60 grayscale': booking.status === 'Rejected'}">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+            <div class="col-span-1 md:col-span-3 flex items-center gap-4">
+              <div class="relative">
+                <div class="size-12 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center font-bold text-lg text-slate-600 dark:text-gray-300 uppercase">{{ booking.safeName.charAt(0) }}</div>
+              </div>
+              <div>
+                <p class="text-slate-900 dark:text-white font-bold text-sm tracking-wide">{{ booking.safeName }}</p>
+                <p class="text-xs text-primary dark:text-[#0df2f2] font-bold mt-0.5">ID: #{{ booking.safeId.substring(0,6) }}</p>
+              </div>
+            </div>
+
+            <div class="col-span-1 md:col-span-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-primary dark:text-[#0df2f2] text-[18px]">developer_board</span>
+                <span class="text-slate-700 dark:text-gray-200 text-sm font-bold truncate max-w-[150px]">{{ booking.safeRoom }}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded">Lab Sector</span>
+              </div>
+            </div>
+
+            <div class="col-span-1 md:col-span-2">
+              <p class="text-slate-900 dark:text-white text-sm font-bold">{{ booking.startTime || '00:00' }} - {{ booking.endTime || '00:00' }}</p>
+              <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5 font-mono">{{ booking.safeDate.split(' ')[0] }}</p>
+            </div>
+
+            <div class="col-span-1 md:col-span-2 flex items-center justify-start">
+              <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20': booking.status === 'Pending',
+                  'bg-green-100 text-green-700 border-green-200 dark:bg-[#0df2f2]/10 dark:text-[#0df2f2] dark:border-[#0df2f2]/20': booking.status === 'Approved',
+                  'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20': booking.status === 'Rejected'
+              }" class="inline-flex items-center px-3 py-1 rounded-md border text-xs font-bold uppercase tracking-wider">
+                  {{ booking.status }}
+              </span>
+            </div>
+
+            <div class="col-span-1 md:col-span-2 flex items-center justify-end gap-3 pl-4">
+              <ng-container *ngIf="booking.status === 'Pending'">
+                <button (click)="approveBooking(booking)" class="h-10 w-10 rounded-full bg-gradient-to-r from-teal-600 to-primary dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black shadow-md hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(23,198,186,0.5)] hover:scale-105 transition-all flex items-center justify-center cursor-pointer border-none outline-none" title="Approve">
+                  <span class="material-symbols-outlined text-[20px]">check</span>
+                </button>
+                <button (click)="rejectBooking(booking)" class="h-10 w-10 rounded-full text-slate-400 dark:text-red-500 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all transform hover:scale-110 flex items-center justify-center cursor-pointer bg-white dark:bg-transparent outline-none" title="Reject">
+                  <span class="material-symbols-outlined text-2xl">close</span>
+                </button>
+              </ng-container>
+              <ng-container *ngIf="booking.status !== 'Pending'">
+                <span class="text-xs font-bold text-slate-400 dark:text-gray-500 italic">Action Taken</span>
+              </ng-container>
+            </div>
+          </div>
         </div>
-        <p class="text-slate-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Conflicts Detected</p>
-        <h3 class="text-3xl font-bold text-slate-900 dark:text-white">{{ conflictCount }}</h3>
       </div>
     </div>
 
-    <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
-      <div class="col-span-3">User / Role</div>
-      <div class="col-span-3">Asset / Location</div>
-      <div class="col-span-2">Schedule</div>
-      <div class="col-span-2">Status</div>
-      <div class="col-span-2 text-right">Decision</div>
-    </div>
+    <div *ngIf="activeTab === 'rsvps'" class="animate-in fade-in duration-300">
+      <div class="hidden md:grid grid-cols-12 gap-4 px-6 py-2 text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">
+        <div class="col-span-3">Participant</div>
+        <div class="col-span-3">Target Event</div>
+        <div class="col-span-2">Contact Info</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2 text-right">Decision</div>
+      </div>
 
-    <div *ngIf="filteredBookings.length === 0" class="text-center py-20 bg-white/50 dark:bg-[#121212]/50 backdrop-blur rounded-2xl border border-slate-200 dark:border-white/10 mt-2">
-      <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">event_busy</span>
-      <h3 class="text-xl font-bold text-slate-700 dark:text-white">No Bookings Found</h3>
-      <p class="text-slate-500 dark:text-gray-400 mt-2">There are no reservation requests matching your criteria.</p>
-    </div>
+      <div *ngIf="filteredRsvps.length === 0" class="text-center py-20 bg-white/50 dark:bg-[#121212]/50 backdrop-blur rounded-2xl border border-slate-200 dark:border-white/10 mt-2">
+        <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">how_to_reg</span>
+        <h3 class="text-xl font-bold text-slate-700 dark:text-white">No RSVPs Found</h3>
+        <p class="text-slate-500 dark:text-gray-400 mt-2">No event registrations matching your criteria.</p>
+      </div>
 
-    <div class="flex flex-col gap-4 mt-2 pb-10">
-      <div *ngFor="let booking of filteredBookings" class="group bg-white dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-4 transition-all hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm" [ngClass]="{'opacity-60 grayscale': booking.status === 'Rejected'}">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+      <div class="flex flex-col gap-4 mt-2 pb-10">
+        <div *ngFor="let rsvp of filteredRsvps" class="group bg-white dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-4 transition-all hover:bg-slate-50 dark:hover:bg-white/5 shadow-sm" [ngClass]="{'opacity-60 grayscale': rsvp.status === 'Rejected'}">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
 
-          <div class="col-span-1 md:col-span-3 flex items-center gap-4">
-            <div class="relative">
-              <div class="size-12 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center font-bold text-lg text-slate-600 dark:text-gray-300 uppercase">{{ booking.safeName.charAt(0) }}</div>
+            <div class="col-span-1 md:col-span-3 flex items-center gap-4">
+              <div class="size-12 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-primary border border-slate-200 dark:border-white/10">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <div>
+                <p class="text-slate-900 dark:text-white font-bold text-sm tracking-wide">{{ rsvp.name }}</p>
+                <span class="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 dark:bg-white/10 dark:text-gray-400 dark:border-white/20">{{ rsvp.role }}</span>
+              </div>
             </div>
-            <div>
-              <p class="text-slate-900 dark:text-white font-bold text-sm tracking-wide">{{ booking.safeName }}</p>
-              <p class="text-xs text-primary dark:text-[#0df2f2] font-bold mt-0.5">ID: #{{ booking.safeId.substring(0,6) }}</p>
+
+            <div class="col-span-1 md:col-span-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-accent-cyan text-[18px]">event</span>
+                <span class="text-slate-700 dark:text-gray-200 text-sm font-bold truncate max-w-[180px]">{{ rsvp.eventName }}</span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5">ID: {{ rsvp.id }}</p>
+            </div>
+
+            <div class="col-span-1 md:col-span-2 flex flex-col gap-1">
+              <a [href]="'mailto:' + rsvp.email" class="text-slate-900 dark:text-white text-sm hover:text-primary transition-colors no-underline">{{ rsvp.email }}</a>
+              <span *ngIf="rsvp.message" class="text-[10px] text-slate-500 truncate max-w-[150px] italic">"{{ rsvp.message }}"</span>
+            </div>
+
+            <div class="col-span-1 md:col-span-2 flex items-center justify-start">
+              <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20': rsvp.status === 'Pending',
+                  'bg-green-100 text-green-700 border-green-200 dark:bg-[#0df2f2]/10 dark:text-[#0df2f2] dark:border-[#0df2f2]/20': rsvp.status === 'Approved',
+                  'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20': rsvp.status === 'Rejected'
+              }" class="inline-flex items-center px-3 py-1 rounded-md border text-xs font-bold uppercase tracking-wider">
+                  {{ rsvp.status }}
+              </span>
+            </div>
+
+            <div class="col-span-1 md:col-span-2 flex items-center justify-end gap-3 pl-4">
+              <ng-container *ngIf="rsvp.status === 'Pending'">
+                <button (click)="approveRsvp(rsvp)" class="h-10 w-10 rounded-full bg-gradient-to-r from-teal-600 to-primary dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black shadow-md hover:shadow-lg transition-all flex items-center justify-center cursor-pointer border-none outline-none" title="Approve">
+                  <span class="material-symbols-outlined text-[20px]">check</span>
+                </button>
+                <button (click)="rejectRsvp(rsvp)" class="h-10 w-10 rounded-full text-slate-400 dark:text-red-500 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all flex items-center justify-center cursor-pointer bg-transparent outline-none" title="Reject">
+                  <span class="material-symbols-outlined text-2xl">close</span>
+                </button>
+              </ng-container>
+              <ng-container *ngIf="rsvp.status !== 'Pending'">
+                <span class="text-xs font-bold text-slate-400 dark:text-gray-500 italic">Action Taken</span>
+              </ng-container>
             </div>
           </div>
-
-          <div class="col-span-1 md:col-span-3">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="material-symbols-outlined text-primary dark:text-[#0df2f2] text-[18px]">developer_board</span>
-              <span class="text-slate-700 dark:text-gray-200 text-sm font-bold truncate max-w-[150px]">{{ booking.safeRoom }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] uppercase font-bold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded">Lab Sector</span>
-            </div>
-          </div>
-
-          <div class="col-span-1 md:col-span-2">
-            <p class="text-slate-900 dark:text-white text-sm font-bold">{{ booking.startTime || '00:00' }} - {{ booking.endTime || '00:00' }}</p>
-            <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5 font-mono">{{ booking.safeDate.split(' ')[0] }}</p>
-          </div>
-
-          <div class="col-span-1 md:col-span-2 flex items-center justify-start">
-                        <span [ngClass]="{
-                            'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/20': booking.status === 'Pending',
-                            'bg-green-100 text-green-700 border-green-200 dark:bg-[#0df2f2]/10 dark:text-[#0df2f2] dark:border-[#0df2f2]/20': booking.status === 'Approved',
-                            'bg-red-100 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20': booking.status === 'Rejected'
-                        }" class="inline-flex items-center px-3 py-1 rounded-md border text-xs font-bold uppercase tracking-wider">
-                            {{ booking.status }}
-                        </span>
-          </div>
-
-          <div class="col-span-1 md:col-span-2 flex items-center justify-end gap-3 pl-4">
-            <ng-container *ngIf="booking.status === 'Pending'">
-              <button (click)="approveBooking(booking)" class="h-10 w-10 rounded-full bg-gradient-to-r from-teal-600 to-primary dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black shadow-md hover:shadow-lg dark:hover:shadow-[0_0_15px_rgba(23,198,186,0.5)] hover:scale-105 transition-all flex items-center justify-center cursor-pointer border-none outline-none" title="Approve">
-                <span class="material-symbols-outlined text-[20px]">check</span>
-              </button>
-              <button (click)="rejectBooking(booking)" class="h-10 w-10 rounded-full text-slate-400 dark:text-red-500 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all transform hover:scale-110 flex items-center justify-center cursor-pointer bg-white dark:bg-transparent outline-none" title="Reject">
-                <span class="material-symbols-outlined text-2xl">close</span>
-              </button>
-            </ng-container>
-
-            <ng-container *ngIf="booking.status !== 'Pending'">
-              <span class="text-xs font-bold text-slate-400 dark:text-gray-500 italic">Action Taken</span>
-            </ng-container>
-          </div>
-
         </div>
       </div>
+    </div>
+
+    <div *ngIf="activeTab === 'messages'" class="animate-in fade-in duration-300">
+
+      <div *ngIf="filteredMessages.length === 0" class="text-center py-20 bg-white/50 dark:bg-[#121212]/50 backdrop-blur rounded-2xl border border-slate-200 dark:border-white/10 mt-2">
+        <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-white/10 mb-4">drafts</span>
+        <h3 class="text-xl font-bold text-slate-700 dark:text-white">Inbox Empty</h3>
+        <p class="text-slate-500 dark:text-gray-400 mt-2">No contact messages match your criteria.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
+        <div *ngFor="let msg of filteredMessages; let i = index" class="glass-card bg-white dark:bg-[#121212]/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl p-6 flex flex-col relative shadow-sm hover:shadow-lg transition-all" [ngClass]="{'border-l-4 border-l-primary dark:border-l-[#0df2f2]': msg.status === 'Unread'}">
+
+          <div class="absolute top-4 right-4 flex items-center gap-2">
+            <span *ngIf="msg.status === 'Unread'" class="flex h-3 w-3 rounded-full bg-red-500 animate-pulse"></span>
+            <button (click)="deleteMessage(i)" class="text-slate-400 hover:text-red-500 transition-colors cursor-pointer bg-transparent border-none outline-none"><span class="material-symbols-outlined text-xl">delete</span></button>
+          </div>
+
+          <div class="mb-4 pr-10">
+            <span class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 dark:bg-white/10 dark:text-gray-300 dark:border-white/20 mb-2 inline-block">{{ msg.department }}</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">{{ msg.name }}</h3>
+            <a [href]="'mailto:' + msg.email" class="text-sm text-primary hover:underline no-underline block truncate">{{ msg.email }}</a>
+          </div>
+
+          <div class="flex-grow bg-slate-50 dark:bg-black/30 rounded-xl p-4 border border-slate-100 dark:border-white/5 mb-4">
+            <p class="text-sm text-slate-600 dark:text-gray-300 font-body leading-relaxed italic whitespace-pre-wrap line-clamp-4">"{{ msg.message }}"</p>
+          </div>
+
+          <div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-4">
+            <span class="text-xs font-mono text-slate-400">{{ msg.date }}</span>
+            <button *ngIf="msg.status === 'Unread'" (click)="markMessageAsRead(msg)" class="text-xs font-bold text-primary flex items-center gap-1 cursor-pointer bg-transparent border-none outline-none hover:text-accent-cyan">
+              <span class="material-symbols-outlined text-[16px]">mark_email_read</span> Mark Read
+            </button>
+            <span *ngIf="msg.status === 'Read'" class="text-xs font-bold text-slate-400 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">done_all</span> Read
+            </span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>

@@ -25,6 +25,9 @@ export class Conference implements OnInit, OnDestroy {
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
 
+  // 🌟 新增：控制图片全屏查看的变量
+  isImageModalOpen: boolean = false;
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -122,5 +125,16 @@ export class Conference implements OnInit, OnDestroy {
     } else {
       alert(`The Official Program Book for ${this.confData.shortName} ${this.currentYear} is not available yet. Please check back later.`);
     }
+  }
+
+  // 🌟 新增：打开和关闭图片的方法
+  openImageModal() {
+    if (this.confData && this.confData.imageUrl && this.confData.imageUrl.trim() !== '') {
+      this.isImageModalOpen = true;
+    }
+  }
+
+  closeImageModal() {
+    this.isImageModalOpen = false;
   }
 }

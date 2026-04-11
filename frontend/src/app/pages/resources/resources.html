@@ -41,51 +41,22 @@
         </div>
 
         <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center" data-aos="fade-up" data-aos-delay="100">
-
-          <div class="w-full md:w-auto">
-            <p class="text-sm font-medium text-slate-500 dark:text-gray-400 border-l-2 border-primary pl-3 py-1 max-w-[280px] leading-relaxed">
+          <div class="w-full">
+            <p class="text-sm font-medium text-slate-500 dark:text-gray-400 border-l-2 border-primary pl-3 py-1 leading-relaxed">
               {{ cmsData.filterTitle }}
             </p>
-          </div>
-
-          <div class="flex flex-wrap gap-3">
-            <button (click)="setCategory('All')"
-                    [ngClass]="activeCategory === 'All' ? 'border-primary bg-primary/10 text-primary dark:border-accent-teal dark:bg-accent-teal/20' : 'border-slate-200 bg-slate-100 text-slate-600 dark:border-transparent dark:bg-white/5 dark:text-gray-300'"
-                    class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors hover:bg-primary/20 cursor-pointer outline-none">
-              All Resources
-            </button>
-            <button (click)="setCategory('Cybersecurity')"
-                    [ngClass]="activeCategory === 'Cybersecurity' ? 'border-primary bg-primary/10 text-primary dark:border-accent-teal dark:bg-accent-teal/20' : 'border-slate-200 bg-slate-100 text-slate-600 dark:border-transparent dark:bg-white/5 dark:text-gray-300'"
-                    class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer outline-none">
-              Cybersecurity
-            </button>
-            <button (click)="setCategory('AI / ML')"
-                    [ngClass]="activeCategory === 'AI / ML' ? 'border-primary bg-primary/10 text-primary dark:border-accent-teal dark:bg-accent-teal/20' : 'border-slate-200 bg-slate-100 text-slate-600 dark:border-transparent dark:bg-white/5 dark:text-gray-300'"
-                    class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer outline-none">
-              AI / ML
-            </button>
-            <button (click)="setCategory('Network Protocol')"
-                    [ngClass]="activeCategory === 'Network Protocol' ? 'border-primary bg-primary/10 text-primary dark:border-accent-teal dark:bg-accent-teal/20' : 'border-slate-200 bg-slate-100 text-slate-600 dark:border-transparent dark:bg-white/5 dark:text-gray-300'"
-                    class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer outline-none">
-              Network Protocol
-            </button>
-            <button (click)="setCategory('Datasets')"
-                    [ngClass]="activeCategory === 'Datasets' ? 'border-primary bg-primary/10 text-primary dark:border-accent-teal dark:bg-accent-teal/20' : 'border-slate-200 bg-slate-100 text-slate-600 dark:border-transparent dark:bg-white/5 dark:text-gray-300'"
-                    class="rounded-full border px-4 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer outline-none">
-              Datasets
-            </button>
           </div>
         </div>
 
         <div class="mt-4 grid grid-cols-1 gap-6 pb-12 md:grid-cols-2">
 
-          <div *ngIf="filteredResources.length === 0" class="col-span-full py-12 text-center text-slate-500 dark:text-gray-400 glass-panel rounded-2xl border border-slate-200 dark:border-white/10">
+          <div *ngIf="allResources.length === 0" class="col-span-full py-12 text-center text-slate-500 dark:text-gray-400 glass-panel rounded-2xl border border-slate-200 dark:border-white/10">
             <span class="material-symbols-outlined text-5xl mb-2 opacity-50">search_off</span>
             <p class="font-bold">No public publications found.</p>
-            <p class="text-sm mt-1">Students haven't made any papers public in this category yet.</p>
+            <p class="text-sm mt-1">Students haven't made any papers public yet.</p>
           </div>
 
-          <div *ngFor="let res of filteredResources; let i = index" class="glass-panel group flex flex-col gap-4 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 md:p-8 shadow-sm hover:shadow-lg dark:border-white/10 dark:hover:shadow-[0_0_15px_rgba(13,242,242,0.2)]" data-aos="fade-up" [attr.data-aos-delay]="(i % 2) * 100">
+          <div *ngFor="let res of allResources; let i = index" class="glass-panel group flex flex-col gap-4 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 md:p-8 shadow-sm hover:shadow-lg dark:border-white/10 dark:hover:shadow-[0_0_15px_rgba(13,242,242,0.2)]" data-aos="fade-up" [attr.data-aos-delay]="(i % 2) * 100">
 
             <div class="flex items-start justify-between">
               <div [class]="res.typeClass" class="rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider">

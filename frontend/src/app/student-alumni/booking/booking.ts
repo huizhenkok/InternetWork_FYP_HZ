@@ -59,12 +59,24 @@ export class Booking implements OnInit, AfterViewInit {
       if (storedRooms) {
         this.rooms = JSON.parse(storedRooms);
 
-        // 🌟 【核心修复】自动修复旧的冗余数据
+        // 🌟 【核心修复】自动修复旧的冗余数据和缺失的图标/颜色
         let dataFixed = false;
+        const colors = ['teal', 'slate', 'cyan', 'orange'];
+
         this.rooms.forEach(room => {
-          // 如果发现有房间卡在旧版本的 'Occupied' 状态，强制恢复为 'Available'
+          // 修复旧版占用的状态
           if (room.status === 'Occupied') {
             room.status = 'Available';
+            dataFixed = true;
+          }
+          // 🌟 如果 CMS 添加的新房间没有 icon，给它一个默认门图标
+          if (!room.icon) {
+            room.icon = 'meeting_room';
+            dataFixed = true;
+          }
+          // 🌟 如果没有颜色，随机分配一个好看的颜色
+          if (!room.color) {
+            room.color = colors[Math.floor(Math.random() * colors.length)];
             dataFixed = true;
           }
         });
@@ -84,7 +96,6 @@ export class Booking implements OnInit, AfterViewInit {
     this.applyFilters();
     this.loadMyBookings();
   }
-
   loadDefaultRooms() {
     this.rooms = [
       { id: '#101', name: 'Discussion Room A', floor: 'Floor 2', location: 'East Wing', capacity: 6, equipment: ['Whiteboard', 'Screen'], status: 'Available', cleanedTime: 'Today, 09:00 AM', icon: 'meeting_room', color: 'teal' },

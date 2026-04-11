@@ -1,17 +1,16 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms'; // 🌟 引入表单模块支持 RSVP
 
 declare var AOS: any;
 
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule], // 🌟 注册 FormsModule
   templateUrl: './news.html'
 })
 export class News implements OnInit {
-
-  activeTab: string = 'UPCOMING';
 
   // 🌟 默认数据，如果 CMS 里没数据就显示这些
   cmsData: any = {
@@ -36,17 +35,30 @@ export class News implements OnInit {
     quoteAuthor: 'INWLab Vision'
   };
 
+  // ==========================================
+  // 🌟 新增：RSVP 表单状态管理
+  // ==========================================
+  isRsvpModalOpen: boolean = false;
+  rsvpEventName: string = '';
+  isSubmittingRsvp: boolean = false;
+  isRsvpSuccess: boolean = false;
+
+  rsvpData = {
+    name: '',
+    email: '',
+    role: 'UUM Student', // 默认选项
+    message: ''
+  };
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-
-      // 🌟 核心：拉取 CMS 数据
+      // 🌟 拉取 CMS 数据
       const savedCms = localStorage.getItem('inwlab_cms_news_events');
       if (savedCms) {
         try {
           const parsed = JSON.parse(savedCms);
-          // 深度合并对象，防止遗漏字段
           this.cmsData = { ...this.cmsData, ...parsed };
         } catch(e) { console.error(e); }
       }
@@ -61,15 +73,65 @@ export class News implements OnInit {
     }
   }
 
-  setTab(tab: string) {
-    this.activeTab = tab;
-    setTimeout(() => {
-      if (typeof AOS !== 'undefined') AOS.refreshHard();
-    }, 100);
+  // 🌟 打开 RSVP 弹窗
+  handleRSVP(eventName: string) {
+    this.rsvpEventName = eventName;
+    this.isRsvpModalOpen = true;
+    this.isRsvpSuccess = false;
+
+    // 如果用户已经登录了，自动帮他填好名字和邮箱，体验拉满！
+    if (isPlatformBrowser(this.platformId)) {
+      const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
+      if (activeUser.email) {
+        this.rsvpData.email = activeUser.email;
+        this.rsvpData.name = activeUser.fullName || '';
+        this.rsvpData.role = activeUser.role === 'Faculty' ? 'Faculty' : 'UUM Student';
+      }
+    }
   }
 
-  handleRSVP(eventName: string) {
-    alert(`Registration for "${eventName}" will open shortly.\nPlease check back later or contact the lab administration.`);
+  closeRsvpModal() {
+    this.isRsvpModalOpen = false;
+  }
+
+  // 🌟 提交 RSVP 数据到本地数据库，供 Admin 审批
+  submitRSVP() {
+    if (!this.rsvpData.name || !this.rsvpData.email) {
+      alert("Please fill in your Name and Email address.");
+      return;
+    }
+
+    this.isSubmittingRsvp = true;
+
+    setTimeout(() => {
+      if (isPlatformBrowser(this.platformId)) {
+        const existingRsvps = JSON.parse(localStorage.getItem('inwlab_event_rsvps') || '[]');
+
+        // 压入新数据，状态为 Pending
+        existingRsvps.unshift({
+          id: 'RSVP-' + Math.floor(Math.random() * 900000 + 100000),
+          eventName: this.rsvpEventName,
+          name: this.rsvpData.name,
+          email: this.rsvpData.email,
+          role: this.rsvpData.role,
+          message: this.rsvpData.message,
+          status: 'Pending',
+          dateSubmitted: new Date().toLocaleDateString()
+        });
+
+        localStorage.setItem('inwlab_event_rsvps', JSON.stringify(existingRsvps));
+      }
+
+      this.isSubmittingRsvp = false;
+      this.isRsvpSuccess = true;
+
+      // 成功后延迟关闭窗口并清空表单
+      setTimeout(() => {
+        this.closeRsvpModal();
+        this.rsvpData = { name: '', email: '', role: 'UUM Student', message: '' };
+      }, 2000);
+
+    }, 1000);
   }
 
   async shareEvent(eventName: string) {

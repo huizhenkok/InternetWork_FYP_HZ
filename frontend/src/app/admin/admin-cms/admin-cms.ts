@@ -71,7 +71,7 @@ export class AdminCms implements OnInit {
     }
   ];
 
-  // 🌟 核心升级：Contact 数据结构 (彻底移除了 Forum 变量)
+  // 🌟 Contact 数据结构
   contactData: any = {
     mainTitle: 'Get in Touch.',
     subTitle: 'Initiate a secure inquiry. Our team is ready to discuss research collaborations, industry partnerships, and academic opportunities.',
@@ -83,7 +83,8 @@ export class AdminCms implements OnInit {
     social2: '#'  // Secondary Website URL
   };
 
-  rooms: any[] = []; bulletins: any[] = [];
+  rooms: any[] = [];
+  bulletins: any[] = []; // 🌟 用于系统公告
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone, private router: Router) {}
 
@@ -126,11 +127,12 @@ export class AdminCms implements OnInit {
         localStorage.setItem('inwlab_cms_conferences', JSON.stringify(this.conferences));
       }
 
-      // 🌟 加载 Contact 数据 (移除了 Forum 数据加载)
       this.contactData = loadOrInit('inwlab_cms_contact', this.contactData);
 
       const savedRooms = localStorage.getItem('inwlab_rooms');
       if (savedRooms) { this.rooms = JSON.parse(savedRooms); } else { this.rooms = [ { id: '#101', name: 'Discussion Room A', capacity: 6, status: 'Available' } ]; localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms)); }
+
+      // 🌟 加载系统公告数据
       this.bulletins = JSON.parse(localStorage.getItem('inwlab_bulletins') || '[]');
     }
   }
@@ -228,10 +230,47 @@ export class AdminCms implements OnInit {
   saveContact() { this.saveModule('inwlab_cms_contact', this.contactData, 'Contact Info'); }
 
   saveRooms() { if (isPlatformBrowser(this.platformId)) { localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms)); alert("✅ Lab Facilities updated!"); } }
-  addNewRoom() { this.rooms.push({ id: '#'+Math.floor(Math.random()*900+100), name: 'New Room', capacity: 10, status: 'Available' }); }
+
+  // 🌟 修复：新增房间时分配默认图标和颜色
+  addNewRoom() {
+    const colors = ['teal', 'slate', 'cyan', 'orange'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    this.rooms.push({
+      id: '#'+Math.floor(Math.random()*900+100),
+      name: 'New Room',
+      capacity: 10,
+      status: 'Available',
+      icon: 'meeting_room',
+      color: randomColor
+    });
+  }
+
   deleteRoom(index: number) { if (confirm("Delete this facility?")) this.rooms.splice(index, 1); }
 
-  // 🚨 已彻底移除 deleteTopic
+  // ==========================================
+  // 🌟 System Bulletins 管理核心逻辑
+  // ==========================================
+  saveBulletins() {
+    this.saveModule('inwlab_bulletins', this.bulletins, 'System Bulletins');
+  }
+
+  addNewBulletin() {
+    this.bulletins.unshift({
+      title: 'New Important Notice',
+      dateLabel: 'Just Now',
+      content: 'Enter the details of the announcement here...',
+      icon: 'campaign',
+      color: 'primary'
+    });
+    this.saveBulletins();
+  }
+
+  deleteBulletin(index: number) {
+    if (confirm("Are you sure you want to delete this bulletin?")) {
+      this.bulletins.splice(index, 1);
+      this.saveBulletins();
+    }
+  }
 
   logout() { if (confirm("Are you sure you want to logout?")) { localStorage.removeItem('active_user'); this.router.navigate(['/login']); } }
   goToLabEditor(labId: string) { this.editingLab = labId; }
