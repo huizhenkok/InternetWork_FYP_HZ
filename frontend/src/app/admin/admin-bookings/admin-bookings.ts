@@ -2,6 +2,9 @@ import { Component, OnInit, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ContactService } from '../../../services/contact.service';
+import { RsvpService } from '../../../services/rsvp.service';
+import { BookingService } from '../../../services/booking.service'; // 🌟 引入真实的 BookingService
 
 declare var AOS: any;
 
@@ -15,22 +18,17 @@ export class AdminBookings implements OnInit {
 
   adminName: string = 'System Admin';
   searchQuery: string = '';
-
-  // 🌟 核心：控制当前显示哪个管理模块
   activeTab: 'bookings' | 'rsvps' | 'messages' = 'bookings';
 
-  // --- 1. Lab Bookings 数据 ---
   allBookings: any[] = [];
   filteredBookings: any[] = [];
   pendingCount: number = 0;
   conflictCount: number = 0;
 
-  // --- 2. Event RSVPs 数据 ---
   allRsvps: any[] = [];
   filteredRsvps: any[] = [];
   pendingRsvpCount: number = 0;
 
-  // --- 3. Contact Messages 数据 ---
   allMessages: any[] = [];
   filteredMessages: any[] = [];
   unreadMessageCount: number = 0;
@@ -38,7 +36,10 @@ export class AdminBookings implements OnInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
+    private contactService: ContactService,
+    private rsvpService: RsvpService,
+    private bookingService: BookingService // 🌟 注入 BookingService
   ) {}
 
   ngOnInit() {
@@ -58,33 +59,45 @@ export class AdminBookings implements OnInit {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
       if (activeUser.fullName) this.adminName = activeUser.fullName;
 
-      // 1. 加载 Lab Bookings
-      const storedBookings = JSON.parse(localStorage.getItem('inwlab_bookings') || '[]');
-      this.allBookings = storedBookings.map((b: any) => {
-        let rawStatus = b.status || 'Pending';
-        let normalizedStatus = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase();
-        return {
-          ...b,
-          status: normalizedStatus,
-          safeName: b.userName || b.name || 'Unknown User',
-          safeRoom: b.roomName || b.room || b.title || 'Unspecified Asset',
-          safeDate: b.dateStr || b.date || 'No Date',
-          safeId: b.id ? b.id.toString() : Math.floor(Math.random() * 900000).toString()
-        };
-      }).sort((a: any, b: any) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime());
+      // 🌟 1. 加载 Lab Bookings (从 MySQL 获取！)
+      this.bookingService.getAllBookings().subscribe({
+        next: (data: any) => {
+          // 为了适配你原本的 HTML 模板变量名，这里做一下映射
+          this.allBookings = data.map((b: any) => ({
+            ...b,
+            safeName: b.userName,
+            safeRoom: b.roomName,
+            safeDate: b.bookingDate,
+            safeId: b.id.toString()
+          }));
+          this.filterData();
+          this.calculateStats();
+        },
+        error: (err: any) => console.error("Failed to fetch bookings", err)
+      });
 
-      // 2. 加载 Event RSVPs
-      this.allRsvps = JSON.parse(localStorage.getItem('inwlab_event_rsvps') || '[]');
+      // 2. 加载 Event RSVPs (从 MySQL 获取)
+      this.rsvpService.getAllRsvps().subscribe({
+        next: (data: any) => {
+          this.allRsvps = data;
+          this.filterData();
+          this.calculateStats();
+        },
+        error: (err: any) => console.error("Failed to fetch RSVPs", err)
+      });
 
-      // 3. 加载 Contact Messages
-      this.allMessages = JSON.parse(localStorage.getItem('inwlab_contact_messages') || '[]');
-
-      this.filterData();
-      this.calculateStats();
+      // 3. 加载 Contact Messages (从 MySQL 获取)
+      this.contactService.getAllMessages().subscribe({
+        next: (data: any) => {
+          this.allMessages = data;
+          this.filterData();
+          this.calculateStats();
+        },
+        error: (err: any) => console.error("Failed to fetch messages", err)
+      });
     }
   }
 
-  // 🌟 统一的搜索过滤逻辑
   filterData() {
     const query = this.searchQuery.toLowerCase().trim();
 
@@ -110,76 +123,81 @@ export class AdminBookings implements OnInit {
     }
   }
 
-  // 🌟 统一的角标统计逻辑
   calculateStats() {
     this.pendingCount = this.allBookings.filter(b => b.status === 'Pending').length;
     this.pendingRsvpCount = this.allRsvps.filter(r => r.status === 'Pending').length;
     this.unreadMessageCount = this.allMessages.filter(m => m.status === 'Unread').length;
 
-    // 计算冲突
     const roomDates = this.allBookings.map(b => b.safeRoom + '_' + b.safeDate.split(' ')[0]);
     const uniqueRoomDates = new Set(roomDates);
     this.conflictCount = roomDates.length - uniqueRoomDates.size;
   }
 
   // ================= LAB BOOKINGS ACTIONS =================
+
   approveBooking(booking: any) {
     if (isPlatformBrowser(this.platformId) && confirm(`APPROVE booking for ${booking.safeName}?`)) {
-      booking.status = 'Approved';
-      this.saveBookingsToDB();
+      // 🌟 调用真实 API：批准
+      this.bookingService.approveBooking(booking.id).subscribe({
+        next: () => {
+          booking.status = 'Approved';
+          this.calculateStats();
+        },
+        error: (err: any) => console.error("Error approving booking", err)
+      });
     }
   }
 
   rejectBooking(booking: any) {
     if (isPlatformBrowser(this.platformId) && confirm(`REJECT booking for ${booking.safeName}?`)) {
-      booking.status = 'Rejected';
-      this.saveBookingsToDB();
+      // 🌟 调用真实 API：拒绝
+      this.bookingService.rejectBooking(booking.id).subscribe({
+        next: () => {
+          booking.status = 'Rejected';
+          this.calculateStats();
+        },
+        error: (err: any) => console.error("Error rejecting booking", err)
+      });
     }
-  }
-
-  saveBookingsToDB() {
-    this.allBookings.forEach(b => {
-      const filteredMatch = this.filteredBookings.find(fb => fb.safeId === b.safeId);
-      if (filteredMatch) b.status = filteredMatch.status;
-    });
-    localStorage.setItem('inwlab_bookings', JSON.stringify(this.allBookings));
-    this.calculateStats(); this.filterData();
   }
 
   // ================= EVENT RSVPS ACTIONS =================
   approveRsvp(rsvp: any) {
     if (isPlatformBrowser(this.platformId) && confirm(`APPROVE RSVP for ${rsvp.name}?`)) {
-      rsvp.status = 'Approved';
-      this.saveRsvpsToDB();
+      this.rsvpService.approveRsvp(rsvp.id).subscribe({
+        next: () => { rsvp.status = 'Approved'; this.calculateStats(); },
+        error: (err: any) => console.error("Error approving RSVP", err)
+      });
     }
   }
 
   rejectRsvp(rsvp: any) {
     if (isPlatformBrowser(this.platformId) && confirm(`REJECT RSVP for ${rsvp.name}?`)) {
-      rsvp.status = 'Rejected';
-      this.saveRsvpsToDB();
+      this.rsvpService.rejectRsvp(rsvp.id).subscribe({
+        next: () => { rsvp.status = 'Rejected'; this.calculateStats(); },
+        error: (err: any) => console.error("Error rejecting RSVP", err)
+      });
     }
-  }
-
-  saveRsvpsToDB() {
-    localStorage.setItem('inwlab_event_rsvps', JSON.stringify(this.allRsvps));
-    this.calculateStats(); this.filterData();
   }
 
   // ================= CONTACT MESSAGES ACTIONS =================
   markMessageAsRead(msg: any) {
-    msg.status = 'Read';
-    localStorage.setItem('inwlab_contact_messages', JSON.stringify(this.allMessages));
-    this.calculateStats(); this.filterData();
+    this.contactService.markAsRead(msg.id).subscribe({
+      next: () => { msg.status = 'Read'; this.calculateStats(); },
+      error: (err: any) => console.error("Error marking message as read", err)
+    });
   }
 
   deleteMessage(index: number) {
     if (confirm("Permanently delete this message?")) {
-      // 从 filtered 找到对应的 index，并在 allMessages 里删除
       const msgToDelete = this.filteredMessages[index];
-      this.allMessages = this.allMessages.filter(m => m.id !== msgToDelete.id);
-      localStorage.setItem('inwlab_contact_messages', JSON.stringify(this.allMessages));
-      this.calculateStats(); this.filterData();
+      this.contactService.deleteMessage(msgToDelete.id).subscribe({
+        next: () => {
+          this.allMessages = this.allMessages.filter(m => m.id !== msgToDelete.id);
+          this.filterData(); this.calculateStats();
+        },
+        error: (err: any) => console.error("Error deleting message", err)
+      });
     }
   }
 
@@ -188,7 +206,7 @@ export class AdminBookings implements OnInit {
     if (!isPlatformBrowser(this.platformId)) return;
 
     let targetArray = [];
-    let headers = [];
+    let headers: string[] = [];
     let filename = '';
 
     if (this.activeTab === 'bookings') {
@@ -232,7 +250,7 @@ export class AdminBookings implements OnInit {
 
   setTab(tab: 'bookings' | 'rsvps' | 'messages') {
     this.activeTab = tab;
-    this.searchQuery = ''; // 切换 Tab 时清空搜索
+    this.searchQuery = '';
     this.filterData();
   }
 }

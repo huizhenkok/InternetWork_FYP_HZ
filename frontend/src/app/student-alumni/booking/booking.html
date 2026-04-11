@@ -168,10 +168,12 @@
     </div>
   </main>
 
-  <app-booking-modal *ngIf="isBookingModalOpen"
-                     [room]="selectedRoomForBooking"
-                     (close)="isBookingModalOpen = false"
-                     (bookingSaved)="onBookingComplete()">
+  <app-booking-modal
+    *ngIf="isBookingModalOpen"
+    [room]="selectedRoomForBooking"
+    [allSystemBookings]="allSystemBookings"
+    (close)="isBookingModalOpen = false"
+    (bookingSaved)="onBookingComplete()">
   </app-booking-modal>
 
   <div *ngIf="isScheduleModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center px-4">

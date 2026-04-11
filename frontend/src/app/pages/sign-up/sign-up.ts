@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../services/auth.service'; // 🌟 正确的跳层路径
 
 declare var AOS: any;
 
@@ -12,10 +13,10 @@ declare var AOS: any;
   templateUrl: './sign-up.html'
 })
 export class SignUp implements OnInit {
-  regType: 'Student' | 'Alumni' | 'Faculty' = 'Student'; // 🌟 加入 Faculty
+  regType: 'Student' | 'Alumni' | 'Faculty' = 'Student';
 
   formData = {
-    fullName: '',     // 用户的全名
+    fullName: '',
     matricNumber: '',
     email: '',
     phone: '',
@@ -25,6 +26,7 @@ export class SignUp implements OnInit {
 
   constructor(
     private router: Router,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -53,7 +55,7 @@ export class SignUp implements OnInit {
       return;
     }
 
-    // 3. 验证 ID (根据身份不同验证不同)
+    // 3. 验证 ID
     if (this.regType === 'Student') {
       const isIdValid = /^\d{6}$/.test(this.formData.matricNumber);
       if (!isIdValid) {
@@ -61,7 +63,6 @@ export class SignUp implements OnInit {
         return;
       }
     } else if (this.regType === 'Faculty') {
-      // 🌟 教职员要求填写 Staff ID
       if (!this.formData.matricNumber || this.formData.matricNumber.length < 4) {
         alert("Staff ID must be at least 4 characters.");
         return;
@@ -73,26 +74,24 @@ export class SignUp implements OnInit {
       return;
     }
 
-    // 🌟 核心修复区：这次一定要把 fullName 存进去！
+    // 组合要发送给后端的数据
     const newUser = {
-      fullName: this.formData.fullName, // 👈 之前漏掉了这一行！
+      fullName: this.formData.fullName,
       email: this.formData.email.toLowerCase(),
       password: this.formData.password,
       role: this.regType
     };
 
-    let users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
-
-    const userExists = users.find((u: any) => u.email === newUser.email);
-    if (userExists) {
-      alert("This email is already registered! Please login.");
-      return;
-    }
-
-    users.push(newUser);
-    localStorage.setItem('inwlab_users', JSON.stringify(users));
-
-    alert(`Registration Successful as ${this.regType}! You can now login with your email.`);
-    this.router.navigate(['/login']);
+    // 🌟 核心：调用 AuthService 发送真实请求到数据库
+    this.authService.register(newUser).subscribe({
+      next: (response: any) => { // 🌟 修复严格模式报错
+        alert(`Registration Successful as ${this.regType}! You can now login with your email.`);
+        this.router.navigate(['/login']);
+      },
+      error: (err: any) => { // 🌟 修复严格模式报错
+        console.error("Registration Error:", err);
+        alert(err.error || "Registration failed. This email might already be in use.");
+      }
+    });
   }
 }

@@ -1,13 +1,14 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // 🌟 引入表单模块支持 RSVP
+import { FormsModule } from '@angular/forms';
+import { RsvpService } from '../../../services/rsvp.service'; // 🌟 引入真实后端的 RsvpService
 
 declare var AOS: any;
 
 @Component({
   selector: 'app-news',
   standalone: true,
-  imports: [CommonModule, FormsModule], // 🌟 注册 FormsModule
+  imports: [CommonModule, FormsModule],
   templateUrl: './news.html'
 })
 export class News implements OnInit {
@@ -35,9 +36,6 @@ export class News implements OnInit {
     quoteAuthor: 'INWLab Vision'
   };
 
-  // ==========================================
-  // 🌟 新增：RSVP 表单状态管理
-  // ==========================================
   isRsvpModalOpen: boolean = false;
   rsvpEventName: string = '';
   isSubmittingRsvp: boolean = false;
@@ -46,15 +44,17 @@ export class News implements OnInit {
   rsvpData = {
     name: '',
     email: '',
-    role: 'UUM Student', // 默认选项
+    role: 'UUM Student',
     message: ''
   };
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private rsvpService: RsvpService // 🌟 在构造函数中注入 RsvpService
+  ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // 🌟 拉取 CMS 数据
       const savedCms = localStorage.getItem('inwlab_cms_news_events');
       if (savedCms) {
         try {
@@ -73,13 +73,11 @@ export class News implements OnInit {
     }
   }
 
-  // 🌟 打开 RSVP 弹窗
   handleRSVP(eventName: string) {
     this.rsvpEventName = eventName;
     this.isRsvpModalOpen = true;
     this.isRsvpSuccess = false;
 
-    // 如果用户已经登录了，自动帮他填好名字和邮箱，体验拉满！
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
       if (activeUser.email) {
@@ -94,7 +92,7 @@ export class News implements OnInit {
     this.isRsvpModalOpen = false;
   }
 
-  // 🌟 提交 RSVP 数据到本地数据库，供 Admin 审批
+  // 🌟 核心修改：提交真实 RSVP 数据到 Spring Boot 后端
   submitRSVP() {
     if (!this.rsvpData.name || !this.rsvpData.email) {
       alert("Please fill in your Name and Email address.");
@@ -103,35 +101,33 @@ export class News implements OnInit {
 
     this.isSubmittingRsvp = true;
 
-    setTimeout(() => {
-      if (isPlatformBrowser(this.platformId)) {
-        const existingRsvps = JSON.parse(localStorage.getItem('inwlab_event_rsvps') || '[]');
+    // 组合发送给后端的数据，必须和 Spring Boot 的 EventRsvp.java 字段一致
+    const payload = {
+      eventName: this.rsvpEventName,
+      name: this.rsvpData.name,
+      email: this.rsvpData.email,
+      role: this.rsvpData.role,
+      message: this.rsvpData.message
+    };
 
-        // 压入新数据，状态为 Pending
-        existingRsvps.unshift({
-          id: 'RSVP-' + Math.floor(Math.random() * 900000 + 100000),
-          eventName: this.rsvpEventName,
-          name: this.rsvpData.name,
-          email: this.rsvpData.email,
-          role: this.rsvpData.role,
-          message: this.rsvpData.message,
-          status: 'Pending',
-          dateSubmitted: new Date().toLocaleDateString()
-        });
+    // 调用 RsvpService 发送真实 HTTP POST 请求
+    this.rsvpService.submitRsvp(payload).subscribe({
+      next: (response: any) => {
+        this.isSubmittingRsvp = false;
+        this.isRsvpSuccess = true;
 
-        localStorage.setItem('inwlab_event_rsvps', JSON.stringify(existingRsvps));
+        // 成功后延迟关闭窗口并清空表单
+        setTimeout(() => {
+          this.closeRsvpModal();
+          this.rsvpData = { name: '', email: '', role: 'UUM Student', message: '' };
+        }, 2000);
+      },
+      error: (err: any) => {
+        this.isSubmittingRsvp = false;
+        console.error("RSVP Error:", err);
+        alert("Failed to submit RSVP. Please try again.");
       }
-
-      this.isSubmittingRsvp = false;
-      this.isRsvpSuccess = true;
-
-      // 成功后延迟关闭窗口并清空表单
-      setTimeout(() => {
-        this.closeRsvpModal();
-        this.rsvpData = { name: '', email: '', role: 'UUM Student', message: '' };
-      }, 2000);
-
-    }, 1000);
+    });
   }
 
   async shareEvent(eventName: string) {

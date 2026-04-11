@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookingModal } from './booking-modal/booking-modal';
+import { BookingService } from '../../../services/booking.service'; // 🌟 引入真实后端的 BookingService
 
 declare var AOS: any;
 
@@ -26,6 +27,7 @@ export class Booking implements OnInit, AfterViewInit {
   rooms: any[] = [];
   filteredRooms: any[] = [];
   myBookings: any[] = [];
+  allSystemBookings: any[] = []; // 🌟 新增：用来存储从数据库拉取的所有预约记录
 
   isBookingModalOpen: boolean = false;
   selectedRoomForBooking: any = null;
@@ -37,7 +39,8 @@ export class Booking implements OnInit, AfterViewInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private bookingService: BookingService // 🌟 注入 BookingService
   ) {}
 
   ngOnInit() {
@@ -59,29 +62,24 @@ export class Booking implements OnInit, AfterViewInit {
       if (storedRooms) {
         this.rooms = JSON.parse(storedRooms);
 
-        // 🌟 【核心修复】自动修复旧的冗余数据和缺失的图标/颜色
         let dataFixed = false;
         const colors = ['teal', 'slate', 'cyan', 'orange'];
 
         this.rooms.forEach(room => {
-          // 修复旧版占用的状态
           if (room.status === 'Occupied') {
             room.status = 'Available';
             dataFixed = true;
           }
-          // 🌟 如果 CMS 添加的新房间没有 icon，给它一个默认门图标
           if (!room.icon) {
             room.icon = 'meeting_room';
             dataFixed = true;
           }
-          // 🌟 如果没有颜色，随机分配一个好看的颜色
           if (!room.color) {
             room.color = colors[Math.floor(Math.random() * colors.length)];
             dataFixed = true;
           }
         });
 
-        // 如果做了修复，就重新保存到数据库
         if (dataFixed) {
           localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms));
         }
@@ -94,8 +92,9 @@ export class Booking implements OnInit, AfterViewInit {
     }
 
     this.applyFilters();
-    this.loadMyBookings();
+    this.loadMyBookings(); // 🌟 这里会调用后端 API 拉取历史记录
   }
+
   loadDefaultRooms() {
     this.rooms = [
       { id: '#101', name: 'Discussion Room A', floor: 'Floor 2', location: 'East Wing', capacity: 6, equipment: ['Whiteboard', 'Screen'], status: 'Available', cleanedTime: 'Today, 09:00 AM', icon: 'meeting_room', color: 'teal' },
@@ -108,11 +107,19 @@ export class Booking implements OnInit, AfterViewInit {
     }
   }
 
+  // 🌟 核心修改：从真实的 MySQL 数据库获取预约记录
   loadMyBookings() {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
-      const allBookings = JSON.parse(localStorage.getItem('inwlab_bookings') || '[]');
-      this.myBookings = allBookings.filter((b: any) => b.userEmail === activeUser.email);
+
+      this.bookingService.getAllBookings().subscribe({
+        next: (data: any) => {
+          this.allSystemBookings = data; // 保存所有记录供 Schedule 使用
+          // 过滤出只属于当前登录用户的历史记录
+          this.myBookings = data.filter((b: any) => b.userEmail === activeUser.email);
+        },
+        error: (err: any) => console.error("Error loading bookings from DB:", err)
+      });
     } else {
       this.myBookings = [];
     }
@@ -148,21 +155,22 @@ export class Booking implements OnInit, AfterViewInit {
 
   onBookingComplete() {
     this.isBookingModalOpen = false;
-    this.initData();
+    this.initData(); // 提交完成后，重新从数据库拉取最新数据
   }
 
+  // 🌟 核心修改：查看房间时间表时，读取从数据库拉取的真实数据
   openSchedule(room: any) {
     this.selectedScheduleRoom = room;
 
     if (isPlatformBrowser(this.platformId)) {
-      const allBookings = JSON.parse(localStorage.getItem('inwlab_bookings') || '[]');
-      const roomBookings = allBookings.filter((b: any) => b.roomId === room.id);
+      // 从后端返回的数据中，匹配当前房间名称的记录
+      const roomBookings = this.allSystemBookings.filter((b: any) => b.roomName === room.name);
 
       if (roomBookings.length > 0) {
         this.currentRoomSchedule = roomBookings.map((b: any) => ({
-          date: b.date,
+          date: b.bookingDate,
           time: `${b.startTime} - ${b.endTime}`,
-          label: `Occupied (${b.userName})`,
+          label: `${b.status} (${b.userName})`, // 显示真实状态和用户名
           isAvailable: false
         }));
       } else {
