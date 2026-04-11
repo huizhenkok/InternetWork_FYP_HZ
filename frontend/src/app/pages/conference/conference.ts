@@ -2,8 +2,8 @@ import { Component, OnInit, Inject, PLATFORM_ID, OnDestroy } from '@angular/core
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-
 import { ConferenceTeam } from '../people/team/conference-team/conference-team';
+import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
 
 declare var AOS: any;
 
@@ -25,10 +25,14 @@ export class Conference implements OnInit, OnDestroy {
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
 
-  // 🌟 新增：控制图片全屏查看的变量
+  // Variable to control full-screen image modal
   isImageModalOpen: boolean = false;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private route: ActivatedRoute) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private route: ActivatedRoute,
+    private cmsService: CmsService // 🌟 Inject CmsService
+  ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -53,41 +57,51 @@ export class Conference implements OnInit, OnDestroy {
 
   loadConferenceData(year: string) {
     if (isPlatformBrowser(this.platformId)) {
-      const savedConfs = localStorage.getItem('inwlab_cms_conferences');
-      let allConferences = [];
-      if (savedConfs) {
-        allConferences = JSON.parse(savedConfs);
-      }
 
-      const foundConf = allConferences.find((c: any) => c.year === year);
-
-      if (foundConf) {
-        this.confData = foundConf;
-      } else {
-        this.confData = {
-          year: year,
-          title: 'The International Conference on Internet Applications, Protocols and Services',
-          shortName: 'NETAPPS',
-          home: {
-            paragraph1: `The International Conference on Internet Applications, Protocols and Services (NETAPPS ${year}) is a no-frills conference in the area of Internet communications and networking.`,
-            paragraph2: `The main goal of this conference is to serve as an affordable platform to promote greater engagement of network researchers from around the globe...`,
-            confDate: `6 & 7 November ${year}`,
-            targetDate: `${year}-11-06T00:00:00`,
-            date1: `August 15, ${year}`,
-            date2: `Sept 30, ${year}`,
-            fee1: 'RM 1,000',
-            fee2: 'RM 800'
-          },
-          cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.',
-          reg: 'Registration & Final Submission details to be announced.',
-          imageUrl: '',
-          pdfUrl: '',
-          team: []
-        };
-      }
-
-      this.setCountdownForDate(this.confData.home.targetDate);
+      // Core modification: Fetch Conference CMS data from MySQL
+      this.cmsService.getCmsData('inwlab_cms_conferences').subscribe({
+        next: (res: any) => {
+          try {
+            const allConferences = JSON.parse(res.contentJson);
+            const foundConf = allConferences.find((c: any) => c.year === year);
+            if (foundConf) {
+              this.confData = foundConf;
+              this.setCountdownForDate(this.confData.home.targetDate);
+            } else {
+              this.applyDefaultConfData(year);
+            }
+          } catch(e) {
+            console.error("Error parsing Conference CMS", e);
+            this.applyDefaultConfData(year);
+          }
+        },
+        error: () => this.applyDefaultConfData(year)
+      });
     }
+  }
+
+  applyDefaultConfData(year: string) {
+    this.confData = {
+      year: year,
+      title: 'The International Conference on Internet Applications, Protocols and Services',
+      shortName: 'NETAPPS',
+      home: {
+        paragraph1: `The International Conference on Internet Applications, Protocols and Services (NETAPPS ${year}) is a no-frills conference in the area of Internet communications and networking.`,
+        paragraph2: `The main goal of this conference is to serve as an affordable platform to promote greater engagement of network researchers from around the globe...`,
+        confDate: `6 & 7 November ${year}`,
+        targetDate: `${year}-11-06T00:00:00`,
+        date1: `August 15, ${year}`,
+        date2: `Sept 30, ${year}`,
+        fee1: 'RM 1,000',
+        fee2: 'RM 800'
+      },
+      cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.',
+      reg: 'Registration & Final Submission details to be announced.',
+      imageUrl: '',
+      pdfUrl: '',
+      team: []
+    };
+    this.setCountdownForDate(this.confData.home.targetDate);
   }
 
   ngOnDestroy() {
@@ -127,7 +141,7 @@ export class Conference implements OnInit, OnDestroy {
     }
   }
 
-  // 🌟 新增：打开和关闭图片的方法
+  // Methods to open and close image modal
   openImageModal() {
     if (this.confData && this.confData.imageUrl && this.confData.imageUrl.trim() !== '') {
       this.isImageModalOpen = true;

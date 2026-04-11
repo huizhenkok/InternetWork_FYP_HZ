@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CmsService } from '../../../../../services/cms.service'; // 🌟 子组件跳 4 层
 
 interface Student { name: string; department: string; email: string; avatar?: string; }
 declare var AOS: any;
@@ -10,15 +11,29 @@ export class ActiveStudent implements OnInit, OnChanges {
   allStudents: Student[] = [];
   filteredStudents: Student[] = [];
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cmsService: CmsService // 🌟 注入 CmsService
+  ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      const savedTeam = localStorage.getItem('inwlab_cms_team');
-      if (savedTeam) { const parsed = JSON.parse(savedTeam); if (parsed.students) { this.allStudents = parsed.students; } }
-      this.filterStudents();
+      // 🌟 核心修改：从 MySQL 获取 Students 数据
+      this.cmsService.getCmsData('inwlab_cms_team').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            if (parsed.students) {
+              this.allStudents = parsed.students;
+            }
+            this.filterStudents(); // 🌟 数据拿到后再过滤渲染
+          } catch(e) { console.error("Error parsing Students CMS", e); }
+        },
+        error: () => console.log('Using default Students data')
+      });
     }
   }
+
   ngOnChanges() { this.filterStudents(); }
 
   filterStudents() {

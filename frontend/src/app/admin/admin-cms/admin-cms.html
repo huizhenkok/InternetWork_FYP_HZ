@@ -376,7 +376,13 @@
                       <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Role</label><input type="text" [(ngModel)]="member.role" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
                       <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email</label><input type="text" [(ngModel)]="member.email" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
                       <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Social Link</label><input type="text" [(ngModel)]="member.socialLink" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-primary font-bold">Avatar URL</label><input type="text" [(ngModel)]="member.avatar" placeholder="https://..." class="w-full bg-transparent border border-primary/30 dark:border-[#0df2f2]/30 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+
+                      <div class="flex flex-col gap-1">
+                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar</label>
+                        <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-1 h-8 w-8 rounded-full border border-slate-200 dark:border-white/10 object-cover">
+                        <span *ngIf="isUploading" class="text-[10px] text-primary">Uploading...</span>
+                      </div>
                     </div>
                     <button (click)="addTeamMember(sIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-1 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[14px]">person_add</span> Add Member</button>
                   </div>
@@ -403,7 +409,13 @@
                       <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Name</label><input type="text" [(ngModel)]="member.name" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
                       <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Designation</label><input type="text" [(ngModel)]="member.designation" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
                       <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Organization</label><input type="text" [(ngModel)]="member.organization" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-primary font-bold">Avatar URL</label><input type="text" [(ngModel)]="member.avatar" placeholder="https://..." class="w-full bg-transparent border border-primary/30 dark:border-[#0df2f2]/30 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+
+                      <div class="flex flex-col gap-1">
+                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar</label>
+                        <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-1 h-8 w-8 rounded-full border border-slate-200 dark:border-white/10 object-cover">
+                        <span *ngIf="isUploading" class="text-[10px] text-primary">Uploading...</span>
+                      </div>
                     </div>
                     <button (click)="addAlumniMember(yIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-1 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[14px]">person_add</span> Add Alumni</button>
                   </div>
@@ -422,7 +434,13 @@
                     <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Student Name</label><input type="text" [(ngModel)]="student.name" class="w-full pr-6 bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm font-bold text-slate-900 dark:text-white outline-none"></div>
                     <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Department / Program</label><input type="text" [(ngModel)]="student.department" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
                     <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email Address</label><input type="text" [(ngModel)]="student.email" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                    <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-primary font-bold">Avatar URL</label><input type="text" [(ngModel)]="student.avatar" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-primary/30 dark:border-[#0df2f2]/30 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+
+                    <div class="flex flex-col gap-1">
+                      <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar</label>
+                      <input type="file" accept="image/*" (change)="onFileUpload($event, student, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                      <img *ngIf="student.avatar" [src]="student.avatar" alt="Preview" class="mt-1 h-8 w-8 rounded-full border border-slate-200 dark:border-white/10 object-cover">
+                      <span *ngIf="isUploading" class="text-[10px] text-primary">Uploading...</span>
+                    </div>
                   </div>
                 </div>
 
@@ -645,15 +663,26 @@
                       </div>
                     </div>
 
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 mt-6">Media & Downloads (URLs)</h3>
-                    <div class="flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 mt-6">Media & Downloads</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div class="flex flex-col gap-2">
-                        <label class="text-[10px] font-bold text-primary uppercase">Conference Poster / Banner (Image URL)</label>
-                        <input type="text" [(ngModel)]="conferences[editingConfIndex].imageUrl" placeholder="https://... (.jpg, .png)" class="w-full bg-white dark:bg-black/40 border border-primary/30 dark:border-[#0df2f2]/30 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary">
+                        <label class="text-[10px] font-bold text-primary uppercase">Upload Poster / Banner Image</label>
+                        <div class="flex items-center gap-2">
+                          <input type="file" accept="image/*" (change)="onFileUpload($event, conferences[editingConfIndex], 'imageUrl')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                          <span *ngIf="isUploading" class="text-xs text-primary whitespace-nowrap">Uploading...</span>
+                        </div>
+                        <img *ngIf="conferences[editingConfIndex].imageUrl" [src]="conferences[editingConfIndex].imageUrl" alt="Preview" class="mt-2 h-24 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                       </div>
+
                       <div class="flex flex-col gap-2">
-                        <label class="text-[10px] font-bold text-accent-cyan uppercase">Program Book (PDF Download URL)</label>
-                        <input type="text" [(ngModel)]="conferences[editingConfIndex].pdfUrl" placeholder="https://... (.pdf or Drive Link)" class="w-full bg-white dark:bg-black/40 border border-accent-cyan/30 dark:border-[#0df2f2]/30 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-accent-cyan">
+                        <label class="text-[10px] font-bold text-accent-cyan uppercase">Upload Program Book (PDF)</label>
+                        <div class="flex items-center gap-2">
+                          <input type="file" accept="application/pdf" (change)="onFileUpload($event, conferences[editingConfIndex], 'pdfUrl')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-accent-cyan/10 file:text-accent-cyan hover:file:bg-accent-cyan/20 cursor-pointer">
+                          <span *ngIf="isUploading" class="text-xs text-accent-cyan whitespace-nowrap">Uploading...</span>
+                        </div>
+                        <div *ngIf="conferences[editingConfIndex].pdfUrl" class="mt-2 text-xs text-slate-500 dark:text-gray-400 break-all bg-white dark:bg-black/30 p-2 rounded border border-slate-200 dark:border-white/10">
+                          Current PDF URL:<br> <a [href]="conferences[editingConfIndex].pdfUrl" target="_blank" class="text-accent-cyan hover:underline">{{ conferences[editingConfIndex].pdfUrl }}</a>
+                        </div>
                       </div>
                     </div>
 

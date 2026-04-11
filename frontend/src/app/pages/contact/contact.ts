@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContactService } from '../../../services/contact.service';
+import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
 
 declare var AOS: any;
 
@@ -35,21 +36,26 @@ export class Contact implements OnInit {
   isSent: boolean = false;
 
   constructor(
-    private contactService: ContactService, // 🌟 注入 ContactService
+    private contactService: ContactService,
+    private cmsService: CmsService, // 🌟 Inject CmsService
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      const savedCms = localStorage.getItem('inwlab_cms_contact');
-      if (savedCms) {
-        try {
-          const parsed = JSON.parse(savedCms);
-          this.cmsData = { ...this.cmsData, ...parsed };
-        } catch(e) {}
-      }
 
-      // 如果用户已登录，自动填充姓名和邮箱
+      // 🌟 Core modification: Fetch Contact CMS data from MySQL
+      this.cmsService.getCmsData('inwlab_cms_contact').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            this.cmsData = { ...this.cmsData, ...parsed };
+          } catch(e) { console.error("Error parsing Contact CMS", e); }
+        },
+        error: () => console.log('Using default Contact data')
+      });
+
+      // Auto-fill active user data
       try {
         const activeUserStr = localStorage.getItem('active_user');
         if (activeUserStr) {
@@ -79,23 +85,13 @@ export class Contact implements OnInit {
 
     this.isSending = true;
 
-    // 🌟 核心：发送真实 HTTP 请求到后端的 MySQL 数据库
     this.contactService.submitMessage(this.formData).subscribe({
       next: (response: any) => {
         this.isSending = false;
         this.isSent = true;
+        this.formData = { name: '', email: '', department: 'Project Inquiry', message: '' };
 
-        // 清空表单
-        this.formData = {
-          name: '',
-          email: '',
-          department: 'Project Inquiry',
-          message: ''
-        };
-
-        setTimeout(() => {
-          this.isSent = false;
-        }, 3000);
+        setTimeout(() => { this.isSent = false; }, 3000);
       },
       error: (err: any) => {
         this.isSending = false;

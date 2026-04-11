@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { CmsService } from '../../../services/cms.service'; // 🌟 引入 CmsService
 
 declare var AOS: any;
 
@@ -14,28 +15,32 @@ export class Resources implements OnInit {
 
   allResources: any[] = [];
 
-  // 🌟 核心：为 CMS 数据提供默认值
   cmsData: any = {
     mainTitle: 'Public Publications',
     subTitle: 'Explore research papers, datasets, and technical reports publicly shared by INWLab members.',
-    filterTitle: 'Repository of publications, reports, and datasets.' // 稍微精简了这句
+    filterTitle: 'Repository of publications, reports, and datasets.'
   };
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cmsService: CmsService // 🌟 注入 CmsService
+  ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
 
-      // 🌟 加载 CMS 里填写的文案
-      const savedCms = localStorage.getItem('inwlab_cms_resource');
-      if (savedCms) {
-        try {
-          const parsed = JSON.parse(savedCms);
-          this.cmsData.mainTitle = parsed.mainTitle || this.cmsData.mainTitle;
-          this.cmsData.subTitle = parsed.subTitle || this.cmsData.subTitle;
-          this.cmsData.filterTitle = parsed.filterTitle || this.cmsData.filterTitle;
-        } catch(e) {}
-      }
+      // 🌟 核心修改：从 MySQL 获取 Resource 文案数据
+      this.cmsService.getCmsData('inwlab_cms_resource').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            this.cmsData.mainTitle = parsed.mainTitle || this.cmsData.mainTitle;
+            this.cmsData.subTitle = parsed.subTitle || this.cmsData.subTitle;
+            this.cmsData.filterTitle = parsed.filterTitle || this.cmsData.filterTitle;
+          } catch(e) { console.error("Error parsing Resource CMS", e); }
+        },
+        error: () => console.log('Using default Resource data')
+      });
 
       this.loadRealPublications();
 
@@ -54,7 +59,6 @@ export class Resources implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
 
-      // 🌟 核心修改：不再做任何分类，直接拉取所有 Public 文件并按时间排序
       this.allResources = allImports
         .filter((doc: any) => doc.visibility === 'Public')
         .sort((a: any, b: any) => b.timestamp - a.timestamp)
@@ -83,7 +87,6 @@ export class Resources implements OnInit {
     }
   }
 
-  // 🌟 和 Research 一样的智能拆分文字函数
   get titleFirstPart(): string {
     const words = this.cmsData.mainTitle.trim().split(' ');
     if (words.length <= 1) return this.cmsData.mainTitle;

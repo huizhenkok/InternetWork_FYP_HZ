@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CmsService } from '../../../../../services/cms.service'; // 🌟 子组件跳 4 层
 
 interface TeamMember { name: string; role: string; email?: string; socialLink?: string; avatar?: string; }
 interface TeamSection { title: string; members: TeamMember[]; }
@@ -10,13 +11,26 @@ export class OurTeam implements OnInit, OnChanges {
   allSections: TeamSection[] = [];
   filteredSections: TeamSection[] = [];
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cmsService: CmsService // 🌟 注入 CmsService
+  ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      const savedTeam = localStorage.getItem('inwlab_cms_team');
-      if (savedTeam) { const parsed = JSON.parse(savedTeam); if (parsed.ourTeam) { this.allSections = parsed.ourTeam; } }
-      this.filterMembers();
+      // 🌟 核心修改：从 MySQL 获取 Team 数据
+      this.cmsService.getCmsData('inwlab_cms_team').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            if (parsed.ourTeam) {
+              this.allSections = parsed.ourTeam;
+            }
+            this.filterMembers(); // 🌟 数据拿到后再过滤渲染
+          } catch(e) { console.error("Error parsing Our Team CMS", e); }
+        },
+        error: () => console.log('Using default Our Team data')
+      });
     }
   }
 

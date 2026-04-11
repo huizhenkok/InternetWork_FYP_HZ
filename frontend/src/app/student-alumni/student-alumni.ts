@@ -1,6 +1,8 @@
 import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { BookingService } from '../../services/booking.service'; // 🌟 Added BookingService
+import { CmsService } from '../../services/cms.service'; // 🌟 Added CmsService
 
 declare var AOS: any;
 
@@ -16,8 +18,6 @@ export class StudentAlumni implements OnInit, AfterViewInit {
   userName: string = 'User';
 
   bulletins: any[] = [];
-
-  // 🌟 新增：存放当前登录用户的 Upcoming Bookings
   myUpcomingBookings: any[] = [];
 
   @ViewChild('particleCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -27,7 +27,9 @@ export class StudentAlumni implements OnInit, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private bookingService: BookingService, // 🌟 Inject BookingService
+    private cmsService: CmsService // 🌟 Inject CmsService
   ) {}
 
   ngOnInit() {
@@ -36,7 +38,7 @@ export class StudentAlumni implements OnInit, AfterViewInit {
     });
 
     if (isPlatformBrowser(this.platformId)) {
-      this.loadUserData();
+      this.loadUserDataAndBookings();
       this.loadBulletins();
 
       setTimeout(() => {
@@ -53,53 +55,71 @@ export class StudentAlumni implements OnInit, AfterViewInit {
     if (isPlatformBrowser(this.platformId)) { this.initParticles(); }
   }
 
-  loadUserData() {
+  loadUserDataAndBookings() {
     try {
+      // User session data remains in localStorage (intended behavior for Auth)
       const activeUserStr = localStorage.getItem('active_user');
-      if (activeUserStr) {
-        const activeUser = JSON.parse(activeUserStr);
-        if (activeUser && activeUser.fullName) {
-          this.userName = activeUser.fullName.split(' ')[0];
-          if (activeUser.role) this.userRole = activeUser.role;
+      if (!activeUserStr) return;
 
-          // 🌟 核心：加载属于该用户的、已被 Admin 批准 (Approved) 的预约
-          const allBookings = JSON.parse(localStorage.getItem('inwlab_bookings') || '[]');
-          const allRooms = JSON.parse(localStorage.getItem('inwlab_rooms') || '[]');
+      const activeUser = JSON.parse(activeUserStr);
+      if (activeUser && activeUser.fullName) {
+        this.userName = activeUser.fullName.split(' ')[0];
+        if (activeUser.role) this.userRole = activeUser.role;
 
-          this.myUpcomingBookings = allBookings
-            .filter((b: any) => b.userEmail === activeUser.email && b.status === 'Approved')
-            .map((b: any) => {
-              // 找到对应房间，拿它的图标
-              const roomInfo = allRooms.find((r: any) => r.id === b.roomId);
-              return {
-                ...b,
-                icon: roomInfo && roomInfo.icon ? roomInfo.icon : 'meeting_room' // 如果找不到给个默认门图标
-              };
-            })
-            // 按照日期时间排序，最近的在上面
-            .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            // 只取最近的 3 个展示在仪表盘上，避免卡片太长
-            .slice(0, 3);
-        }
+        // 🌟 Fetch Rooms (for icons) and Bookings from MySQL
+        this.cmsService.getCmsData('inwlab_rooms').subscribe({
+          next: (resRoom: any) => {
+            let allRooms: any[] = [];
+            try { allRooms = JSON.parse(resRoom.contentJson); } catch(e) {}
+
+            this.bookingService.getAllBookings().subscribe({
+              next: (allBookings: any[]) => {
+                this.myUpcomingBookings = allBookings
+                  .filter((b: any) => b.userEmail === activeUser.email && b.status === 'Approved')
+                  .map((b: any) => {
+                    // Match room to get its icon (Backend uses roomName)
+                    const roomInfo = allRooms.find((r: any) => r.name === b.roomName);
+                    return {
+                      ...b,
+                      icon: roomInfo && roomInfo.icon ? roomInfo.icon : 'meeting_room'
+                    };
+                  })
+                  .sort((a: any, b: any) => new Date(a.bookingDate).getTime() - new Date(b.bookingDate).getTime())
+                  .slice(0, 3);
+              },
+              error: (err) => console.error("Error fetching bookings:", err)
+            });
+          },
+          error: (err) => console.error("Error fetching rooms for icons:", err)
+        });
       }
     } catch (e) { console.error(e); }
   }
 
   loadBulletins() {
-    const savedBulletins = localStorage.getItem('inwlab_bulletins');
-    if (savedBulletins) {
-      this.bulletins = JSON.parse(savedBulletins);
-    }
-    if (!this.bulletins || this.bulletins.length === 0) {
-      this.bulletins = [
-        { title: 'Main Server Maintenance', dateLabel: 'Today', content: 'The SOC database cluster will be down for scheduled upgrades from 2:00 AM to 4:00 AM. Please save your simulations.', icon: 'dns', color: 'red' },
-        { title: 'New IoT Equipment Arrived', dateLabel: 'Yesterday', content: 'Ten new Raspberry Pi 5 nodes have been added to the hardware lab. You can reserve them starting next Monday.', icon: 'science', color: 'primary' }
-      ];
-      localStorage.setItem('inwlab_bulletins', JSON.stringify(this.bulletins));
-    }
+    // 🌟 Fetch Bulletins from MySQL CMS
+    this.cmsService.getCmsData('inwlab_bulletins').subscribe({
+      next: (res: any) => {
+        try {
+          this.bulletins = JSON.parse(res.contentJson);
+          if (!this.bulletins || this.bulletins.length === 0) this.applyDefaultBulletins();
+        } catch(e) {
+          console.error("Error parsing Bulletins CMS", e);
+          this.applyDefaultBulletins();
+        }
+      },
+      error: () => this.applyDefaultBulletins()
+    });
   }
 
-  // ================= 粒子引擎部分 =================
+  applyDefaultBulletins() {
+    this.bulletins = [
+      { title: 'Main Server Maintenance', dateLabel: 'Today', content: 'The SOC database cluster will be down for scheduled upgrades from 2:00 AM to 4:00 AM. Please save your simulations.', icon: 'dns', color: 'red' },
+      { title: 'New IoT Equipment Arrived', dateLabel: 'Yesterday', content: 'Ten new Raspberry Pi 5 nodes have been added to the hardware lab. You can reserve them starting next Monday.', icon: 'science', color: 'primary' }
+    ];
+  }
+
+  // ================= Particle Engine =================
   initParticles() {
     const canvas = this.canvasRef.nativeElement;
     this.ctx = canvas.getContext('2d');

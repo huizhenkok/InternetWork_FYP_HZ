@@ -2,7 +2,8 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BookingModal } from './booking-modal/booking-modal';
-import { BookingService } from '../../../services/booking.service'; // 🌟 引入真实后端的 BookingService
+import { BookingService } from '../../../services/booking.service';
+import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
 
 declare var AOS: any;
 
@@ -15,7 +16,6 @@ declare var AOS: any;
 export class Booking implements OnInit, AfterViewInit {
 
   showHistory: boolean = false;
-
   isScheduleModalOpen: boolean = false;
   selectedScheduleRoom: any = null;
   currentRoomSchedule: any[] = [];
@@ -27,7 +27,7 @@ export class Booking implements OnInit, AfterViewInit {
   rooms: any[] = [];
   filteredRooms: any[] = [];
   myBookings: any[] = [];
-  allSystemBookings: any[] = []; // 🌟 新增：用来存储从数据库拉取的所有预约记录
+  allSystemBookings: any[] = [];
 
   isBookingModalOpen: boolean = false;
   selectedRoomForBooking: any = null;
@@ -40,7 +40,8 @@ export class Booking implements OnInit, AfterViewInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
-    private bookingService: BookingService // 🌟 注入 BookingService
+    private bookingService: BookingService,
+    private cmsService: CmsService // 🌟 Inject CmsService
   ) {}
 
   ngOnInit() {
@@ -58,41 +59,34 @@ export class Booking implements OnInit, AfterViewInit {
 
   initData() {
     if (isPlatformBrowser(this.platformId)) {
-      const storedRooms = localStorage.getItem('inwlab_rooms');
-      if (storedRooms) {
-        this.rooms = JSON.parse(storedRooms);
 
-        let dataFixed = false;
-        const colors = ['teal', 'slate', 'cyan', 'orange'];
-
-        this.rooms.forEach(room => {
-          if (room.status === 'Occupied') {
-            room.status = 'Available';
-            dataFixed = true;
+      // 🌟 Core modification: Fetch Rooms from MySQL CMS
+      this.cmsService.getCmsData('inwlab_rooms').subscribe({
+        next: (res: any) => {
+          try {
+            this.rooms = JSON.parse(res.contentJson);
+            // Ensure data integrity
+            const colors = ['teal', 'slate', 'cyan', 'orange'];
+            this.rooms.forEach(room => {
+              if (room.status === 'Occupied') room.status = 'Available';
+              if (!room.icon) room.icon = 'meeting_room';
+              if (!room.color) room.color = colors[Math.floor(Math.random() * colors.length)];
+            });
+            this.applyFilters();
+          } catch(e) {
+            console.error("Error parsing Rooms CMS", e);
+            this.loadDefaultRooms();
           }
-          if (!room.icon) {
-            room.icon = 'meeting_room';
-            dataFixed = true;
-          }
-          if (!room.color) {
-            room.color = colors[Math.floor(Math.random() * colors.length)];
-            dataFixed = true;
-          }
-        });
+        },
+        error: () => this.loadDefaultRooms()
+      });
 
-        if (dataFixed) {
-          localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms));
-        }
-
-      } else {
-        this.loadDefaultRooms();
-      }
     } else {
       this.loadDefaultRooms();
     }
 
     this.applyFilters();
-    this.loadMyBookings(); // 🌟 这里会调用后端 API 拉取历史记录
+    this.loadMyBookings();
   }
 
   loadDefaultRooms() {
@@ -102,20 +96,16 @@ export class Booking implements OnInit, AfterViewInit {
       { id: '#310', name: 'IoT Workbench 4', floor: 'Basement Lab', location: 'Maker Space', capacity: 2, equipment: ['Soldering Station', 'Oscilloscope'], status: 'Available', cleanedTime: 'Today, 06:00 AM', icon: 'memory', color: 'cyan' },
       { id: '#404', name: 'Server Room Access', floor: 'Basement Lab', location: 'Secure Zone', capacity: 0, equipment: ['Restricted Access'], status: 'Maintenance', cleanedTime: '2 days ago', icon: 'dns', color: 'orange' }
     ];
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('inwlab_rooms', JSON.stringify(this.rooms));
-    }
+    this.applyFilters();
   }
 
-  // 🌟 核心修改：从真实的 MySQL 数据库获取预约记录
   loadMyBookings() {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
 
       this.bookingService.getAllBookings().subscribe({
         next: (data: any) => {
-          this.allSystemBookings = data; // 保存所有记录供 Schedule 使用
-          // 过滤出只属于当前登录用户的历史记录
+          this.allSystemBookings = data;
           this.myBookings = data.filter((b: any) => b.userEmail === activeUser.email);
         },
         error: (err: any) => console.error("Error loading bookings from DB:", err)
@@ -139,9 +129,7 @@ export class Booking implements OnInit, AfterViewInit {
 
   toggleHistory() {
     this.showHistory = !this.showHistory;
-    if (isPlatformBrowser(this.platformId)) {
-      this.refreshAnimations();
-    }
+    if (isPlatformBrowser(this.platformId)) this.refreshAnimations();
   }
 
   openBookingModal(room: any) {
@@ -155,22 +143,20 @@ export class Booking implements OnInit, AfterViewInit {
 
   onBookingComplete() {
     this.isBookingModalOpen = false;
-    this.initData(); // 提交完成后，重新从数据库拉取最新数据
+    this.initData();
   }
 
-  // 🌟 核心修改：查看房间时间表时，读取从数据库拉取的真实数据
   openSchedule(room: any) {
     this.selectedScheduleRoom = room;
 
     if (isPlatformBrowser(this.platformId)) {
-      // 从后端返回的数据中，匹配当前房间名称的记录
       const roomBookings = this.allSystemBookings.filter((b: any) => b.roomName === room.name);
 
       if (roomBookings.length > 0) {
         this.currentRoomSchedule = roomBookings.map((b: any) => ({
           date: b.bookingDate,
           time: `${b.startTime} - ${b.endTime}`,
-          label: `${b.status} (${b.userName})`, // 显示真实状态和用户名
+          label: `${b.status} (${b.userName})`,
           isAvailable: false
         }));
       } else {
@@ -181,6 +167,7 @@ export class Booking implements OnInit, AfterViewInit {
     this.isScheduleModalOpen = true;
   }
 
+  // ================= Particle Engine =================
   refreshAnimations() {
     this.ngZone.runOutsideAngular(() => {
       setTimeout(() => {
@@ -195,10 +182,7 @@ export class Booking implements OnInit, AfterViewInit {
     if (!this.ctx) return;
     this.resizeCanvas();
     this.createParticles();
-
-    this.ngZone.runOutsideAngular(() => {
-      this.animateParticles();
-    });
+    this.ngZone.runOutsideAngular(() => { this.animateParticles(); });
   }
 
   @HostListener('window:resize')
@@ -214,11 +198,7 @@ export class Booking implements OnInit, AfterViewInit {
     const particleCount = window.innerWidth < 768 ? 40 : 80;
     this.particles = [];
     for (let i = 0; i < particleCount; i++) {
-      this.particles.push({
-        x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.8, vy: (Math.random() - 0.5) * 0.8,
-        radius: Math.random() * 2 + 1
-      });
+      this.particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.8, vy: (Math.random() - 0.5) * 0.8, radius: Math.random() * 2 + 1 });
     }
   }
 

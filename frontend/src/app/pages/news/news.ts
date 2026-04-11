@@ -1,7 +1,8 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RsvpService } from '../../../services/rsvp.service'; // 🌟 引入真实后端的 RsvpService
+import { RsvpService } from '../../../services/rsvp.service';
+import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
 
 declare var AOS: any;
 
@@ -13,7 +14,7 @@ declare var AOS: any;
 })
 export class News implements OnInit {
 
-  // 🌟 默认数据，如果 CMS 里没数据就显示这些
+  // Default data fallback if CMS data is missing
   cmsData: any = {
     mainTitle: 'NEWS',
     mainTitleHighlight: '& EVENTS',
@@ -50,18 +51,23 @@ export class News implements OnInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private rsvpService: RsvpService // 🌟 在构造函数中注入 RsvpService
+    private rsvpService: RsvpService,
+    private cmsService: CmsService // 🌟 Inject CmsService
   ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      const savedCms = localStorage.getItem('inwlab_cms_news_events');
-      if (savedCms) {
-        try {
-          const parsed = JSON.parse(savedCms);
-          this.cmsData = { ...this.cmsData, ...parsed };
-        } catch(e) { console.error(e); }
-      }
+
+      // Core modification: Fetch News CMS data from MySQL
+      this.cmsService.getCmsData('inwlab_cms_news_events').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            this.cmsData = { ...this.cmsData, ...parsed };
+          } catch(e) { console.error("Error parsing News CMS", e); }
+        },
+        error: () => console.log('Using default News data')
+      });
 
       setTimeout(() => {
         if (typeof AOS !== 'undefined') {
@@ -92,7 +98,6 @@ export class News implements OnInit {
     this.isRsvpModalOpen = false;
   }
 
-  // 🌟 核心修改：提交真实 RSVP 数据到 Spring Boot 后端
   submitRSVP() {
     if (!this.rsvpData.name || !this.rsvpData.email) {
       alert("Please fill in your Name and Email address.");
@@ -101,7 +106,7 @@ export class News implements OnInit {
 
     this.isSubmittingRsvp = true;
 
-    // 组合发送给后端的数据，必须和 Spring Boot 的 EventRsvp.java 字段一致
+    // Data payload must match Spring Boot EventRsvp.java fields
     const payload = {
       eventName: this.rsvpEventName,
       name: this.rsvpData.name,
@@ -110,13 +115,13 @@ export class News implements OnInit {
       message: this.rsvpData.message
     };
 
-    // 调用 RsvpService 发送真实 HTTP POST 请求
+    // Call RsvpService to send real HTTP POST request
     this.rsvpService.submitRsvp(payload).subscribe({
       next: (response: any) => {
         this.isSubmittingRsvp = false;
         this.isRsvpSuccess = true;
 
-        // 成功后延迟关闭窗口并清空表单
+        // Delay modal close and clear form on success
         setTimeout(() => {
           this.closeRsvpModal();
           this.rsvpData = { name: '', email: '', role: 'UUM Student', message: '' };

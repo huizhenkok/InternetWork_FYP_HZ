@@ -2,7 +2,8 @@ import { Component, OnInit, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CmsService } from '../../../services/cms.service'; // 🌟 Import the new CmsService
+import { CmsService } from '../../../services/cms.service';
+import { UploadService } from '../../../services/upload.service'; // 🌟 Import the new UploadService
 
 declare var AOS: any;
 
@@ -22,6 +23,8 @@ export class AdminCms implements OnInit {
 
   editingConfIndex: number | null = null;
   activeConfTab: string = 'home';
+
+  isUploading: boolean = false; // 🌟 Added: To handle UI loading state during file upload
 
   // ==============================
   // 🗄️ Global Database Mapping
@@ -74,7 +77,8 @@ export class AdminCms implements OnInit {
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
     private router: Router,
-    private cmsService: CmsService // 🌟 Inject CmsService
+    private cmsService: CmsService,
+    private uploadService: UploadService // 🌟 Inject UploadService
   ) {}
 
   ngOnInit() {
@@ -82,7 +86,6 @@ export class AdminCms implements OnInit {
     if (isPlatformBrowser(this.platformId)) { setTimeout(() => { if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); } }, 100); }
   }
 
-  // 🌟 Core Rewrite: Load everything from MySQL
   loadAllData() {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
@@ -101,8 +104,6 @@ export class AdminCms implements OnInit {
     }
   }
 
-  // 🌟 Helper method to fetch from database and handle defaults
-  // 🌟 升级版：从数据库加载，如果失败则尝试抢救本地旧数据
   loadFromDB(key: string, property: string, defaultData: any) {
     this.cmsService.getCmsData(key).subscribe({
       next: (res: any) => {
@@ -118,7 +119,6 @@ export class AdminCms implements OnInit {
         }
       },
       error: () => {
-        // 🌟 自动迁移旧数据逻辑：如果数据库是空的，先去 localStorage 抢救以前的旧数据！
         const oldLocalData = localStorage.getItem(key);
         let dataToUse = defaultData;
 
@@ -130,17 +130,13 @@ export class AdminCms implements OnInit {
         }
 
         (this as any)[property] = dataToUse;
-
-        // 把抢救回来的旧数据，自动保存到 MySQL 里完成迁移
         this.saveModule(key, dataToUse, 'Data Migration', true);
       }
     });
   }
 
-  // 🌟 Core Rewrite: Save directly to MySQL
   saveModule(key: string, data: any, moduleName: string, silent: boolean = false) {
     if (isPlatformBrowser(this.platformId)) {
-      // Send the data as a JSON string to match the Spring Boot @RequestBody String
       this.cmsService.saveCmsData(key, JSON.stringify(data)).subscribe({
         next: () => {
           if (!silent) alert(`✅ ${moduleName} updated successfully! Visitors will see this instantly from the Database.`);
@@ -165,7 +161,31 @@ export class AdminCms implements OnInit {
   saveBulletins() { this.saveModule('inwlab_bulletins', this.bulletins, 'System Bulletins'); }
 
   // ==========================================
-  // 🌟 Array Management Logic (Unchanged, just triggers DB saves now)
+  // 🌟 Universal File Upload Logic
+  // ==========================================
+  onFileUpload(event: any, targetObject: any, targetProperty: string) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.isUploading = true;
+
+    this.uploadService.uploadFile(file).subscribe({
+      next: (res: any) => {
+        // Assign the returned URL directly to the target object's property
+        targetObject[targetProperty] = res.url;
+        this.isUploading = false;
+        alert('✅ Image uploaded successfully!');
+      },
+      error: (err: any) => {
+        console.error("Upload Error:", err);
+        this.isUploading = false;
+        alert('❌ Failed to upload image. Please check server connection.');
+      }
+    });
+  }
+
+  // ==========================================
+  // 🌟 Array Management Logic
   // ==========================================
 
   saveConferences() {
