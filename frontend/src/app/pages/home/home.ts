@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CmsService } from '../../../services/cms.service'; // 🌟 引入 CmsService
+import { CmsService } from '../../../services/cms.service';
 
 declare var AOS: any;
 
@@ -12,6 +12,8 @@ declare var AOS: any;
   templateUrl: './home.html'
 })
 export class Home implements OnInit, OnDestroy {
+
+  // 🌟 倒计时变量
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
 
@@ -27,32 +29,57 @@ export class Home implements OnInit, OnDestroy {
     heading: 'InterNetWorks Research Laboratory',
     subheading: 'Advancing the frontiers of Cybersecurity, Data Science, and Digital Innovation. A centralized platform for academic collaboration and discovery.',
     announcement: 'Leading Research Center',
-    upcomingEvent: 'The 7th International Conference on Internet Applications, Protocols & Services',
-    upcomingEventDesc: 'NETAPPS2024 is a premier platform to promote greater engagement of network researchers from around the globe...',
-    conferenceDate: '2026-11-06T00:00:00',
+    conferenceDate: '2026-11-06T00:00:00', // 默认倒计时目标
     stats: { activePhds: '85+', globalAwards: '42', industryPartners: '200+' }
   };
 
+  visionMission: any = {};
+
+  newsList: any[] = [];
+  currentNewsIndex: number = 0;
+  private newsTimer: any;
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private cmsService: CmsService // 🌟 注入 CmsService
+    private ngZone: NgZone,
+    private cmsService: CmsService
   ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
 
-      // 🌟 核心修改：从真实数据库拉取 Home 数据
+      // 1. 获取 Home 基础数据 (包含倒计时日期)
       this.cmsService.getCmsData('inwlab_cms_home').subscribe({
         next: (res: any) => {
           try {
             const parsed = JSON.parse(res.contentJson);
             this.cmsData = { ...this.cmsData, ...parsed };
           } catch(e) { console.error("Error parsing Home CMS", e); }
-        },
-        error: () => console.log('Using default Home data')
+        }
       });
 
-      // 暂留本地统计逻辑（后续可以接真实数据库的统计）
+      // 2. 获取 About 数据
+      this.cmsService.getCmsData('inwlab_cms_about').subscribe({
+        next: (res: any) => {
+          try {
+            const aboutParsed = JSON.parse(res.contentJson);
+            this.visionMission = aboutParsed.visionMission || {};
+          } catch(e) {}
+        }
+      });
+
+      // 3. 获取 News 数据并启动轮播
+      this.cmsService.getCmsData('inwlab_cms_news_events').subscribe({
+        next: (res: any) => {
+          try {
+            const newsParsed = JSON.parse(res.contentJson);
+            this.newsList = newsParsed.gatherings || [];
+            this.startNewsCarousel();
+          } catch(e) {}
+        }
+      });
+
+      // 统计数据拉取
       const pubs = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
       this.realPublications = pubs.filter((p: any) => p.visibility === 'Public').length;
       const projs = JSON.parse(localStorage.getItem('inwlab_projects') || '[]');
@@ -60,9 +87,11 @@ export class Home implements OnInit, OnDestroy {
       const users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
       this.realMembers = users.filter((u: any) => u.status === 'Active').length;
 
+      // 🌟 启动背景轮播与倒计时
+      this.bgTimer = setInterval(() => { this.currentBgIndex = (this.currentBgIndex + 1) % this.bgImages.length; }, 10000);
+
       this.calculateCountdown();
       this.timer = setInterval(() => { this.calculateCountdown(); }, 1000);
-      this.bgTimer = setInterval(() => { this.currentBgIndex = (this.currentBgIndex + 1) % this.bgImages.length; }, 10000);
 
       setTimeout(() => {
         if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 100 }); AOS.refreshHard(); window.scrollTo(0, 0); }
@@ -71,13 +100,15 @@ export class Home implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.timer) clearInterval(this.timer);
     if (this.bgTimer) clearInterval(this.bgTimer);
+    if (this.newsTimer) clearInterval(this.newsTimer);
+    if (this.timer) clearInterval(this.timer);
   }
 
+  // 🌟 倒计时计算逻辑
   calculateCountdown() {
     const now = new Date().getTime();
-    const targetDate = new Date(this.cmsData.conferenceDate).getTime();
+    const targetDate = new Date(this.cmsData.conferenceDate || '2026-11-06T00:00:00').getTime();
     const distance = targetDate - now;
     if (distance > 0) {
       this.days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -90,4 +121,22 @@ export class Home implements OnInit, OnDestroy {
   }
 
   formatNumber(num: number): string { return num < 10 ? `0${num}` : num.toString(); }
+
+  startNewsCarousel() {
+    if (this.newsList.length > 1) {
+      this.ngZone.runOutsideAngular(() => {
+        this.newsTimer = setInterval(() => {
+          this.ngZone.run(() => {
+            this.currentNewsIndex = (this.currentNewsIndex + 1) % this.newsList.length;
+          });
+        }, 5000);
+      });
+    }
+  }
+
+  setNewsIndex(index: number) {
+    this.currentNewsIndex = index;
+    if (this.newsTimer) clearInterval(this.newsTimer);
+    this.startNewsCarousel();
+  }
 }
