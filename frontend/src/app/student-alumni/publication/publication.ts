@@ -1,6 +1,8 @@
 import { Component, OnInit, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
+import { UploadService } from '../../../services/upload.service'; // 🌟 Added UploadService
 
 declare var AOS: any;
 
@@ -13,11 +15,14 @@ declare var AOS: any;
 export class Publication implements OnInit {
 
   isDragging: boolean = false;
+  isUploading: boolean = false; // 🌟 Added: Uploading state
   recentImports: any[] = [];
   currentUserEmail: string = '';
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cmsService: CmsService,
+    private uploadService: UploadService
   ) {}
 
   ngOnInit() {
@@ -37,20 +42,21 @@ export class Publication implements OnInit {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
       this.currentUserEmail = activeUser.email;
 
-      const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
-
-      let dataChanged = false;
-      allImports.forEach((doc: any) => {
-        if (!doc.visibility) {
-          doc.visibility = 'Private';
-          dataChanged = true;
-        }
+      // 🌟 Fetch real Publications from MySQL
+      this.cmsService.getCmsData('inwlab_publications').subscribe({
+        next: (res: any) => {
+          try {
+            const allImports = JSON.parse(res.contentJson);
+            this.recentImports = allImports
+              .filter((doc: any) => doc.userEmail === this.currentUserEmail)
+              .sort((a: any, b: any) => b.timestamp - a.timestamp);
+          } catch(e) {
+            console.error("Error parsing Publications", e);
+            this.recentImports = [];
+          }
+        },
+        error: () => this.recentImports = []
       });
-      if (dataChanged) localStorage.setItem('inwlab_publications', JSON.stringify(allImports));
-
-      this.recentImports = allImports
-        .filter((doc: any) => doc.userEmail === this.currentUserEmail)
-        .sort((a: any, b: any) => b.timestamp - a.timestamp);
     }
   }
 
@@ -58,12 +64,16 @@ export class Publication implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       record.visibility = record.visibility === 'Public' ? 'Private' : 'Public';
 
-      const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
-      const index = allImports.findIndex((r: any) => r.id === record.id);
-      if(index !== -1) {
-        allImports[index].visibility = record.visibility;
-        localStorage.setItem('inwlab_publications', JSON.stringify(allImports));
-      }
+      this.cmsService.getCmsData('inwlab_publications').subscribe({
+        next: (res: any) => {
+          const allImports = JSON.parse(res.contentJson);
+          const index = allImports.findIndex((r: any) => r.id === record.id);
+          if(index !== -1) {
+            allImports[index].visibility = record.visibility;
+            this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe();
+          }
+        }
+      });
     }
   }
 
@@ -98,43 +108,67 @@ export class Publication implements OnInit {
   handleFiles(files: FileList) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const validExtensions = ['pdf', 'bib', 'xml', 'doc', 'docx'];
+      const validExtensions = ['pdf', 'bib', 'xml', 'doc', 'docx', 'jpg', 'png']; // Added image formats just in case
       const fileExt = file.name.split('.').pop()?.toLowerCase();
 
       if (!fileExt || !validExtensions.includes(fileExt)) {
-        alert(`Invalid format for file: ${file.name}. Only PDF, BIB, or XML allowed.`);
+        alert(`Invalid format for file: ${file.name}.`);
         continue;
       }
-      if (file.size > 50 * 1024 * 1024) {
-        alert(`File ${file.name} is too large. Max size is 50MB.`);
-        continue;
-      }
-      this.saveFileRecord(file.name);
+
+      this.isUploading = true;
+
+      // 🌟 Send actual file to Spring Boot backend!
+      this.uploadService.uploadFile(file).subscribe({
+        next: (res: any) => {
+          this.isUploading = false;
+          this.saveFileRecord(file.name, res.url); // Pass the real URL to save
+        },
+        error: (err: any) => {
+          this.isUploading = false;
+          alert(`Failed to upload ${file.name} to server.`);
+        }
+      });
     }
   }
 
-  saveFileRecord(fileName: string) {
+  saveFileRecord(fileName: string, fileUrl: string) {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
-      const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
 
-      const newRecord = {
-        id: Date.now() + Math.random(),
-        fileName: fileName,
-        userEmail: this.currentUserEmail,
-        authorName: activeUser.fullName || 'Unknown Scholar',
-        authorRole: activeUser.role || 'Member',
-        timestamp: Date.now(),
-        dateStr: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        status: 'Completed',
-        visibility: 'Private'
-      };
-
-      allImports.push(newRecord);
-      localStorage.setItem('inwlab_publications', JSON.stringify(allImports));
-
-      this.loadImports();
-      alert(`${fileName} uploaded successfully!\nBy default, this file is PRIVATE. You can make it PUBLIC in the list below.`);
+      this.cmsService.getCmsData('inwlab_publications').subscribe({
+        next: (res: any) => {
+          const allImports = JSON.parse(res.contentJson);
+          this.appendAndSaveRecord(allImports, fileName, fileUrl, activeUser);
+        },
+        error: () => {
+          // If DB is empty, start a new array
+          this.appendAndSaveRecord([], fileName, fileUrl, activeUser);
+        }
+      });
     }
+  }
+
+  appendAndSaveRecord(allImports: any[], fileName: string, fileUrl: string, activeUser: any) {
+    const newRecord = {
+      id: Date.now() + Math.random(),
+      fileName: fileName,
+      fileUrl: fileUrl, // 🌟 Save the real server URL
+      userEmail: this.currentUserEmail,
+      authorName: activeUser.fullName || 'Unknown Scholar',
+      authorRole: activeUser.role || 'Member',
+      timestamp: Date.now(),
+      dateStr: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+      status: 'Completed',
+      visibility: 'Private'
+    };
+
+    allImports.push(newRecord);
+    this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe({
+      next: () => {
+        this.loadImports();
+        alert(`${fileName} uploaded successfully to Server!\nBy default, this file is PRIVATE. You can make it PUBLIC in the list below.`);
+      }
+    });
   }
 }

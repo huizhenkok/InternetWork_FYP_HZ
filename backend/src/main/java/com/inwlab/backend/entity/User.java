@@ -5,28 +5,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
-@Entity // 告诉 JPA 这是一个实体类
-@Table(name = "users") // 指定在数据库中生成的表名，避免和 SQL 关键字 user 冲突
-@Data // Lombok 注解：自动生成 getter, setter, toString 等方法
-@NoArgsConstructor // Lombok 注解：自动生成无参构造函数
-@AllArgsConstructor // Lombok 注解：自动生成全参构造函数
+@Entity // Marks this class as a JPA Entity
+@Table(name = "users") // Specifies the table name in DB to avoid SQL keyword conflicts
+@Data // Lombok: Generates getters, setters, toString, etc.
+@NoArgsConstructor // Lombok: Generates an empty constructor
+@AllArgsConstructor // Lombok: Generates an all-arguments constructor
 public class User {
 
-    @Id // 告诉 JPA 这是主键 (Primary Key)
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 设置主键自动递增 (Auto Increment)
+    @Id // Marks this field as the Primary Key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment ID
     private Long id;
 
-    @Column(nullable = false, unique = true) // 邮箱不能为空且必须唯一
+    @Column(nullable = false, unique = true) // Email cannot be null and must be unique
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String password; // Will now store BCrypt hashed strings
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Column(nullable = false)
-    private String role; // 例如：'Student', 'Faculty', 'Alumni', 'Admin'
+    private String role; // e.g., 'Student', 'Faculty', 'Alumni', 'Admin'
 
-    // 你可以根据前端需要，后续再添加其他字段，比如 avatar, phone 等
 }

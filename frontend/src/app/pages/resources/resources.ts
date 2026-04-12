@@ -28,8 +28,6 @@ export class Resources implements OnInit {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-
-      // 🌟 核心修改：从 MySQL 获取 Resource 文案数据
       this.cmsService.getCmsData('inwlab_cms_resource').subscribe({
         next: (res: any) => {
           try {
@@ -57,31 +55,49 @@ export class Resources implements OnInit {
 
   loadRealPublications() {
     if (isPlatformBrowser(this.platformId)) {
-      const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
-
-      this.allResources = allImports
-        .filter((doc: any) => doc.visibility === 'Public')
-        .sort((a: any, b: any) => b.timestamp - a.timestamp)
-        .map((doc: any) => {
-          return {
-            type: 'Publication',
-            typeClass: 'bg-primary/10 border-primary/20 text-primary dark:bg-accent-teal/20 dark:border-accent-teal/30 dark:text-accent-teal',
-            date: doc.dateStr.split(' ')[0],
-            title: doc.fileName,
-            authors: `${doc.authorName} (${doc.authorRole})`,
-            desc: `This document was uploaded and made public by ${doc.authorName} on ${doc.dateStr}. It is part of the INWLab secure archive.`,
-            primaryBtnText: 'Download',
-            primaryBtnIcon: 'download',
-            secondaryBtnText: 'View Details',
-            secondaryBtnIcon: 'info'
-          };
-        });
+      // 🌟 核心修复：彻底消灭 localStorage，让它去 MySQL 数据库里找最新上传的文件！
+      this.cmsService.getCmsData('inwlab_publications').subscribe({
+        next: (res: any) => {
+          try {
+            const allImports = JSON.parse(res.contentJson);
+            this.allResources = allImports
+              .filter((doc: any) => doc.visibility === 'Public')
+              .sort((a: any, b: any) => b.timestamp - a.timestamp)
+              .map((doc: any) => {
+                return {
+                  type: 'Publication',
+                  typeClass: 'bg-primary/10 border-primary/20 text-primary dark:bg-accent-teal/20 dark:border-accent-teal/30 dark:text-accent-teal',
+                  date: doc.dateStr.split(' ')[0],
+                  title: doc.fileName,
+                  fileUrl: doc.fileUrl, // 🌟 从数据库里把这个真实的下载链接提取出来
+                  authors: `${doc.authorName} (${doc.authorRole})`,
+                  desc: `This document was uploaded and made public by ${doc.authorName} on ${doc.dateStr}. It is part of the INWLab secure archive.`,
+                  primaryBtnText: 'Download',
+                  primaryBtnIcon: 'download',
+                  secondaryBtnText: 'View Details',
+                  secondaryBtnIcon: 'info'
+                };
+              });
+          } catch(e) {
+            console.error("Error parsing publications", e);
+            this.allResources = [];
+          }
+        },
+        error: () => this.allResources = []
+      });
     }
   }
 
+  // 🌟 核心修复：真实触发文件下载！
   handleAction(actionType: string, title: string) {
     if (actionType === 'Download') {
-      alert(`Initiating secure download for: ${title}`);
+      const resource = this.allResources.find(r => r.title === title);
+
+      if (resource && resource.fileUrl) {
+        window.open(resource.fileUrl, '_blank'); // 真正下载/打开 PDF！
+      } else {
+        alert(`Initiating secure download for: ${title}`);
+      }
     } else {
       alert(`Viewing metadata details for: ${title}`);
     }

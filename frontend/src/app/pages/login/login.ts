@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../../services/auth.service'; // 🌟 正确的跳层路径
+import { AuthService } from '../../../services/auth.service';
 
 declare var AOS: any;
 
@@ -38,7 +38,8 @@ export class Login implements OnInit {
   }
 
   onLogin() {
-    const email = this.loginData.email.toLowerCase().trim();
+    // 🌟 核心修复 1：去掉了 .toLowerCase()，保留你的大写 'IOT' 原样去数据库核对
+    const email = this.loginData.email.trim();
     const password = this.loginData.password;
 
     if (!email || !password) {
@@ -46,24 +47,20 @@ export class Login implements OnInit {
       return;
     }
 
-    // 🌟 保留 Admin 的专属通道
-    if (email === 'admintest@gmail.com' && password === '123') {
-      alert("Admin Authentication Successful! Accessing Command Center...");
-      localStorage.setItem('active_user', JSON.stringify({ fullName: 'System Admin', email: 'admintest@gmail.com', role: 'Admin' }));
-      this.router.navigate(['/admin-dashboard']);
-      return;
-    }
+    // 🌟 核心修复 2：彻底删除了 admintest 的硬编码后门！
+    // 现在所有人（包括 Admin）都必须经过真实的数据库校验！
 
-    // 🌟 核心：调用 AuthService 向后端发起真实登录请求
     this.authService.login({ email, password }).subscribe({
-      next: (userFromDatabase: any) => { // 🌟 修复严格模式报错
+      next: (userFromDatabase: any) => {
         alert(`Authentication Successful! Welcome back, ${userFromDatabase.fullName}.`);
 
-        // 保存用户状态
+        // 保存用户状态到浏览器，维持登录
         localStorage.setItem('active_user', JSON.stringify(userFromDatabase));
 
-        // 根据真实的 Role 跳转
-        if (userFromDatabase.role === 'Student') {
+        // 🌟 核心修复 3：加入真实的 Admin 路由跳转
+        if (userFromDatabase.role === 'Admin') {
+          this.router.navigate(['/admin-dashboard']);
+        } else if (userFromDatabase.role === 'Student') {
           this.router.navigate(['/student']);
         } else if (userFromDatabase.role === 'Faculty') {
           this.router.navigate(['/faculty']);
@@ -71,7 +68,7 @@ export class Login implements OnInit {
           this.router.navigate(['/alumni']);
         }
       },
-      error: (err: any) => { // 🌟 修复严格模式报错
+      error: (err: any) => {
         console.error("Login Error:", err);
         alert("Invalid Email or Password. Please try again or Create an Account.");
       }

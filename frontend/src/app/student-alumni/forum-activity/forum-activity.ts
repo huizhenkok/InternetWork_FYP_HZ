@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CmsService } from '../../../services/cms.service'; // 🌟 Import CmsService
 
 declare var AOS: any;
 
@@ -29,7 +30,6 @@ export class ForumActivity implements OnInit, AfterViewInit {
   newTopicCategory: string = 'Research';
   newTopicContent: string = '';
 
-  // 🌟 修复：把 static 设为 true，确保初始化时就能抓到 Canvas
   @ViewChild('particleCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D | null;
   private particles: any[] = [];
@@ -37,7 +37,8 @@ export class ForumActivity implements OnInit, AfterViewInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cmsService: CmsService // 🌟 Inject CmsService
   ) {}
 
   ngOnInit() {
@@ -51,18 +52,6 @@ export class ForumActivity implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.initParticles();
-    }
-  }
-
-  @HostListener('window:storage', ['$event'])
-  onStorageChange(event: StorageEvent) {
-    if (event.key === 'inwlab_forum_topics') {
-      this.ngZone.run(() => {
-        this.loadTopics();
-        if (this.activeTopic) {
-          this.activeTopic = this.topics.find(t => t.id === this.activeTopic.id);
-        }
-      });
     }
   }
 
@@ -82,42 +71,60 @@ export class ForumActivity implements OnInit, AfterViewInit {
 
   loadTopics() {
     if (isPlatformBrowser(this.platformId)) {
-      const stored = localStorage.getItem('inwlab_forum_topics');
-      if (stored) {
-        this.topics = JSON.parse(stored);
-      } else {
-        this.topics = [
-          {
-            id: 1,
-            title: 'Discussion: Implementing Zero-Knowledge Proofs in IoT Networks',
-            category: 'Cryptography',
-            authorName: 'Prof. Alan Turing',
-            authorRole: 'Faculty',
-            authorAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfMaSTme0-Xx9Ez-NJMjo7uHJ3PV5lt1hBU3JAhgzgdC40mxRxpaJ4g98ha0kYddAUwVUXx4nZi78cm-ieT7fjmWNsSaFqIR6jOP67HfR1yin7bQ46uc6JxA-byPnI0Q-YhAjh5dj5FarG81yWQ7xRRb0p9_yo94CfukZ0SBiuwjpZtcZVJSq1YaioXcocYJx9njE8yUjtTe9A2z0wD8aLDZfyD-cfC4mfCiRBsFhi6HTUd59m3pAw8dH3DuQ5HlhovTNZQrxHo-M2',
-            time: '2 hours ago',
-            content: 'I\'ve been working on reducing computational overhead on edge devices for secure communications. Does anyone see potential optimizations for memory usage?',
-            replies: [
-              {
-                id: 101,
-                authorName: 'Sarah_PhD',
-                authorRole: 'Student',
-                authorAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA3NlDT4u4GVRd1qdW2IqYwuqHD7MvZ9MkvYDbIcGVjBNAVOFDjtWs3SUSiQnAOXZlz6Km9C49O90GXLoMKCHJhlR7gLI1HDtwOc0dCzko20r5Nrz5TGaQjYT6SYsBiiT115GcfqbigfVeTeHFfvlm-lgZOgdci-1RaSEbTRHT9Jfm1K2690u4fEak7Mi-0v-YmnRVLKlVGN9fNEsgQ1UovpgDOWDtW8Jsw9eS5RrRBa--i1U-MxEwIU6w9le_9a8oqkJOyfb9AX_Cc',
-                time: '1 hr ago',
-                content: 'I tried this implementation on the Raspberry Pi cluster, but latency increased by 15% compared to the standard library.',
-                image: null
-              }
-            ]
+      // 🌟 Fetch Forum Topics from MySQL CMS
+      this.cmsService.getCmsData('inwlab_forum_topics').subscribe({
+        next: (res: any) => {
+          try {
+            this.topics = JSON.parse(res.contentJson);
+            this.topics.sort((a, b) => b.id - a.id);
+            // Re-sync active topic if one is open
+            if (this.activeTopic) {
+              this.activeTopic = this.topics.find(t => t.id === this.activeTopic.id);
+            }
+          } catch(e) {
+            console.error("Error parsing Forum CMS", e);
+            this.loadDefaultTopics();
           }
-        ];
-        localStorage.setItem('inwlab_forum_topics', JSON.stringify(this.topics));
-      }
-      this.topics.sort((a, b) => b.id - a.id);
+        },
+        error: () => this.loadDefaultTopics()
+      });
     }
+  }
+
+  loadDefaultTopics() {
+    this.topics = [
+      {
+        id: 1,
+        title: 'Discussion: Implementing Zero-Knowledge Proofs in IoT Networks',
+        category: 'Cryptography',
+        authorName: 'Prof. Alan Turing',
+        authorRole: 'Faculty',
+        authorAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCfMaSTme0-Xx9Ez-NJMjo7uHJ3PV5lt1hBU3JAhgzgdC40mxRxpaJ4g98ha0kYddAUwVUXx4nZi78cm-ieT7fjmWNsSaFqIR6jOP67HfR1yin7bQ46uc6JxA-byPnI0Q-YhAjh5dj5FarG81yWQ7xRRb0p9_yo94CfukZ0SBiuwjpZtcZVJSq1YaioXcocYJx9njE8yUjtTe9A2z0wD8aLDZfyD-cfC4mfCiRBsFhi6HTUd59m3pAw8dH3DuQ5HlhovTNZQrxHo-M2',
+        time: '2 hours ago',
+        content: 'I\'ve been working on reducing computational overhead on edge devices for secure communications. Does anyone see potential optimizations for memory usage?',
+        replies: [
+          {
+            id: 101,
+            authorName: 'Sarah_PhD',
+            authorRole: 'Student',
+            authorAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA3NlDT4u4GVRd1qdW2IqYwuqHD7MvZ9MkvYDbIcGVjBNAVOFDjtWs3SUSiQnAOXZlz6Km9C49O90GXLoMKCHJhlR7gLI1HDtwOc0dCzko20r5Nrz5TGaQjYT6SYsBiiT115GcfqbigfVeTeHFfvlm-lgZOgdci-1RaSEbTRHT9Jfm1K2690u4fEak7Mi-0v-YmnRVLKlVGN9fNEsgQ1UovpgDOWDtW8Jsw9eS5RrRBa--i1U-MxEwIU6w9le_9a8oqkJOyfb9AX_Cc',
+            time: '1 hr ago',
+            content: 'I tried this implementation on the Raspberry Pi cluster, but latency increased by 15% compared to the standard library.',
+            image: null
+          }
+        ]
+      }
+    ];
+    // Save defaults to DB
+    this.saveDataAndSync();
   }
 
   saveDataAndSync() {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('inwlab_forum_topics', JSON.stringify(this.topics));
+      // 🌟 Save updated topics back to MySQL
+      this.cmsService.saveCmsData('inwlab_forum_topics', JSON.stringify(this.topics)).subscribe({
+        error: (err) => console.error("Failed to save forum data to DB", err)
+      });
     }
   }
 
@@ -207,7 +214,7 @@ export class ForumActivity implements OnInit, AfterViewInit {
   }
 
   // ==========================================
-  // 🚀 Canvas 粒子背景引擎
+  // 🚀 Canvas Animation Engine
   // ==========================================
   refreshAnimations() {
     this.ngZone.runOutsideAngular(() => {
@@ -225,7 +232,6 @@ export class ForumActivity implements OnInit, AfterViewInit {
     this.resizeCanvas();
     this.createParticles();
 
-    // 🌟 防止 Angular SSR 报错
     this.ngZone.runOutsideAngular(() => {
       this.animateParticles();
     });

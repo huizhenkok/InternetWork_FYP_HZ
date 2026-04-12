@@ -2,6 +2,8 @@ package com.inwlab.backend.controller;
 
 import com.inwlab.backend.entity.User;
 import com.inwlab.backend.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
+import org.mindrot.jbcrypt.BCrypt; // 🌟 BCrypt Import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,47 +12,71 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:4200") // 🌟 极其重要：允许 Angular 前端跨域请求！
+@CrossOrigin(origins = "http://localhost:4200") // Allow Angular frontend CORS requests
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
 
     // ==========================================
-    // 1. 注册 API (Register)
-    // 前端发送 POST 请求到 http://localhost:8080/api/users/register
+    // 🌟 System Initialization: Auto-create Admin
+    // Runs automatically every time Spring Boot starts
+    // ==========================================
+    @PostConstruct
+    public void initAdmin() {
+        String adminEmail = "IOT_admin123@gmail.com";
+        String adminRawPassword = "Enjoyurday_123";
+
+        // Check if the admin account already exists
+        if (!userRepository.existsByEmail(adminEmail)) {
+            User admin = new User();
+            admin.setEmail(adminEmail);
+            // Hash the password before saving to DB!
+            admin.setPassword(BCrypt.hashpw(adminRawPassword, BCrypt.gensalt()));
+            admin.setFullName("System Admin");
+            admin.setRole("Admin");
+
+            userRepository.save(admin);
+            System.out.println("✅ Security Alert: Default Admin account initialized successfully.");
+        }
+    }
+
+    // ==========================================
+    // 1. Registration API (POST: /api/users/register)
     // ==========================================
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        // 检查邮箱是否已经被注册
+        // Check if email is already registered
         if (userRepository.existsByEmail(user.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
 
-        // 🚨 V1 版本：为了方便我们测试，密码直接明文保存。
-        // 在真实的生产环境中，这里必须使用 BCrypt 加密密码！
+        // 🌟 Security Upgrade: Hash the user's password using BCrypt
+        String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
+        user.setPassword(hashedPassword);
+
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok(savedUser);
     }
 
     // ==========================================
-    // 2. 登录 API (Login)
-    // 前端发送 POST 请求到 http://localhost:8080/api/users/login
+    // 2. Login API (POST: /api/users/login)
     // ==========================================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User loginRequest) {
-        // 去数据库里找这个邮箱对应的用户
+        // Find user by email in the database
         Optional<User> userOptional = userRepository.findByEmail(loginRequest.getEmail());
 
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            // 比对密码 (第一版我们用明文比对)
-            if (user.getPassword().equals(loginRequest.getPassword())) {
-                return ResponseEntity.ok(user); // 登录成功！把用户信息(包含角色)返回给前端
+            User dbUser = userOptional.get();
+
+            // 🌟 Security Upgrade: Compare raw login password against stored BCrypt hash
+            if (BCrypt.checkpw(loginRequest.getPassword(), dbUser.getPassword())) {
+                return ResponseEntity.ok(dbUser); // Login successful, return user info
             }
         }
 
-        // 密码不对或者邮箱不存在，返回 401 未授权错误
+        // Incorrect password or email not found
         return ResponseEntity.status(401).body("Error: Invalid email or password");
     }
 }

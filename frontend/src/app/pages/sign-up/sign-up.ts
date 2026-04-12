@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth.service'; // 🌟 正确的跳层路径
+import { AuthService } from '../../../services/auth.service';
 
 declare var AOS: any;
 
@@ -43,19 +43,16 @@ export class SignUp implements OnInit {
   }
 
   onRegister() {
-    // 1. 验证密码
     if (this.formData.password !== this.formData.confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
     }
 
-    // 2. 验证名字是否为空
     if (!this.formData.fullName.trim()) {
       alert("Please enter your full name.");
       return;
     }
 
-    // 3. 验证 ID
     if (this.regType === 'Student') {
       const isIdValid = /^\d{6}$/.test(this.formData.matricNumber);
       if (!isIdValid) {
@@ -74,21 +71,19 @@ export class SignUp implements OnInit {
       return;
     }
 
-    // 组合要发送给后端的数据
     const newUser = {
       fullName: this.formData.fullName,
-      email: this.formData.email.toLowerCase(),
+      email: this.formData.email.trim(), // 🌟 修复：不再强制转小写，原样发送
       password: this.formData.password,
       role: this.regType
     };
 
-    // 🌟 核心：调用 AuthService 发送真实请求到数据库
     this.authService.register(newUser).subscribe({
-      next: (response: any) => { // 🌟 修复严格模式报错
+      next: (response: any) => {
         alert(`Registration Successful as ${this.regType}! You can now login with your email.`);
         this.router.navigate(['/login']);
       },
-      error: (err: any) => { // 🌟 修复严格模式报错
+      error: (err: any) => {
         console.error("Registration Error:", err);
         alert(err.error || "Registration failed. This email might already be in use.");
       }

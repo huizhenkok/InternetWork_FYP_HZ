@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { CmsService } from '../../../services/cms.service'; // 🌟 引入 CmsService
 
 declare var AOS: any;
 
@@ -24,7 +25,8 @@ export class Archive implements OnInit, AfterViewInit {
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cmsService: CmsService // 🌟 注入 CmsService
   ) {}
 
   ngOnInit() {
@@ -42,11 +44,26 @@ export class Archive implements OnInit, AfterViewInit {
 
   loadPublicPapers() {
     if (isPlatformBrowser(this.platformId)) {
-      const allImports = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
-      this.publicPapers = allImports
-        .filter((doc: any) => doc.visibility === 'Public')
-        .sort((a: any, b: any) => b.timestamp - a.timestamp);
-      this.filteredPapers = [...this.publicPapers];
+      // 🌟 从 MySQL 数据库拉取所有上传的文档
+      this.cmsService.getCmsData('inwlab_publications').subscribe({
+        next: (res: any) => {
+          try {
+            const allImports = JSON.parse(res.contentJson);
+            this.publicPapers = allImports
+              .filter((doc: any) => doc.visibility === 'Public')
+              .sort((a: any, b: any) => b.timestamp - a.timestamp);
+            this.filteredPapers = [...this.publicPapers];
+          } catch(e) {
+            console.error("Error parsing Publications CMS", e);
+            this.publicPapers = [];
+            this.filteredPapers = [];
+          }
+        },
+        error: () => {
+          this.publicPapers = [];
+          this.filteredPapers = [];
+        }
+      });
     }
   }
 
@@ -59,8 +76,18 @@ export class Archive implements OnInit, AfterViewInit {
     );
   }
 
+  // 🌟 核心修复：把假弹窗换成了真实的下载逻辑！
   downloadMock(fileName: string) {
-    alert(`Downloading ${fileName} from INWLab Secure Archive...`);
+    // 根据你点击的文件名，从数组里找到它对应的真实对象
+    const paper = this.filteredPapers.find(p => p.fileName === fileName);
+
+    // 如果找到了且有真实的 URL，就在新标签页打开/下载它
+    if (paper && paper.fileUrl) {
+      window.open(paper.fileUrl, '_blank');
+    } else {
+      // 备用方案，防止旧的脏数据没有 URL 导致报错
+      alert(`Downloading ${fileName} from INWLab Secure Archive...`);
+    }
   }
 
   refreshAnimations() {
@@ -127,7 +154,6 @@ export class Archive implements OnInit, AfterViewInit {
         const dx = p.x - p2.x;
         const dy = p.y - p2.y;
 
-        // 🌟 彻底修复：使用 distance，消灭所有 dist 报错！
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < 120) {

@@ -8,12 +8,12 @@ declare var AOS: any;
   selector: 'app-my-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './my-profile.html'
+  templateUrl: './my-profile.html' // 🌟 已经修复：去掉了多余的 "template"
 })
 export class MyProfile implements OnInit, AfterViewInit {
 
   isEditMode: boolean = false;
-  newTagValue: string = ''; // 🌟 实时抓取你输入到一半的 Tag
+  newTagValue: string = '';
 
   userProfile: any = {
     fullName: '',
@@ -60,21 +60,19 @@ export class MyProfile implements OnInit, AfterViewInit {
 
   toggleEditMode(status: boolean) {
     this.isEditMode = status;
-    this.newTagValue = ''; // 清空未完成的输入
+    this.newTagValue = '';
     if (!status) {
       this.loadProfile();
     }
     this.refreshAnimations();
   }
 
-  // 🌟 修复后的智能保存逻辑
   saveProfile() {
     if (!this.userProfile.fullName.trim()) {
       alert("Full Name cannot be empty.");
       return;
     }
 
-    // 🌟 防呆设计：如果用户打字打到一半忘记按 Enter 就按了 Save，系统自动帮他把 Tag 加进去！
     if (this.newTagValue.trim()) {
       this.addTag();
     }
@@ -89,7 +87,7 @@ export class MyProfile implements OnInit, AfterViewInit {
         localStorage.setItem('inwlab_users', JSON.stringify(users));
       }
 
-      alert("Profile updated successfully! System records synchronized.");
+      alert("Profile updated successfully in your local session.");
       this.isEditMode = false;
       this.refreshAnimations();
 
@@ -110,17 +108,14 @@ export class MyProfile implements OnInit, AfterViewInit {
     }
   }
 
-  // 🌟 修复后的 Tag 增加逻辑 (保证 Angular 100% 察觉到数据变化)
   addTag() {
     const value = this.newTagValue.trim();
     if (value && !this.userProfile.focusAreas.includes(value)) {
-      // 用扩展运算符 [...] 重新赋值数组，强制 Angular 刷新画面
       this.userProfile.focusAreas = [...this.userProfile.focusAreas, value];
     }
-    this.newTagValue = ''; // 添加完后清空输入框
+    this.newTagValue = '';
   }
 
-  // 🌟 修复后的 Tag 移除逻辑
   removeTag(tag: string) {
     this.userProfile.focusAreas = this.userProfile.focusAreas.filter((t: string) => t !== tag);
   }
