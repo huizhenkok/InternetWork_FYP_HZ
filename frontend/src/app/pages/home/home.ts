@@ -49,7 +49,7 @@ export class Home implements OnInit, OnDestroy {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
 
-      // 1. 获取 Home 基础数据
+      // 1. 获取 Home 基础数据 (Purpose, Heading 等)
       this.cmsService.getCmsData('inwlab_cms_home').subscribe({
         next: (res: any) => {
           try {
@@ -59,7 +59,7 @@ export class Home implements OnInit, OnDestroy {
         }
       });
 
-      // 2. 获取 Conference 数据 (同步倒计时)
+      // 2. 获取 Conference 数据 (同步最新倒计时)
       this.cmsService.getCmsData('inwlab_cms_conferences').subscribe({
         next: (res: any) => {
           try {
@@ -75,28 +75,29 @@ export class Home implements OnInit, OnDestroy {
         }
       });
 
-      // 3. 获取 About 数据
+      // 🌟 3. 核心修复：获取 About 数据 (同步 Mission & Vision)
       this.cmsService.getCmsData('inwlab_cms_about').subscribe({
         next: (res: any) => {
           try {
             const aboutParsed = JSON.parse(res.contentJson);
-            this.visionMission = aboutParsed.visionMission || {};
+            // 确保能准确提取到 visionMission 节点
+            if (aboutParsed && aboutParsed.visionMission) {
+              this.visionMission = aboutParsed.visionMission;
+            }
           } catch(e) {}
         }
       });
 
-      // 🌟 4. 获取 News 数据并合并
+      // 4. 获取 News 数据并合并
       this.cmsService.getCmsData('inwlab_cms_news_events').subscribe({
         next: (res: any) => {
           try {
             const newsParsed = JSON.parse(res.contentJson);
-
             let combinedNews: any[] = [];
 
-            // Flagship 活动 (打上 isFlagship = true 的标签)
             if (newsParsed.flagship && newsParsed.flagship.title) {
               combinedNews.push({
-                isFlagship: true, // 🌟 区分是否需要 RSVP
+                isFlagship: true,
                 title: newsParsed.flagship.title,
                 desc: newsParsed.flagship.desc,
                 date: newsParsed.flagship.date,
@@ -106,7 +107,6 @@ export class Home implements OnInit, OnDestroy {
               });
             }
 
-            // Gatherings 新闻 (打上 isFlagship = false 的标签)
             if (newsParsed.gatherings && Array.isArray(newsParsed.gatherings)) {
               const normalNews = newsParsed.gatherings.map((g: any) => ({ ...g, isFlagship: false }));
               combinedNews = combinedNews.concat(normalNews);

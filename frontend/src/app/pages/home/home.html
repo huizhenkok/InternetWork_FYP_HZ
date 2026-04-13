@@ -161,17 +161,17 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
                 <div class="flex flex-col gap-4">
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Mission</h3>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">{{ visionMission?.visionTitle || 'Vision' }}</h3>
                   <p class="text-sm text-slate-600 dark:text-gray-400 leading-relaxed text-justify flex-grow">
-                    {{ visionMission.missionTextEnglish || 'To educate leaders with holistic characteristics to serve the global community.' }}
+                    {{ visionMission?.visionTextEnglish || 'To Be An Eminent Management University that drives innovation.' }}
                   </p>
                   <div class="h-[2px] w-full bg-green-200 dark:bg-green-700/50 mt-auto"></div>
                 </div>
 
                 <div class="flex flex-col gap-4">
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Vision</h3>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">{{ visionMission?.missionTitle || 'Mission' }}</h3>
                   <p class="text-sm text-slate-600 dark:text-gray-400 leading-relaxed text-justify flex-grow">
-                    {{ visionMission.visionTextEnglish || 'To Be An Eminent Management University that drives innovation.' }}
+                    {{ visionMission?.missionTextEnglish || 'To educate leaders with holistic characteristics to serve the global community.' }}
                   </p>
                   <div class="h-[2px] w-full bg-green-200 dark:bg-green-700/50 mt-auto"></div>
                 </div>
@@ -179,7 +179,7 @@
                 <div class="flex flex-col gap-4">
                   <h3 class="text-xl font-bold text-slate-900 dark:text-white">Purpose</h3>
                   <p class="text-sm text-slate-600 dark:text-gray-400 leading-relaxed text-justify flex-grow">
-                    {{ cmsData.aboutPurpose || 'Our purpose is to conduct focused research on Internet protocols, applications, and technology to contribute to its evolution.' }}
+                    {{ cmsData?.aboutPurpose || 'Our purpose is to conduct focused research on Internet protocols, applications, and technology to contribute to its evolution.' }}
                   </p>
                   <div class="h-[2px] w-full bg-green-200 dark:bg-green-700/50 mt-auto"></div>
                 </div>
