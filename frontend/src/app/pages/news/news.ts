@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RsvpService } from '../../../services/rsvp.service';
-import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
+import { CmsService } from '../../../services/cms.service';
 
 declare var AOS: any;
 
@@ -14,7 +14,6 @@ declare var AOS: any;
 })
 export class News implements OnInit {
 
-  // Default data fallback if CMS data is missing
   cmsData: any = {
     mainTitle: 'NEWS',
     mainTitleHighlight: '& EVENTS',
@@ -23,62 +22,49 @@ export class News implements OnInit {
       badge: 'Flagship Event', date: 'NOV 6-7, 2026', location: 'ALOR SETAR',
       title: 'NETAPPS 2026 Summit', desc: 'Join us for an immersive discussion on the next horizon of decentralized protocols and network defense strategies.', icon: 'hub'
     },
-    gatheringsTitle: 'INCOMING GATHERINGS',
-    gatherings: [
-      { date: 'NOV 12', location: 'LAB A', title: 'Cyber Forensics Workshop', desc: 'Advanced techniques in digital evidence recovery and analysis for next-gen networks.', icon: 'security' },
-      { date: 'DEC 05', location: 'VIRTUAL', title: 'PhD Thesis Defense: AI Ethics', desc: 'Defending the framework for ethical decision making in autonomous network agents.', icon: 'psychology' }
-    ],
+    gatheringsTitle: 'LATEST NEWS',
+    gatherings: [],
     quickUpdatesTitle: 'QUICK UPDATES',
-    quickUpdates: [
-      { tag: 'NEXT WEEK', text: 'Lab server maintenance scheduled.' },
-      { tag: 'REMINDER', text: 'Call for papers deadline extended to Nov 1.' }
-    ],
+    quickUpdates: [],
     quoteText: '"Innovation in networking is not just about speed, but securing the foundation of tomorrow\'s digital society."',
     quoteAuthor: 'INWLab Vision'
   };
 
+  // RSVP 状态
   isRsvpModalOpen: boolean = false;
   rsvpEventName: string = '';
   isSubmittingRsvp: boolean = false;
   isRsvpSuccess: boolean = false;
+  rsvpData = { name: '', email: '', role: 'UUM Student', message: '' };
 
-  rsvpData = {
-    name: '',
-    email: '',
-    role: 'UUM Student',
-    message: ''
-  };
+  // 🌟 新增：News 详情弹窗状态
+  isNewsModalOpen: boolean = false;
+  selectedNews: any = null;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private rsvpService: RsvpService,
-    private cmsService: CmsService // 🌟 Inject CmsService
+    private cmsService: CmsService
   ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-
-      // Core modification: Fetch News CMS data from MySQL
       this.cmsService.getCmsData('inwlab_cms_news_events').subscribe({
         next: (res: any) => {
           try {
             const parsed = JSON.parse(res.contentJson);
             this.cmsData = { ...this.cmsData, ...parsed };
           } catch(e) { console.error("Error parsing News CMS", e); }
-        },
-        error: () => console.log('Using default News data')
+        }
       });
 
       setTimeout(() => {
-        if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
-          AOS.refreshHard();
-          window.scrollTo(0, 0);
-        }
+        if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); }
       }, 150);
     }
   }
 
+  // --- RSVP 逻辑 (针对 Flagship Event) ---
   handleRSVP(eventName: string) {
     this.rsvpEventName = eventName;
     this.isRsvpModalOpen = true;
@@ -94,62 +80,42 @@ export class News implements OnInit {
     }
   }
 
-  closeRsvpModal() {
-    this.isRsvpModalOpen = false;
-  }
+  closeRsvpModal() { this.isRsvpModalOpen = false; }
 
   submitRSVP() {
-    if (!this.rsvpData.name || !this.rsvpData.email) {
-      alert("Please fill in your Name and Email address.");
-      return;
-    }
-
+    if (!this.rsvpData.name || !this.rsvpData.email) { alert("Please fill in your Name and Email."); return; }
     this.isSubmittingRsvp = true;
+    const payload = { eventName: this.rsvpEventName, name: this.rsvpData.name, email: this.rsvpData.email, role: this.rsvpData.role, message: this.rsvpData.message };
 
-    // Data payload must match Spring Boot EventRsvp.java fields
-    const payload = {
-      eventName: this.rsvpEventName,
-      name: this.rsvpData.name,
-      email: this.rsvpData.email,
-      role: this.rsvpData.role,
-      message: this.rsvpData.message
-    };
-
-    // Call RsvpService to send real HTTP POST request
     this.rsvpService.submitRsvp(payload).subscribe({
-      next: (response: any) => {
-        this.isSubmittingRsvp = false;
-        this.isRsvpSuccess = true;
-
-        // Delay modal close and clear form on success
-        setTimeout(() => {
-          this.closeRsvpModal();
-          this.rsvpData = { name: '', email: '', role: 'UUM Student', message: '' };
-        }, 2000);
+      next: () => {
+        this.isSubmittingRsvp = false; this.isRsvpSuccess = true;
+        setTimeout(() => { this.closeRsvpModal(); this.rsvpData = { name: '', email: '', role: 'UUM Student', message: '' }; }, 2000);
       },
       error: (err: any) => {
-        this.isSubmittingRsvp = false;
-        console.error("RSVP Error:", err);
-        alert("Failed to submit RSVP. Please try again.");
+        this.isSubmittingRsvp = false; console.error("RSVP Error:", err); alert("Failed to submit RSVP.");
       }
     });
   }
 
+  // --- 🌟 新增：News 详情逻辑 ---
+  openNewsModal(newsItem: any) {
+    this.selectedNews = newsItem;
+    this.isNewsModalOpen = true;
+    if (isPlatformBrowser(this.platformId)) document.body.style.overflow = 'hidden';
+  }
+
+  closeNewsModal() {
+    this.isNewsModalOpen = false;
+    if (isPlatformBrowser(this.platformId)) document.body.style.overflow = 'auto';
+    setTimeout(() => this.selectedNews = null, 300); // 等动画结束清空数据
+  }
+
   async shareEvent(eventName: string) {
-    const shareData = {
-      title: `INWLab Event: ${eventName}`,
-      text: `Check out this upcoming event at INWLab: ${eventName}`,
-      url: window.location.href,
-    };
+    const shareData = { title: `INWLab: ${eventName}`, text: `Check out this update from INWLab: ${eventName}`, url: window.location.href };
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(`${shareData.title}\n${shareData.url}`);
-        alert('Event link copied to clipboard! You can now paste it anywhere to share.');
-      }
-    } catch (err) {
-      console.log('Error sharing:', err);
-    }
+      if (navigator.share) await navigator.share(shareData);
+      else { await navigator.clipboard.writeText(`${shareData.title}\n${shareData.url}`); alert('Link copied to clipboard!'); }
+    } catch (err) {}
   }
 }

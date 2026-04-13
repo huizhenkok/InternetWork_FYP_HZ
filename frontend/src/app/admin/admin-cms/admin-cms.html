@@ -104,24 +104,29 @@
                   <input type="text" [(ngModel)]="homeData.announcement" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none">
                 </div>
 
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 border-t border-slate-200 dark:border-white/10 pt-4">Upcoming Event Settings</h3>
-                <div class="flex flex-col gap-4">
+                <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 border-t border-slate-200 dark:border-white/10 pt-4">About Us Snippet (Shown on Home Page)</h3>
+                <p class="text-xs text-slate-400 mb-4">*Note: The Vision and Mission texts shown on the Home page are automatically synced from the About Us module. Here you can edit the Main Title, the Purpose text, and the Image.</p>
+                <div class="flex flex-col gap-4 p-5 border border-slate-200 dark:border-white/10 rounded-2xl bg-white/50 dark:bg-black/20">
                   <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Event Title</label>
-                    <input type="text" [(ngModel)]="homeData.upcomingEvent" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none font-medium">
+                    <label class="text-xs font-bold text-primary uppercase">Snippet Title</label>
+                    <input type="text" [(ngModel)]="homeData.aboutTitle" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-bold outline-none">
                   </div>
                   <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Event Description</label>
-                    <textarea [(ngModel)]="homeData.upcomingEventDesc" rows="3" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none resize-none"></textarea>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Purpose Text</label>
+                    <textarea [(ngModel)]="homeData.aboutPurpose" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white outline-none resize-none"></textarea>
                   </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Countdown Target Date (e.g., 2026-11-06T00:00:00)</label>
-                    <input type="datetime-local" [(ngModel)]="homeData.conferenceDate" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white focus:ring-1 focus:ring-primary outline-none font-mono">
+                  <div class="flex flex-col gap-2 mt-2">
+                    <label class="text-[10px] font-bold text-accent-cyan uppercase">Upload Side Image</label>
+                    <div class="flex items-center gap-2">
+                      <input type="file" accept="image/*" (change)="onFileUpload($event, homeData, 'aboutImage')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-accent-cyan/10 file:text-accent-cyan hover:file:bg-accent-cyan/20 cursor-pointer">
+                      <span *ngIf="isUploading" class="text-xs text-accent-cyan whitespace-nowrap">Uploading...</span>
+                    </div>
+                    <img *ngIf="homeData.aboutImage" [src]="homeData.aboutImage" alt="Preview" class="mt-2 h-32 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                   </div>
                 </div>
 
                 <h3 class="text-lg font-bold text-slate-900 dark:text-white mt-4 border-t border-slate-200 dark:border-white/10 pt-4">Academic Excellence (Static Data)</h3>
-                <p class="text-xs text-slate-400 mb-2">*Note: Publications, Projects, and Members are auto-calculated from live database.</p>
+                <p class="text-xs text-slate-400 mb-2">*Note: Publications, Projects, and Members are auto-calculated from the live database.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div class="flex flex-col gap-2">
                     <label class="text-[10px] font-bold text-slate-500 uppercase">Active PhDs</label>
@@ -141,6 +146,260 @@
                   <button (click)="saveHome()" class="glow-button px-8 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer"><span class="material-symbols-outlined text-[18px]">save</span> Save Home</button>
                 </div>
               </div>
+            </div>
+
+            <div *ngIf="activeTab === 'news'" class="animate-in fade-in duration-300">
+              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">News & Events Editor</h2>
+                <button (click)="saveNews()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save All News</button>
+              </div>
+
+              <div class="flex flex-col gap-6 mb-10">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold text-slate-500 uppercase">Main Title (Black Text)</label>
+                    <input type="text" [(ngModel)]="newsAndEventsData.mainTitle" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold outline-none">
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-xs font-bold text-primary uppercase">Main Title (Gradient Text)</label>
+                    <input type="text" [(ngModel)]="newsAndEventsData.mainTitleHighlight" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-primary font-bold outline-none focus:border-primary">
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Subheading Description</label>
+                  <textarea [(ngModel)]="newsAndEventsData.subTitle" rows="2" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                </div>
+              </div>
+
+              <div class="p-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 mb-10 shadow-sm relative">
+                <div class="absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r from-accent-teal to-accent-cyan rounded-full text-[10px] font-bold tracking-widest text-white uppercase shadow-sm">Flagship Event Settings</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Top Badge Label</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.badge" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Background Icon (Google Material Icon)</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.icon" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Event Date</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.date" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-primary font-bold outline-none"></div>
+                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Location</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.location" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                </div>
+                <div class="flex flex-col gap-2 mt-4"><label class="text-[10px] font-bold text-slate-500 uppercase">Event Title</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.title" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-lg text-slate-900 dark:text-white font-bold outline-none"></div>
+                <div class="flex flex-col gap-2 mt-4"><label class="text-[10px] font-bold text-slate-500 uppercase">Event Description</label><textarea [(ngModel)]="newsAndEventsData.flagship.desc" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
+                <div class="flex flex-col gap-2 mt-4">
+                  <label class="text-[10px] font-bold text-primary uppercase">Upload Cover Image</label>
+                  <div class="flex items-center gap-2"><input type="file" accept="image/*" (change)="onFileUpload($event, newsAndEventsData.flagship, 'imageUrl')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"></div>
+                  <img *ngIf="newsAndEventsData.flagship.imageUrl" [src]="newsAndEventsData.flagship.imageUrl" alt="Preview" class="mt-2 h-32 w-auto object-cover rounded-lg shadow-sm border border-slate-200 dark:border-white/10">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="flex flex-col gap-4 border border-slate-200 dark:border-white/10 rounded-2xl p-6 bg-slate-50/50 dark:bg-black/20">
+                  <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-2 mb-2">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">News Database</h3>
+                    <button (click)="addGathering()" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">add_circle</span> Add Article</button>
+                  </div>
+
+                  <div class="flex flex-col gap-2 mb-4">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Section Title (e.g. LATEST NEWS)</label>
+                    <input type="text" [(ngModel)]="newsAndEventsData.gatheringsTitle" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none">
+                  </div>
+
+                  <div *ngFor="let g of newsAndEventsData.gatherings; let i = index" class="p-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative group flex flex-col gap-3">
+                    <button (click)="deleteGathering(i)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors z-10"><span class="material-symbols-outlined text-[18px]">close</span></button>
+
+                    <div class="flex items-center gap-3 pr-6">
+                      <div class="flex flex-col gap-1 w-1/3"><label class="text-[9px] uppercase text-slate-500 font-bold">Date</label><input type="text" [(ngModel)]="g.date" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded text-xs px-2 py-1 text-primary outline-none"></div>
+                      <div class="flex flex-col gap-1 w-1/3"><label class="text-[9px] uppercase text-slate-500 font-bold">Location</label><input type="text" [(ngModel)]="g.location" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded text-xs px-2 py-1 text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1 w-1/3"><label class="text-[9px] uppercase text-slate-500 font-bold">Icon</label><input type="text" [(ngModel)]="g.icon" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded text-xs px-2 py-1 text-slate-900 dark:text-white outline-none"></div>
+                    </div>
+                    <div class="flex flex-col gap-1"><label class="text-[9px] uppercase text-slate-500 font-bold">Title</label><input type="text" [(ngModel)]="g.title" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded text-sm font-bold px-2 py-1.5 text-slate-900 dark:text-white outline-none"></div>
+                    <div class="flex flex-col gap-1"><label class="text-[9px] uppercase text-slate-500 font-bold">Short Snippet (Card)</label><textarea [(ngModel)]="g.desc" rows="2" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded text-xs px-2 py-1 text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
+
+                    <div class="flex flex-col gap-1">
+                      <label class="text-[9px] uppercase text-primary font-bold">Full Article Content (Modal)</label>
+                      <textarea [(ngModel)]="g.fullContent" rows="4" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded text-sm px-3 py-2 text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                    </div>
+
+                    <div class="flex flex-col gap-1 mt-1">
+                      <label class="text-[9px] uppercase text-primary font-bold">Upload News Image</label>
+                      <input type="file" accept="image/*" (change)="onFileUpload($event, g, 'imageUrl')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-primary/10 file:text-primary cursor-pointer">
+                      <img *ngIf="g.imageUrl" [src]="g.imageUrl" alt="Preview" class="mt-2 h-16 w-32 object-cover rounded border border-slate-200 dark:border-white/10 shadow-sm">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex flex-col gap-6">
+                  <div class="flex flex-col gap-4 border border-slate-200 dark:border-white/10 rounded-2xl p-6 bg-slate-50/50 dark:bg-black/20">
+                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-2 mb-2">
+                      <h3 class="text-sm font-bold text-slate-900 dark:text-white">Quick Updates (Sidebar)</h3>
+                      <button (click)="addQuickUpdate()" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">add_circle</span> Add Item</button>
+                    </div>
+
+                    <div class="flex flex-col gap-2 mb-2">
+                      <label class="text-[10px] font-bold text-slate-500 uppercase">Section Title (e.g. QUICK UPDATES)</label>
+                      <input type="text" [(ngModel)]="newsAndEventsData.quickUpdatesTitle" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none">
+                    </div>
+
+                    <div *ngFor="let u of newsAndEventsData.quickUpdates; let j = index" class="flex gap-3 bg-white dark:bg-white/5 p-3 border border-slate-200 dark:border-white/10 rounded-xl relative mt-2">
+                      <button (click)="deleteQuickUpdate(j)" class="absolute top-1 right-1 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+                      <input type="text" [(ngModel)]="u.tag" placeholder="TAG (e.g. NEXT WEEK)" class="w-1/3 bg-transparent border-b border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase outline-none">
+                      <input type="text" [(ngModel)]="u.text" placeholder="Update detail text..." class="w-2/3 bg-transparent border-b border-slate-200 dark:border-white/10 text-xs font-medium text-slate-900 dark:text-white outline-none">
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-4 border border-slate-200 dark:border-white/10 rounded-2xl p-6 bg-slate-50/50 dark:bg-black/20">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Vision Quote (Sidebar)</h3>
+                    <div class="flex flex-col gap-2"><label class="text-[9px] uppercase text-slate-500 font-bold">Quote Text</label><textarea [(ngModel)]="newsAndEventsData.quoteText" rows="3" class="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded text-sm px-3 py-2 text-slate-900 dark:text-white outline-none italic resize-none"></textarea></div>
+                    <div class="flex flex-col gap-2"><label class="text-[9px] uppercase text-slate-500 font-bold">Author / Source</label><input type="text" [(ngModel)]="newsAndEventsData.quoteAuthor" class="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded text-xs font-bold uppercase px-3 py-2 text-slate-900 dark:text-white outline-none"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-white/10 mt-8">
+                <button (click)="saveNews()" class="glow-button px-8 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save All News</button>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'people'" class="animate-in fade-in duration-300">
+              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Leadership & Team Directory</h2>
+                <button (click)="saveTeam()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save Directory</button>
+              </div>
+
+              <div class="flex flex-col gap-6 mb-8">
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Directory Main Title</label>
+                  <input type="text" [(ngModel)]="teamData.mainTitle" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold outline-none">
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-xs font-bold text-slate-500 uppercase">Directory Description</label>
+                  <textarea [(ngModel)]="teamData.subTitle" rows="2" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5 mb-8">
+                <button (click)="activeTeamTab = 'team'" [ngClass]="activeTeamTab === 'team' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-6 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Our Team</button>
+                <button (click)="activeTeamTab = 'alumni'" [ngClass]="activeTeamTab === 'alumni' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-6 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Alumni</button>
+                <button (click)="activeTeamTab = 'student'" [ngClass]="activeTeamTab === 'student' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-6 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Active Students</button>
+              </div>
+
+              <div *ngIf="activeTeamTab === 'team'" class="animate-in fade-in flex flex-col gap-8">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2">
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Staff & Management Boards</h3>
+                  <button (click)="addTeamSection()" class="flex items-center gap-1 text-sm font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">add_circle</span> Add Department</button>
+                </div>
+
+                <div *ngFor="let section of teamData.ourTeam; let sIndex = index" class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl relative group">
+                  <button (click)="deleteTeamSection(sIndex)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+
+                  <div class="flex flex-col gap-2 mb-6 w-full max-w-md">
+                    <label class="text-[10px] font-bold text-primary uppercase">Department Title (e.g. Management Board)</label>
+                    <input type="text" [(ngModel)]="section.title" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white font-bold outline-none">
+                  </div>
+
+                  <div class="flex flex-col gap-6 pl-4 border-l-2 border-primary/20 dark:border-[#0df2f2]/30">
+                    <div *ngFor="let member of section.members; let mIndex = index" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-black/30 p-5 rounded-xl border border-slate-200 dark:border-white/10 relative pr-12">
+                      <button (click)="deleteTeamMember(sIndex, mIndex)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[20px]">close</span></button>
+
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Name</label><input type="text" [(ngModel)]="member.name" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Role / Position</label><input type="text" [(ngModel)]="member.role" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email Address</label><input type="email" [(ngModel)]="member.email" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Social / Portfolio Link</label><input type="url" [(ngModel)]="member.socialLink" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+
+                      <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-[10px] uppercase text-slate-500 font-bold">Biography / Research Description</label>
+                        <textarea [(ngModel)]="member.description" rows="3" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                      </div>
+
+                      <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar Image</label>
+                        <div class="flex items-center gap-4">
+                          <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                          <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
+                        </div>
+                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
+                      </div>
+                    </div>
+                    <button (click)="addTeamMember(sIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-2 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">person_add</span> Add Member</button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="activeTeamTab === 'alumni'" class="animate-in fade-in flex flex-col gap-8">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2">
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Alumni Database (By Year)</h3>
+                  <button (click)="addAlumniYear()" class="flex items-center gap-1 text-sm font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">add_circle</span> Add Class Year</button>
+                </div>
+
+                <div *ngFor="let alumniGroup of teamData.alumni; let yIndex = index" class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl relative group">
+                  <button (click)="deleteAlumniYear(yIndex)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+
+                  <div class="flex flex-col gap-2 mb-6 w-32">
+                    <label class="text-[10px] font-bold text-primary uppercase">Class Year</label>
+                    <input type="text" [(ngModel)]="alumniGroup.year" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white font-bold outline-none">
+                  </div>
+
+                  <div class="flex flex-col gap-6 pl-4 border-l-2 border-primary/20 dark:border-[#0df2f2]/30">
+                    <div *ngFor="let member of alumniGroup.members; let mIndex = index" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white dark:bg-black/30 p-5 rounded-xl border border-slate-200 dark:border-white/10 relative pr-12">
+                      <button (click)="deleteAlumniMember(yIndex, mIndex)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[20px]">close</span></button>
+
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Name</label><input type="text" [(ngModel)]="member.name" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Designation (e.g. Senior Dev)</label><input type="text" [(ngModel)]="member.designation" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Organization / Company</label><input type="text" [(ngModel)]="member.organization" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email Address</label><input type="email" [(ngModel)]="member.email" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Social / LinkedIn</label><input type="url" [(ngModel)]="member.socialLink" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+
+                      <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-[10px] uppercase text-slate-500 font-bold">Biography / Career Description</label>
+                        <textarea [(ngModel)]="member.description" rows="3" class="w-full bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-white/5 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                      </div>
+
+                      <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar Image</label>
+                        <div class="flex items-center gap-4">
+                          <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                          <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
+                        </div>
+                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
+                      </div>
+                    </div>
+                    <button (click)="addAlumniMember(yIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-2 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">person_add</span> Add Alumni</button>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="activeTeamTab === 'student'" class="animate-in fade-in flex flex-col gap-6">
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-4">
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Active Students</h3>
+                  <button (click)="addStudent()" class="flex items-center gap-1 text-sm font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">person_add</span> Add Student</button>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6">
+                  <div *ngFor="let student of teamData.students; let i = index" class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative flex flex-col gap-4 group">
+                    <button (click)="deleteStudent(i)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pr-8">
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Student Name</label><input type="text" [(ngModel)]="student.name" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm font-bold text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Department / Program</label><input type="text" [(ngModel)]="student.department" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email Address</label><input type="text" [(ngModel)]="student.email" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Portfolio / Web Link</label><input type="text" [(ngModel)]="student.socialLink" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
+
+                      <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-[10px] uppercase text-slate-500 font-bold">Research Description / Bio</label>
+                        <textarea [(ngModel)]="student.description" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                      </div>
+
+                      <div class="flex flex-col gap-1 md:col-span-2">
+                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar Image</label>
+                        <div class="flex items-center gap-4">
+                          <input type="file" accept="image/*" (change)="onFileUpload($event, student, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                          <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
+                        </div>
+                        <img *ngIf="student.avatar" [src]="student.avatar" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="teamData.students.length === 0" class="text-center py-10 text-slate-500 font-medium">No active students. Click "Add Student" to enroll one.</div>
+              </div>
+
             </div>
 
             <div *ngIf="activeTab === 'research'" class="animate-in fade-in duration-300">
@@ -332,254 +591,7 @@
               </div>
             </div>
 
-            <div *ngIf="activeTab === 'people'" class="animate-in fade-in duration-300">
-              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Leadership & Team Directory</h2>
-                <button (click)="saveTeam()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save Directory</button>
-              </div>
-
-              <div class="flex flex-col gap-6 mb-8">
-                <div class="flex flex-col gap-2">
-                  <label class="text-xs font-bold text-slate-500 uppercase">Directory Main Title</label>
-                  <input type="text" [(ngModel)]="teamData.mainTitle" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold outline-none">
-                </div>
-                <div class="flex flex-col gap-2">
-                  <label class="text-xs font-bold text-slate-500 uppercase">Directory Description</label>
-                  <textarea [(ngModel)]="teamData.subTitle" rows="2" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none resize-none"></textarea>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5 mb-8">
-                <button (click)="activeTeamTab = 'team'" [ngClass]="activeTeamTab === 'team' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-6 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Our Team</button>
-                <button (click)="activeTeamTab = 'alumni'" [ngClass]="activeTeamTab === 'alumni' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-6 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Alumni</button>
-                <button (click)="activeTeamTab = 'student'" [ngClass]="activeTeamTab === 'student' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-6 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Active Students</button>
-              </div>
-
-              <div *ngIf="activeTeamTab === 'team'" class="animate-in fade-in flex flex-col gap-8">
-                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2">
-                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Staff & Management Boards</h3>
-                  <button (click)="addTeamSection()" class="flex items-center gap-1 text-sm font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">add_circle</span> Add Department</button>
-                </div>
-
-                <div *ngFor="let section of teamData.ourTeam; let sIndex = index" class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl relative group">
-                  <button (click)="deleteTeamSection(sIndex)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
-
-                  <div class="flex flex-col gap-2 mb-6 w-full max-w-md">
-                    <label class="text-[10px] font-bold text-primary uppercase">Department Title (e.g. Management Board)</label>
-                    <input type="text" [(ngModel)]="section.title" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white font-bold outline-none">
-                  </div>
-
-                  <div class="flex flex-col gap-4 pl-4 border-l-2 border-primary/20 dark:border-[#0df2f2]/30">
-                    <div *ngFor="let member of section.members; let mIndex = index" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-white dark:bg-black/30 p-4 rounded-xl border border-slate-200 dark:border-white/10 relative pr-10">
-                      <button (click)="deleteTeamMember(sIndex, mIndex)" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">close</span></button>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Name</label><input type="text" [(ngModel)]="member.name" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Role</label><input type="text" [(ngModel)]="member.role" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email</label><input type="text" [(ngModel)]="member.email" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Social Link</label><input type="text" [(ngModel)]="member.socialLink" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-
-                      <div class="flex flex-col gap-1">
-                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar</label>
-                        <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-1 h-8 w-8 rounded-full border border-slate-200 dark:border-white/10 object-cover">
-                        <span *ngIf="isUploading" class="text-[10px] text-primary">Uploading...</span>
-                      </div>
-                    </div>
-                    <button (click)="addTeamMember(sIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-1 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[14px]">person_add</span> Add Member</button>
-                  </div>
-                </div>
-              </div>
-
-              <div *ngIf="activeTeamTab === 'alumni'" class="animate-in fade-in flex flex-col gap-8">
-                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2">
-                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Alumni Database (By Year)</h3>
-                  <button (click)="addAlumniYear()" class="flex items-center gap-1 text-sm font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">add_circle</span> Add Class Year</button>
-                </div>
-
-                <div *ngFor="let alumniGroup of teamData.alumni; let yIndex = index" class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl relative group">
-                  <button (click)="deleteAlumniYear(yIndex)" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[20px]">delete</span></button>
-
-                  <div class="flex flex-col gap-2 mb-6 w-32">
-                    <label class="text-[10px] font-bold text-primary uppercase">Class Year</label>
-                    <input type="text" [(ngModel)]="alumniGroup.year" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-900 dark:text-white font-bold outline-none">
-                  </div>
-
-                  <div class="flex flex-col gap-3 pl-4 border-l-2 border-primary/20 dark:border-[#0df2f2]/30">
-                    <div *ngFor="let member of alumniGroup.members; let mIndex = index" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-black/30 p-4 rounded-xl border border-slate-200 dark:border-white/10 relative pr-10">
-                      <button (click)="deleteAlumniMember(yIndex, mIndex)" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">close</span></button>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Name</label><input type="text" [(ngModel)]="member.name" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Designation</label><input type="text" [(ngModel)]="member.designation" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Organization</label><input type="text" [(ngModel)]="member.organization" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-
-                      <div class="flex flex-col gap-1">
-                        <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar</label>
-                        <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-1 h-8 w-8 rounded-full border border-slate-200 dark:border-white/10 object-cover">
-                        <span *ngIf="isUploading" class="text-[10px] text-primary">Uploading...</span>
-                      </div>
-                    </div>
-                    <button (click)="addAlumniMember(yIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-1 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[14px]">person_add</span> Add Alumni</button>
-                  </div>
-                </div>
-              </div>
-
-              <div *ngIf="activeTeamTab === 'student'" class="animate-in fade-in flex flex-col gap-6">
-                <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-4">
-                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">Active Students</h3>
-                  <button (click)="addStudent()" class="flex items-center gap-1 text-sm font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">person_add</span> Add Student</button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div *ngFor="let student of teamData.students; let i = index" class="p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative flex flex-col gap-3 group">
-                    <button (click)="deleteStudent(i)" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
-                    <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Student Name</label><input type="text" [(ngModel)]="student.name" class="w-full pr-6 bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm font-bold text-slate-900 dark:text-white outline-none"></div>
-                    <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Department / Program</label><input type="text" [(ngModel)]="student.department" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-                    <div class="flex flex-col gap-1"><label class="text-[10px] uppercase text-slate-500 font-bold">Email Address</label><input type="text" [(ngModel)]="student.email" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-1.5 text-sm text-slate-900 dark:text-white outline-none"></div>
-
-                    <div class="flex flex-col gap-1">
-                      <label class="text-[10px] uppercase text-primary font-bold">Upload Avatar</label>
-                      <input type="file" accept="image/*" (change)="onFileUpload($event, student, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
-                      <img *ngIf="student.avatar" [src]="student.avatar" alt="Preview" class="mt-1 h-8 w-8 rounded-full border border-slate-200 dark:border-white/10 object-cover">
-                      <span *ngIf="isUploading" class="text-[10px] text-primary">Uploading...</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div *ngIf="teamData.students.length === 0" class="text-center py-10 text-slate-500 font-medium">No active students. Click "Add Student" to enroll one.</div>
-              </div>
-
-            </div>
-
-            <div *ngIf="activeTab === 'contact'" class="animate-in fade-in duration-300">
-              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Contact Page Editor</h2>
-                <button (click)="saveContact()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save Changes</button>
-              </div>
-
-              <div class="flex flex-col gap-8 max-w-4xl">
-                <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
-                  <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Page Headers</h3>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-primary uppercase">Main Title</label>
-                    <input type="text" [(ngModel)]="contactData.mainTitle" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-lg text-slate-900 dark:text-white font-bold outline-none focus:border-primary">
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase">Subtitle Description</label>
-                    <textarea [(ngModel)]="contactData.subTitle" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">mail</span> Official Email</h3>
-                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Label (e.g. General Inquiries)</label><input type="text" [(ngModel)]="contactData.emailLabel" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
-                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Email Address</label><input type="text" [(ngModel)]="contactData.email" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
-                  </div>
-
-                  <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 flex items-center gap-2"><span class="material-symbols-outlined text-accent-teal text-[18px]">location_on</span> Physical Address</h3>
-                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Label (e.g. Base of Operations)</label><input type="text" [(ngModel)]="contactData.addressLabel" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
-                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Full Address (Use Enter for new lines)</label><textarea [(ngModel)]="contactData.address" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea></div>
-                  </div>
-                </div>
-
-                <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
-                  <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Social & External Links</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">share</span> Primary Social Link URL</label><input type="text" [(ngModel)]="contactData.social1" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
-                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">public</span> Secondary Website URL</label><input type="text" [(ngModel)]="contactData.social2" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div *ngIf="activeTab === 'news'" class="animate-in fade-in duration-300">
-              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
-                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">News & Events Editor</h2>
-                <button (click)="saveNews()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save All News</button>
-              </div>
-
-              <div class="flex flex-col gap-6 mb-10">
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Main Title (Black Text)</label>
-                    <input type="text" [(ngModel)]="newsAndEventsData.mainTitle" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold outline-none">
-                  </div>
-                  <div class="flex flex-col gap-2">
-                    <label class="text-xs font-bold text-primary uppercase">Main Title (Gradient Text)</label>
-                    <input type="text" [(ngModel)]="newsAndEventsData.mainTitleHighlight" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-primary font-bold outline-none focus:border-primary">
-                  </div>
-                </div>
-                <div class="flex flex-col gap-2">
-                  <label class="text-xs font-bold text-slate-500 uppercase">Subheading Description</label>
-                  <textarea [(ngModel)]="newsAndEventsData.subTitle" rows="2" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none resize-none"></textarea>
-                </div>
-              </div>
-
-              <div class="p-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 mb-10 shadow-sm relative">
-                <div class="absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r from-accent-teal to-accent-cyan rounded-full text-[10px] font-bold tracking-widest text-white uppercase shadow-sm">Flagship Event Settings</div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Top Badge Label</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.badge" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
-                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Background Icon (Google Material Icon)</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.icon" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
-                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Event Date</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.date" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-primary font-bold outline-none"></div>
-                  <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Location</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.location" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none"></div>
-                </div>
-                <div class="flex flex-col gap-2 mt-4"><label class="text-[10px] font-bold text-slate-500 uppercase">Event Title</label><input type="text" [(ngModel)]="newsAndEventsData.flagship.title" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-lg text-slate-900 dark:text-white font-bold outline-none"></div>
-                <div class="flex flex-col gap-2 mt-4"><label class="text-[10px] font-bold text-slate-500 uppercase">Event Description</label><textarea [(ngModel)]="newsAndEventsData.flagship.desc" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
-              </div>
-
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                <div class="flex flex-col gap-4 border border-slate-200 dark:border-white/10 rounded-2xl p-6 bg-slate-50/50 dark:bg-black/20">
-                  <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-2 mb-2">
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Incoming Gatherings</h3>
-                    <button (click)="addGathering()" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">add_circle</span> Add Event</button>
-                  </div>
-
-                  <div *ngFor="let g of newsAndEventsData.gatherings; let i = index" class="p-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative group">
-                    <button (click)="deleteGathering(i)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[18px]">close</span></button>
-
-                    <div class="flex items-center gap-3 mb-3 pr-6">
-                      <div class="flex flex-col gap-1 w-1/3"><label class="text-[9px] uppercase text-slate-500 font-bold">Date</label><input type="text" [(ngModel)]="g.date" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded text-xs px-2 py-1 text-primary outline-none"></div>
-                      <div class="flex flex-col gap-1 w-1/3"><label class="text-[9px] uppercase text-slate-500 font-bold">Location</label><input type="text" [(ngModel)]="g.location" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded text-xs px-2 py-1 text-slate-900 dark:text-white outline-none"></div>
-                      <div class="flex flex-col gap-1 w-1/3"><label class="text-[9px] uppercase text-slate-500 font-bold">Icon</label><input type="text" [(ngModel)]="g.icon" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded text-xs px-2 py-1 text-slate-900 dark:text-white outline-none"></div>
-                    </div>
-                    <div class="flex flex-col gap-1 mb-2"><label class="text-[9px] uppercase text-slate-500 font-bold">Title</label><input type="text" [(ngModel)]="g.title" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded text-sm font-bold px-2 py-1 text-slate-900 dark:text-white outline-none"></div>
-                    <div class="flex flex-col gap-1"><label class="text-[9px] uppercase text-slate-500 font-bold">Description</label><textarea [(ngModel)]="g.desc" rows="2" class="w-full bg-transparent border border-slate-200 dark:border-white/10 rounded text-xs px-2 py-1 text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
-                  </div>
-                </div>
-
-                <div class="flex flex-col gap-6">
-
-                  <div class="flex flex-col gap-4 border border-slate-200 dark:border-white/10 rounded-2xl p-6 bg-slate-50/50 dark:bg-black/20">
-                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-2 mb-2">
-                      <h3 class="text-sm font-bold text-slate-900 dark:text-white">Quick Updates (Sidebar)</h3>
-                      <button (click)="addQuickUpdate()" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">add_circle</span> Add Item</button>
-                    </div>
-
-                    <div *ngFor="let u of newsAndEventsData.quickUpdates; let j = index" class="flex gap-3 bg-white dark:bg-white/5 p-3 border border-slate-200 dark:border-white/10 rounded-xl relative">
-                      <button (click)="deleteQuickUpdate(j)" class="absolute top-1 right-1 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
-                      <input type="text" [(ngModel)]="u.tag" placeholder="TAG (e.g. NEXT WEEK)" class="w-1/3 bg-transparent border-b border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 uppercase outline-none">
-                      <input type="text" [(ngModel)]="u.text" placeholder="Update detail text..." class="w-2/3 bg-transparent border-b border-slate-200 dark:border-white/10 text-xs font-medium text-slate-900 dark:text-white outline-none">
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col gap-4 border border-slate-200 dark:border-white/10 rounded-2xl p-6 bg-slate-50/50 dark:bg-black/20">
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Vision Quote (Sidebar)</h3>
-                    <div class="flex flex-col gap-2"><label class="text-[9px] uppercase text-slate-500 font-bold">Quote Text</label><textarea [(ngModel)]="newsAndEventsData.quoteText" rows="3" class="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded text-sm px-3 py-2 text-slate-900 dark:text-white outline-none italic resize-none"></textarea></div>
-                    <div class="flex flex-col gap-2"><label class="text-[9px] uppercase text-slate-500 font-bold">Author / Source</label><input type="text" [(ngModel)]="newsAndEventsData.quoteAuthor" class="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded text-xs font-bold uppercase px-3 py-2 text-slate-900 dark:text-white outline-none"></div>
-                  </div>
-
-                </div>
-              </div>
-
-              <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-white/10 mt-8">
-                <button (click)="saveNews()" class="glow-button px-8 py-3 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save All News</button>
-              </div>
-            </div>
-
             <div *ngIf="activeTab === 'conference'" class="animate-in fade-in duration-300">
-
               <ng-container *ngIf="editingConfIndex === null">
                 <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
                   <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Conference Databases</h2>
@@ -730,6 +742,49 @@
               </ng-container>
             </div>
 
+            <div *ngIf="activeTab === 'contact'" class="animate-in fade-in duration-300">
+              <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Contact Page Editor</h2>
+                <button (click)="saveContact()" class="glow-button px-6 py-2 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] text-white dark:text-black font-bold tracking-wide flex items-center gap-2 border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[18px]">save</span> Save Changes</button>
+              </div>
+
+              <div class="flex flex-col gap-8 max-w-4xl">
+                <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Page Headers</h3>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-primary uppercase">Main Title</label>
+                    <input type="text" [(ngModel)]="contactData.mainTitle" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-lg text-slate-900 dark:text-white font-bold outline-none focus:border-primary">
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase">Subtitle Description</label>
+                    <textarea [(ngModel)]="contactData.subTitle" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px]">mail</span> Official Email</h3>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Label (e.g. General Inquiries)</label><input type="text" [(ngModel)]="contactData.emailLabel" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Email Address</label><input type="text" [(ngModel)]="contactData.email" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                  </div>
+
+                  <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 flex items-center gap-2"><span class="material-symbols-outlined text-accent-teal text-[18px]">location_on</span> Physical Address</h3>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Label (e.g. Base of Operations)</label><input type="text" [(ngModel)]="contactData.addressLabel" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Full Address (Use Enter for new lines)</label><textarea [(ngModel)]="contactData.address" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea></div>
+                  </div>
+                </div>
+
+                <div class="p-6 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex flex-col gap-4">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2">Social & External Links</h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">share</span> Primary Social Link URL</label><input type="text" [(ngModel)]="contactData.social1" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                    <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">public</span> Secondary Website URL</label><input type="text" [(ngModel)]="contactData.social2" placeholder="https://..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2 text-sm text-slate-900 dark:text-white outline-none focus:border-primary"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div *ngIf="activeTab === 'bulletins'" class="animate-in fade-in duration-300">
               <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-6 mb-8">
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
@@ -796,4 +851,4 @@
       </div>
     </div>
   </main>
-</div>。
+</div>

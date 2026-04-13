@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CmsService } from '../../../services/cms.service';
-import { UploadService } from '../../../services/upload.service'; // 🌟 Import the new UploadService
+import { UploadService } from '../../../services/upload.service';
 
 declare var AOS: any;
 
@@ -16,7 +16,7 @@ declare var AOS: any;
 export class AdminCms implements OnInit {
 
   adminName: string = 'System Admin';
-  activeTab: string = 'contact';
+  activeTab: string = 'home';
   editingLab: string = '';
   activeAboutTab: string = 'vision';
   activeTeamTab: string = 'team';
@@ -24,12 +24,22 @@ export class AdminCms implements OnInit {
   editingConfIndex: number | null = null;
   activeConfTab: string = 'home';
 
-  isUploading: boolean = false; // 🌟 Added: To handle UI loading state during file upload
+  isUploading: boolean = false;
 
   // ==============================
   // 🗄️ Global Database Mapping
   // ==============================
-  homeData: any = { heading: 'Innovating the Future...', subheading: '...', announcement: '...', upcomingEvent: '...', upcomingEventDesc: '...', conferenceDate: '...', stats: {} };
+
+  homeData: any = {
+    heading: 'Innovating the Future...',
+    subheading: '...',
+    announcement: '...',
+    aboutTitle: 'What Is Internetworks Research Laboratory?',
+    aboutPurpose: 'Our purpose is to conduct focused research on Internet protocols, applications, and technology to contribute to its evolution.',
+    aboutImage: '',
+    stats: {}
+  };
+
   researchData: any = { mainTitle: 'Research Areas', subTitle: '...', domains: { cyber: {}, forensics: {}, iot: {}, ai: {}, cloud: {}, network: {} } };
   resourceData: any = { mainTitle: 'Public Publications', subTitle: '...', filterTitle: '...', projects: [] };
   aboutData: any = { visionMission: {}, objective: {}, philosophy: {} };
@@ -78,7 +88,7 @@ export class AdminCms implements OnInit {
     private ngZone: NgZone,
     private router: Router,
     private cmsService: CmsService,
-    private uploadService: UploadService // 🌟 Inject UploadService
+    private uploadService: UploadService
   ) {}
 
   ngOnInit() {
@@ -149,7 +159,6 @@ export class AdminCms implements OnInit {
     }
   }
 
-  // Action Triggers for saving specific modules
   saveHome() { this.saveModule('inwlab_cms_home', this.homeData, 'Home Page'); }
   saveResearch() { this.saveModule('inwlab_cms_research', this.researchData, 'Research Area'); }
   saveResource() { this.saveModule('inwlab_cms_resource', this.resourceData, 'Publication & Projects'); }
@@ -160,9 +169,6 @@ export class AdminCms implements OnInit {
   saveRooms() { this.saveModule('inwlab_rooms', this.rooms, 'Lab Facilities'); }
   saveBulletins() { this.saveModule('inwlab_bulletins', this.bulletins, 'System Bulletins'); }
 
-  // ==========================================
-  // 🌟 Universal File Upload Logic
-  // ==========================================
   onFileUpload(event: any, targetObject: any, targetProperty: string) {
     const file = event.target.files[0];
     if (!file) return;
@@ -171,7 +177,6 @@ export class AdminCms implements OnInit {
 
     this.uploadService.uploadFile(file).subscribe({
       next: (res: any) => {
-        // Assign the returned URL directly to the target object's property
         targetObject[targetProperty] = res.url;
         this.isUploading = false;
         alert('✅ Image uploaded successfully!');
@@ -183,10 +188,6 @@ export class AdminCms implements OnInit {
       }
     });
   }
-
-  // ==========================================
-  // 🌟 Array Management Logic
-  // ==========================================
 
   saveConferences() {
     this.conferences.sort((a: any, b: any) => parseInt(b.year) - parseInt(a.year));
@@ -224,20 +225,39 @@ export class AdminCms implements OnInit {
   addConfMember(cIndex: number) { if (this.editingConfIndex !== null) this.conferences[this.editingConfIndex].team[cIndex].members.push({ name: 'Member Name', org: 'University / Org', role: '' }); }
   deleteConfMember(cIndex: number, mIndex: number) { if (this.editingConfIndex !== null && confirm("Remove this member?")) this.conferences[this.editingConfIndex].team[cIndex].members.splice(mIndex, 1); }
 
-  addGathering() { this.newsAndEventsData.gatherings.push({ date: 'DATE', location: 'LOCATION', title: 'New Event Title', desc: 'Event description.', icon: 'event' }); }
-  deleteGathering(index: number) { if (confirm("Remove this gathering?")) this.newsAndEventsData.gatherings.splice(index, 1); }
+  // 🌟 核心：为新增的 Gathering / News 加入 fullContent 字段
+  addGathering() {
+    this.newsAndEventsData.gatherings.push({
+      date: 'DATE', location: 'LOCATION', title: 'New Article Title',
+      desc: 'Short snippet shown on the main card.',
+      fullContent: 'Full article text goes here...',
+      icon: 'article', imageUrl: ''
+    });
+  }
+  deleteGathering(index: number) { if (confirm("Remove this article?")) this.newsAndEventsData.gatherings.splice(index, 1); }
   addQuickUpdate() { this.newsAndEventsData.quickUpdates.push({ tag: 'NEW TAG', text: 'New update text here.' }); }
   deleteQuickUpdate(index: number) { if (confirm("Remove this update?")) this.newsAndEventsData.quickUpdates.splice(index, 1); }
+
   addTeamSection() { this.teamData.ourTeam.push({ title: 'New Department', members: [] }); }
   deleteTeamSection(index: number) { if (confirm("Delete this entire department?")) this.teamData.ourTeam.splice(index, 1); }
-  addTeamMember(sectionIndex: number) { this.teamData.ourTeam[sectionIndex].members.push({ name: 'New Member', role: 'Role', email: '', socialLink: '', avatar: '' }); }
+
+  addTeamMember(sectionIndex: number) {
+    this.teamData.ourTeam[sectionIndex].members.push({ name: 'New Member', role: 'Role', email: '', socialLink: '', avatar: '', description: '' });
+  }
   deleteTeamMember(sectionIndex: number, memberIndex: number) { if (confirm("Remove this member?")) this.teamData.ourTeam[sectionIndex].members.splice(memberIndex, 1); }
+
   addAlumniYear() { this.teamData.alumni.unshift({ year: new Date().getFullYear().toString(), members: [] }); }
   deleteAlumniYear(index: number) { if (confirm("Delete this entire class year?")) this.teamData.alumni.splice(index, 1); }
-  addAlumniMember(yearIndex: number) { this.teamData.alumni[yearIndex].members.push({ name: 'New Alumni', designation: 'Job Title', organization: 'Company / Uni', avatar: '' }); }
+  addAlumniMember(yearIndex: number) {
+    this.teamData.alumni[yearIndex].members.push({ name: 'New Alumni', designation: 'Job Title', organization: 'Company / Uni', email: '', socialLink: '', avatar: '', description: '' });
+  }
   deleteAlumniMember(yearIndex: number, memberIndex: number) { if (confirm("Remove this alumni?")) this.teamData.alumni[yearIndex].members.splice(memberIndex, 1); }
-  addStudent() { this.teamData.students.unshift({ name: 'New Student', department: 'MSc / PhD Program', email: '', avatar: '' }); }
+
+  addStudent() {
+    this.teamData.students.unshift({ name: 'New Student', department: 'MSc / PhD Program', email: '', socialLink: '', avatar: '', description: '' });
+  }
   deleteStudent(index: number) { if (confirm("Remove this student?")) this.teamData.students.splice(index, 1); }
+
   addProject() { this.resourceData.projects.unshift({ id: new Date().getTime(), title: 'New Research Project', name: 'Researcher Name', date: new Date().toISOString().split('T')[0], summary: 'Enter project description here.' }); }
   deleteProject(index: number) { if (confirm("Delete this project permanently?")) this.resourceData.projects.splice(index, 1); }
 

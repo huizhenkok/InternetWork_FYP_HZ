@@ -1,6 +1,6 @@
-import { Component, Input, OnChanges, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { CmsService } from '../../../../../services/cms.service'; // 🌟 子组件跳 4 层
+import { CmsService } from '../../../../../services/cms.service';
 
 interface AlumniMember { name: string; designation: string; organization: string; avatar?: string; }
 interface AlumniYear { year: string; members: AlumniMember[]; }
@@ -9,17 +9,18 @@ declare var AOS: any;
 @Component({ selector: 'app-alumni', standalone: true, imports: [CommonModule], templateUrl: './alumni.html' })
 export class Alumni implements OnInit, OnChanges {
   @Input() searchTerm: string = '';
+  @Output() memberClick = new EventEmitter<any>(); // 🌟 新增
+
   allYears: AlumniYear[] = [];
   filteredYears: AlumniYear[] = [];
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private cmsService: CmsService // 🌟 注入 CmsService
+    private cmsService: CmsService
   ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // 🌟 核心修改：从 MySQL 获取 Alumni 数据
       this.cmsService.getCmsData('inwlab_cms_team').subscribe({
         next: (res: any) => {
           try {
@@ -27,7 +28,7 @@ export class Alumni implements OnInit, OnChanges {
             if (parsed.alumni) {
               this.allYears = parsed.alumni;
             }
-            this.filterAlumni(); // 🌟 数据拿到后再过滤渲染
+            this.filterAlumni();
           } catch(e) { console.error("Error parsing Alumni CMS", e); }
         },
         error: () => console.log('Using default Alumni data')
@@ -43,5 +44,10 @@ export class Alumni implements OnInit, OnChanges {
     this.filteredYears = this.allYears.map(yearGroup => {
       return { year: yearGroup.year, members: yearGroup.members.filter(m => m.name.toLowerCase().includes(term) || m.designation.toLowerCase().includes(term) || m.organization.toLowerCase().includes(term) || yearGroup.year.includes(term)) };
     }).filter(yearGroup => yearGroup.members.length > 0);
+  }
+
+  // 🌟 新增：触发点击事件
+  onMemberClick(member: AlumniMember) {
+    this.memberClick.emit(member);
   }
 }

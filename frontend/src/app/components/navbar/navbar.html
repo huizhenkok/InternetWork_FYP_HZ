@@ -3,11 +3,9 @@
 
     <div class="flex items-center gap-3">
       <a routerLink="/home" class="flex items-center gap-3 no-underline outline-none group">
-
         <div class="bg-white rounded-xl p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-transparent dark:shadow-[0_0_12px_rgba(255,255,255,0.1)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
           <img src="/logo.png" alt="UUM IoT Logo" class="h-6 w-auto object-contain" onerror="this.src='https://via.placeholder.com/24x24?text=Logo'">
         </div>
-
         <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">INWLab</h2>
       </a>
     </div>
@@ -16,13 +14,25 @@
       <a routerLink="/home" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" [routerLinkActiveOptions]="{exact: true}" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Home</a>
       <a routerLink="/research" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Research Area</a>
       <a routerLink="/resources" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Publication</a>
+      <a routerLink="/news" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">News&Events</a>
+
+      <div class="relative group" routerLinkActive #conferenceActive="routerLinkActive">
+        <button [ngClass]="conferenceActive.isActive ? '!text-primary dark:!text-[#0df2f2] !font-bold' : 'text-slate-500 dark:text-gray-300'" class="flex items-center gap-1 text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300 py-2 outline-none border-none bg-transparent cursor-pointer">
+          NETAPPS
+          <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:rotate-180">arrow_drop_down</span>
+        </button>
+        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden flex flex-col p-2 text-left">
+          <a *ngFor="let year of conferenceYears" [routerLink]="'/conference/' + year" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">NetApp {{ year }}</a>
+        </div>
+      </div>
+
+      <a routerLink="/forum" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Forum</a>
 
       <div class="relative group" routerLinkActive #aboutActive="routerLinkActive">
         <button [ngClass]="aboutActive.isActive ? '!text-primary dark:!text-[#0df2f2] !font-bold' : 'text-slate-500 dark:text-gray-300'" class="flex items-center gap-1 text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300 py-2 outline-none border-none bg-transparent cursor-pointer">
           About Us
           <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:rotate-180">arrow_drop_down</span>
         </button>
-
         <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden flex flex-col p-2 text-left">
           <a routerLink="/about/vision-mission" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">Vision & Mission</a>
           <a routerLink="/about/objective" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">Objective</a>
@@ -30,27 +40,13 @@
 
           <div class="h-[1px] w-full bg-slate-100 dark:bg-white/10 my-1"></div>
 
-          <a routerLink="/people" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline flex items-center justify-between outline-none">
-            Leadership
-            <span class="material-symbols-outlined text-[16px]">groups</span>
-          </a>
+          <div class="px-4 py-1 text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Our Team</div>
+          <a routerLink="/people" [queryParams]="{tab: 'team'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Leadership</a>
+          <a routerLink="/people" [queryParams]="{tab: 'alumni'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">school</span> Alumni</a>
+          <a routerLink="/people" [queryParams]="{tab: 'student'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">groups</span> Student</a>
         </div>
       </div>
 
-      <a routerLink="/news" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">News&Events</a>
-
-      <div class="relative group" routerLinkActive #conferenceActive="routerLinkActive">
-        <button [ngClass]="conferenceActive.isActive ? '!text-primary dark:!text-[#0df2f2] !font-bold' : 'text-slate-500 dark:text-gray-300'" class="flex items-center gap-1 text-sm font-medium hover:text-slate-900 dark:hover:text-white transition-colors duration-300 py-2 outline-none border-none bg-transparent cursor-pointer">
-          Conference
-          <span class="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:rotate-180">arrow_drop_down</span>
-        </button>
-
-        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 rounded-2xl bg-white/95 dark:bg-[#1a1a1a]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top translate-y-2 group-hover:translate-y-0 z-50 overflow-hidden flex flex-col p-2 text-left">
-          <a *ngFor="let year of conferenceYears" [routerLink]="'/conference/' + year" routerLinkActive="!text-primary dark:!text-[#0df2f2] !bg-slate-50 dark:!bg-white/10" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none">NetApp {{ year }}</a>
-        </div>
-      </div>
-
-      <a routerLink="/forum" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Forum</a>
       <a routerLink="/contact" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors duration-300 no-underline outline-none">Contact</a>
     </div>
 

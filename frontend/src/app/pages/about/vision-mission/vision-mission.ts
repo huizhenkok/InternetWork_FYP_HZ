@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { CmsService } from '../../../../services/cms.service'; // 🌟 引入 CmsService
+import { CmsService } from '../../../../services/cms.service';
+declare var AOS: any; // 🌟 新增
 
 @Component({
   selector: 'app-vision-mission',
@@ -10,36 +11,27 @@ import { CmsService } from '../../../../services/cms.service'; // 🌟 引入 Cm
 })
 export class VisionMission implements OnInit {
   cmsData: any = {};
-
-  // 默认备用数据
   defaultData = {
     visionTitle: 'Our Vision', visionTextMalay: 'MENJADI UNIVERSITI PENGURUSAN TERKEMUKA', visionTextEnglish: '"To Be An Eminent Management University"',
     missionTitle: 'Our Mission', missionTextMalay: 'KAMI MENDIDIK PEMIMPIN BERPERWATAKAN HOLISTIK UNTUK BERBAKTI KEPADA KOMUNITI GLOBAL', missionTextEnglish: '"We educate leaders with holistic characteristics to serve the global community"'
   };
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private cmsService: CmsService // 🌟 注入 CmsService
-  ) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private cmsService: CmsService) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-
-      // 🌟 核心修改：从 MySQL 数据库拉取 About 数据，并提取 visionMission 部分
       this.cmsService.getCmsData('inwlab_cms_about').subscribe({
         next: (res: any) => {
           try {
             const parsed = JSON.parse(res.contentJson);
             this.cmsData = parsed.visionMission || this.defaultData;
-          } catch(e) {
-            console.error("Error parsing Vision/Mission CMS", e);
-            this.cmsData = this.defaultData;
-          }
+          } catch(e) { this.cmsData = this.defaultData; }
         },
         error: () => this.cmsData = this.defaultData
       });
 
-      window.scrollTo(0, 0);
+      // 🌟 唤醒滑动动画引擎
+      setTimeout(() => { if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); } }, 150);
     }
   }
 }

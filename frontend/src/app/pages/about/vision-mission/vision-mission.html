@@ -1,11 +1,11 @@
-<div class="relative min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white pt-32 pb-20">
+<div class="relative min-h-screen bg-slate-50 dark:bg-[#050505] text-slate-900 dark:text-white pt-32 pb-20 overflow-hidden">
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
     <div class="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-accent-teal rounded-full blur-[120px] opacity-10 dark:opacity-20 animate-pulse"></div>
     <div class="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-accent-cyan rounded-full blur-[140px] opacity-10 dark:opacity-10"></div>
   </div>
 
   <div class="max-w-[1000px] mx-auto px-6 relative z-10">
-    <div class="text-center mb-16">
+    <div class="text-center mb-16" data-aos="fade-down">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 w-fit mb-6">
         <span class="text-xs font-bold tracking-wide uppercase text-primary dark:text-[#0df2f2]">About UUM & INWLab</span>
       </div>
@@ -13,22 +13,18 @@
     </div>
 
     <div class="flex flex-col gap-8">
-      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-slate-200 dark:border-white/10 shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-slate-200 dark:border-white/10 shadow-lg relative overflow-hidden group" data-aos="fade-up">
         <div class="absolute -right-10 -top-10 text-9xl text-slate-100 dark:text-white/5 font-black opacity-50 group-hover:scale-110 transition-transform duration-500 select-none">01</div>
-        <h2 class="text-xl font-bold text-slate-500 dark:text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary dark:text-[#0df2f2]">visibility</span> {{ cmsData.visionTitle }}
-        </h2>
+        <h2 class="text-xl font-bold text-slate-500 dark:text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-primary dark:text-[#0df2f2]">visibility</span> {{ cmsData.visionTitle }}</h2>
         <div class="space-y-2 relative z-10">
           <p class="text-2xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight uppercase">{{ cmsData.visionTextMalay }}</p>
           <p class="text-lg md:text-xl text-slate-500 dark:text-gray-400 font-medium italic">{{ cmsData.visionTextEnglish }}</p>
         </div>
       </div>
 
-      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-slate-200 dark:border-white/10 shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 fill-mode-both">
+      <div class="bg-white dark:bg-[#121212]/80 backdrop-blur-lg rounded-3xl p-8 md:p-12 border border-slate-200 dark:border-white/10 shadow-lg relative overflow-hidden group" data-aos="fade-up" data-aos-delay="150">
         <div class="absolute -right-10 -top-10 text-9xl text-slate-100 dark:text-white/5 font-black opacity-50 group-hover:scale-110 transition-transform duration-500 select-none">02</div>
-        <h2 class="text-xl font-bold text-slate-500 dark:text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary dark:text-[#0df2f2]">rocket_launch</span> {{ cmsData.missionTitle }}
-        </h2>
+        <h2 class="text-xl font-bold text-slate-500 dark:text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-primary dark:text-[#0df2f2]">rocket_launch</span> {{ cmsData.missionTitle }}</h2>
         <div class="space-y-2 relative z-10">
           <p class="text-2xl md:text-4xl font-black text-slate-900 dark:text-white leading-tight uppercase">{{ cmsData.missionTextMalay }}</p>
           <p class="text-lg md:text-xl text-slate-500 dark:text-gray-400 font-medium italic">{{ cmsData.missionTextEnglish }}</p>

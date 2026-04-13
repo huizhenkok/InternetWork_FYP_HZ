@@ -2,8 +2,9 @@ import { Component, OnInit, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { BookingService } from '../../../services/booking.service'; // 🌟 Added
-import { CmsService } from '../../../services/cms.service'; // 🌟 Added
+import { BookingService } from '../../../services/booking.service';
+import { CmsService } from '../../../services/cms.service';
+import { AuthService } from '../../../services/auth.service'; // 🌟 引入 AuthService 用来获取真实用户数
 
 declare var AOS: any;
 
@@ -29,61 +30,74 @@ export class AdminDashboard implements OnInit {
   pendingBookings: any[] = [];
   pendingCount: number = 0;
 
+  isDarkMode: boolean = false; // 🌟 记录当前主题状态
+
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
     private router: Router,
-    private bookingService: BookingService, // 🌟 Inject
-    private cmsService: CmsService // 🌟 Inject
+    private bookingService: BookingService,
+    private cmsService: CmsService,
+    private authService: AuthService // 🌟 注入
   ) {}
 
   ngOnInit() {
+    this.checkTheme();
     this.loadSystemData();
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
-        if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
-          AOS.refreshHard();
-        }
+        if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); }
       }, 100);
+    }
+  }
+
+  // 🌟 Req 3: 检查系统当前是否是暗黑模式
+  checkTheme() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.isDarkMode = document.documentElement.classList.contains('dark');
+    }
+  }
+
+  // 🌟 Req 3: 切换暗黑模式
+  toggleTheme() {
+    if (isPlatformBrowser(this.platformId)) {
+      const root = document.documentElement;
+      if (root.classList.contains('dark')) {
+        root.classList.remove('dark');
+        this.isDarkMode = false;
+      } else {
+        root.classList.add('dark');
+        this.isDarkMode = true;
+      }
     }
   }
 
   loadSystemData() {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
-      if (activeUser.fullName) {
-        this.adminName = activeUser.fullName;
-      }
+      if (activeUser.fullName) { this.adminName = activeUser.fullName; }
 
-      // 1. Get Users (Temporarily from LocalStorage until backend API is built)
-      const users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
-      this.totalUsers = users.length;
+      // 🌟 Req 1: 彻底抛弃 LocalStorage，从真实数据库获取所有用户
+      this.authService.getAllUsers().subscribe({
+        next: (users: any[]) => {
+          this.totalUsers = users.length;
+        },
+        error: (err) => console.error("Failed to load real users", err)
+      });
 
-      // 2. Get Topics from MySQL CMS
       this.cmsService.getCmsData('inwlab_forum_topics').subscribe({
         next: (res: any) => {
-          try {
-            const topics = JSON.parse(res.contentJson);
-            this.totalTopics = topics.length;
-          } catch(e) {}
+          try { this.totalTopics = JSON.parse(res.contentJson).length; } catch(e) {}
         }
       });
 
-      // 3. Get Real Bookings from MySQL Booking API
       this.bookingService.getAllBookings().subscribe({
         next: (bookings: any[]) => {
           this.activeBookings = bookings.length;
-
-          // Calculate pending notifications
-          this.pendingBookings = bookings.filter((b: any) => b.status === 'Pending')
-            .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          this.pendingBookings = bookings.filter((b: any) => b.status === 'Pending').sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
           this.pendingCount = this.pendingBookings.length;
 
-          // Generate System Logs from recent bookings
-          const recentBookings = [...bookings]
-            .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, 5);
+          const recentBookings = [...bookings].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
 
           this.systemLogs = recentBookings.map((b: any) => ({
             time: new Date(b.createdAt).toLocaleString(),
@@ -103,34 +117,16 @@ export class AdminDashboard implements OnInit {
   }
 
   addDefaultLog() {
-    this.systemLogs = [{
-      time: new Date().toLocaleString(),
-      eventId: '#SYS-0001',
-      status: 'SYSTEM',
-      user: 'Root Admin',
-      action: 'Command Center Initialized',
-      avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBu-QHK2bRGqtLLmojWpxlA6gWMXlDzIcGkgEZkxZ4tRoME2ax9-qlQu3G6ETm_secv4WpStFn5C7HmrVlUVDsQEGpSHQMYU_jCV_5uonKERqKBehLM1NkoerJ1gsUFKXUJ-WdpCpWo2ubaE9hkvrQOyFcU9m7FqTdmEeiMZX9k8LHhMRFG7Y4nuVl3Ldt0enjI-swgoEcJ9RL1ZdFmzaK6YD9WKT30WuE-D98ZA1vZAdQwkasDN5FxUs-TrsppYRzONIcd6_pqvwbc'
-    }];
+    this.systemLogs = [{ time: new Date().toLocaleString(), eventId: '#SYS-0001', status: 'SYSTEM', user: 'Root Admin', action: 'Command Center Initialized', avatar: 'https://via.placeholder.com/150' }];
     this.filteredLogs = [...this.systemLogs];
   }
 
-  toggleNotifications() {
-    this.showNotifications = !this.showNotifications;
-  }
+  toggleNotifications() { this.showNotifications = !this.showNotifications; }
 
   filterLogs() {
     const query = this.searchQuery.toLowerCase().trim();
-    if (!query) {
-      this.filteredLogs = [...this.systemLogs];
-      return;
-    }
-
-    this.filteredLogs = this.systemLogs.filter(log =>
-      log.user.toLowerCase().includes(query) ||
-      log.action.toLowerCase().includes(query) ||
-      log.eventId.toLowerCase().includes(query) ||
-      log.status.toLowerCase().includes(query)
-    );
+    if (!query) { this.filteredLogs = [...this.systemLogs]; return; }
+    this.filteredLogs = this.systemLogs.filter(log => log.user.toLowerCase().includes(query) || log.action.toLowerCase().includes(query) || log.eventId.toLowerCase().includes(query) || log.status.toLowerCase().includes(query));
   }
 
   logout() {

@@ -3,21 +3,33 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root' // 表明这是一个全局服务
+  providedIn: 'root'
 })
 export class AuthService {
-  // 🌟 这里指向我们刚刚在 Spring Boot 写的 API 地址
   private apiUrl = 'http://localhost:8080/api/users';
 
   constructor(private http: HttpClient) {}
 
-  // 1. 发送注册请求到后端
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, userData);
   }
 
-  // 2. 发送登录请求到后端
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, credentials);
+  }
+
+  // 🌟 验证安全问题答案 (必须加 responseType: 'text')
+  verifySecurityQuestions(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verify-security`, data, { responseType: 'text' });
+  }
+
+  // 🌟 重置密码 (必须加 responseType: 'text')
+  resetPassword(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
+  }
+
+  // 🌟 获取所有用户 (供 Admin Dashboard 和 User Management 使用)
+  getAllUsers(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/all`);
   }
 }

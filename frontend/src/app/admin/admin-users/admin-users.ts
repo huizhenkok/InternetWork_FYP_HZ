@@ -2,6 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service'; // 🌟 引入 AuthService
 
 declare var AOS: any;
 
@@ -25,7 +26,8 @@ export class AdminUsers implements OnInit {
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private ngZone: NgZone,
-    private router: Router
+    private router: Router,
+    private authService: AuthService // 🌟 注入
   ) {}
 
   ngOnInit() {
@@ -42,19 +44,24 @@ export class AdminUsers implements OnInit {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
       if (activeUser.fullName) this.adminName = activeUser.fullName;
 
-      // Note: Kept in localStorage until Spring Boot 'getAllUsers' API is implemented
-      const storedUsers = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
-
-      this.allUsers = storedUsers.map((user: any) => ({
-        ...user,
-        displayName: user.fullName || user.name || (user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Unknown User'),
-        email: user.email || 'No Email Provided',
-        role: user.role || 'Member',
-        status: user.status || 'Active'
-      }));
-
-      this.filteredUsers = [...this.allUsers];
-      this.calculateStats();
+      // 🌟 Req 1: 彻底抛弃 localStorage，从 MySQL 获取全部用户！
+      this.authService.getAllUsers().subscribe({
+        next: (users: any[]) => {
+          this.allUsers = users.map((user: any) => ({
+            ...user,
+            // 确保有个展示名
+            displayName: user.fullName || user.email.split('@')[0],
+            // 如果后端还没有实现 ban 字段，先默认 Active
+            status: user.status || 'Active'
+          }));
+          this.filteredUsers = [...this.allUsers];
+          this.calculateStats();
+        },
+        error: (err) => {
+          console.error("Error loading users from database", err);
+          alert("Failed to load users from the server.");
+        }
+      });
     }
   }
 
@@ -78,16 +85,18 @@ export class AdminUsers implements OnInit {
     );
   }
 
+  // ⚠️ 注意：这只是前端状态模拟，如果要真正在后端封禁，需要再写一个 update API
   toggleUserStatus(user: any) {
     if (isPlatformBrowser(this.platformId)) {
       const action = user.status === 'Active' ? 'BAN' : 'UNBAN';
       if (confirm(`Are you sure you want to ${action} ${user.displayName}?`)) {
         user.status = user.status === 'Active' ? 'Banned' : 'Active';
-        this.saveUsersToDB();
+        this.calculateStats();
       }
     }
   }
 
+  // ⚠️ 同上，如果要在后端真删除，需要调用 deleteUser API
   deleteUser(index: number, userName: string) {
     if (isPlatformBrowser(this.platformId)) {
       if (confirm(`CRITICAL WARNING: Are you sure you want to PERMANENTLY DELETE ${userName}? This action cannot be undone.`)) {
@@ -97,16 +106,9 @@ export class AdminUsers implements OnInit {
         if (realIndex !== -1) {
           this.allUsers.splice(realIndex, 1);
           this.filterUsers();
-          this.saveUsersToDB();
+          this.calculateStats();
         }
       }
-    }
-  }
-
-  saveUsersToDB() {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('inwlab_users', JSON.stringify(this.allUsers));
-      this.calculateStats();
     }
   }
 

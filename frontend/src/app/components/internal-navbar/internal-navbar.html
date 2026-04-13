@@ -2,30 +2,28 @@
   <nav class="glass-panel w-full max-w-[1200px] rounded-full px-8 py-4 flex items-center justify-between transition-all duration-300 dark:bg-[#121212]/80 dark:border-white/10 shadow-sm">
 
     <div class="flex items-center gap-3">
-      <a [routerLink]="homeLink" class="flex items-center gap-3 no-underline">
-        <div class="size-8 text-primary">
-          <svg class="w-full h-full drop-shadow-[0_0_8px_rgba(8,145,178,0.45)] dark:drop-shadow-[0_0_8px_rgba(13,242,242,0.8)]" fill="currentColor" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill-rule="evenodd"></path>
-          </svg>
+      <a [routerLink]="homeLink" class="flex items-center gap-3 no-underline outline-none group">
+        <div class="bg-white rounded-xl p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-transparent dark:shadow-[0_0_12px_rgba(255,255,255,0.1)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
+          <img src="/logo.png" alt="UUM IoT Logo" class="h-6 w-auto object-contain" onerror="this.src='https://via.placeholder.com/24x24?text=Logo'">
         </div>
         <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">INWLab<span class="text-primary text-sm font-mono ml-2 uppercase tracking-widest">Portal</span></h2>
       </a>
     </div>
 
     <div class="hidden md:flex items-center gap-8 justify-center flex-1 mx-4">
-      <a [routerLink]="homeLink" routerLinkActive="!text-primary !font-bold dark:!text-primary drop-shadow-sm" [routerLinkActiveOptions]="{exact: true}" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Home</a>
-      <a routerLink="/my-profile" routerLinkActive="!text-primary !font-bold dark:!text-primary drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">My Profile</a>
-      <a routerLink="/booking" routerLinkActive="!text-primary !font-bold dark:!text-primary drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Booking</a>
-      <a routerLink="/forum-activity" routerLinkActive="!text-primary !font-bold dark:!text-primary drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Forum Activity</a>
-      <a routerLink="/publication" routerLinkActive="!text-primary !font-bold dark:!text-primary drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Publication</a>
+      <a [routerLink]="homeLink" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" [routerLinkActiveOptions]="{exact: true}" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Home</a>
+      <a routerLink="/my-profile" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">My Profile</a>
+      <a routerLink="/booking" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Booking</a>
+      <a routerLink="/forum-activity" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Forum Activity</a>
+      <a routerLink="/publication" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Publication</a>
     </div>
 
     <div class="hidden md:flex items-center gap-4">
-      <button type="button" (click)="toggleTheme()" class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm transition-all duration-300 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-primary dark:hover:bg-white/10 border-none cursor-pointer">
+      <button type="button" (click)="toggleTheme()" class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm transition-all duration-300 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-[#0df2f2] dark:hover:bg-white/10 border-none cursor-pointer outline-none">
         <span class="material-symbols-outlined text-[20px] dark:hidden">dark_mode</span>
         <span class="material-symbols-outlined text-[20px] hidden dark:inline">light_mode</span>
       </button>
-      <a routerLink="/login" class="glow-button inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black text-sm font-bold px-6 py-2.5 rounded-full transition-all duration-300 hover:-translate-y-0.5 no-underline cursor-pointer">
+      <a routerLink="/login" class="glow-button inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black text-sm font-bold px-6 py-2.5 rounded-full transition-all duration-300 hover:-translate-y-0.5 no-underline cursor-pointer outline-none">
         <span class="material-symbols-outlined text-[18px]">logout</span>
         Logout
       </a>

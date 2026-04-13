@@ -28,4 +28,21 @@ public class User {
     @Column(nullable = false)
     private String role; // e.g., 'Student', 'Faculty', 'Alumni', 'Admin'
 
+    // ==========================================
+    // 🌟 新增：用户身份 ID (Student/Staff/Alumni ID)
+    // ==========================================
+    @Column(name = "matric_number")
+    private String matricNumber;
+
+    // ==========================================
+    // 🌟 新增：安全问题答案 (Security Questions)
+    // ==========================================
+    @Column(name = "sec_ans_color")
+    private String secAnsColor; // What is your favorite color?
+
+    @Column(name = "sec_ans_state")
+    private String secAnsState; // Which state were you born in?
+
+    @Column(name = "sec_ans_fruit")
+    private String secAnsFruit; // What is your favorite fruit?
 }

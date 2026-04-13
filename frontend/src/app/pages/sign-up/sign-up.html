@@ -6,7 +6,6 @@
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
     <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
-    <div class="absolute top-[-5%] left-1/2 -translate-x-1/2 w-[90%] max-w-4xl h-64 bg-primary/40 dark:bg-primary/20 blur-[120px] animate-pulse z-20 pointer-events-none"></div>
   </div>
 
   <div class="relative z-50 p-6 md:p-10">
@@ -19,8 +18,7 @@
   </div>
 
   <div class="relative z-30 flex-grow flex flex-col items-center justify-center w-full px-4 -mt-8">
-
-    <div class="w-full max-w-[500px]" data-aos="zoom-out-up" data-aos-duration="1000">
+    <div class="w-full max-w-[600px]" data-aos="zoom-out-up" data-aos-duration="1000">
 
       <div class="relative w-full rounded-3xl border border-slate-200 bg-white/70 backdrop-blur-2xl shadow-2xl flex flex-col p-8 sm:p-10 dark:border-white/10 dark:bg-[#112120]/60">
 
@@ -33,19 +31,19 @@
         </div>
 
         <div class="flex p-1 bg-slate-200/50 dark:bg-black/40 rounded-xl mb-8 border border-slate-200 dark:border-white/5">
-          <button type="button" (click)="regType = 'Student'"
+          <button type="button" (click)="regType = 'Student'; formData.matricNumber = ''"
                   [ngClass]="regType === 'Student' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
                   class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none flex items-center justify-center gap-1">
             <span class="material-symbols-outlined text-[16px] hidden sm:block">school</span> Student
           </button>
 
-          <button type="button" (click)="regType = 'Faculty'"
+          <button type="button" (click)="regType = 'Faculty'; formData.matricNumber = ''"
                   [ngClass]="regType === 'Faculty' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
                   class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none flex items-center justify-center gap-1">
             <span class="material-symbols-outlined text-[16px] hidden sm:block">local_library</span> Faculty
           </button>
 
-          <button type="button" (click)="regType = 'Alumni'"
+          <button type="button" (click)="regType = 'Alumni'; formData.matricNumber = ''"
                   [ngClass]="regType === 'Alumni' ? 'bg-white dark:bg-white/10 text-primary shadow-sm dark:shadow-none' : 'text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200'"
                   class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all cursor-pointer border-none outline-none flex items-center justify-center gap-1">
             <span class="material-symbols-outlined text-[16px] hidden sm:block">workspace_premium</span> Alumni
@@ -54,26 +52,23 @@
 
         <form (submit)="onRegister(); $event.preventDefault()" class="flex w-full flex-col gap-5">
 
-          <div class="flex flex-col gap-2">
-            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Full Name</label>
-            <div class="relative">
-              <input [(ngModel)]="formData.fullName" name="fullName" type="text" placeholder="Your Full Name" required
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
-              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">badge</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Full Name</label>
+              <div class="relative">
+                <input [(ngModel)]="formData.fullName" name="fullName" type="text" placeholder="Your Name" required
+                       class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
+              </div>
             </div>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">
-              {{ regType === 'Student' ? 'Student ID' : (regType === 'Faculty' ? 'Staff ID' : 'Alumni ID') }}
-              <span *ngIf="regType === 'Alumni'" class="text-[10px] text-slate-400 dark:text-gray-500 lowercase normal-case ml-1">(Optional)</span>
-            </label>
-            <div class="relative">
-              <input [(ngModel)]="formData.matricNumber" name="matricNumber" type="text"
-                     [placeholder]="regType === 'Student' ? 'e.g. 298068' : (regType === 'Faculty' ? 'e.g. F1024' : 'Optional ID')"
-                     [required]="regType !== 'Alumni'"
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
-              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">pin</span>
+            <div class="flex flex-col gap-2">
+              <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">
+                {{ regType === 'Student' ? 'Student ID' : (regType === 'Faculty' ? 'Staff ID' : 'Alumni ID') }}
+              </label>
+              <div class="relative">
+                <input [(ngModel)]="formData.matricNumber" name="matricNumber" type="text"
+                       [placeholder]="regType === 'Student' ? 'e.g. 298068' : (regType === 'Faculty' ? 'e.g. 6013' : 'Your Alumni ID')" required
+                       class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
+              </div>
             </div>
           </div>
 
@@ -82,24 +77,25 @@
             <div class="relative">
               <input [(ngModel)]="formData.email" name="email" type="email" placeholder="example@uum.edu.my" required
                      class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
-              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">mail</span>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Phone Number <span class="text-[10px] text-slate-400 dark:text-gray-500 lowercase normal-case ml-1">(Optional)</span></label>
-            <div class="relative">
-              <input [(ngModel)]="formData.phone" name="phone" type="tel" placeholder="e.g. 012-3456789"
-                     class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
-              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400">call</span>
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="flex flex-col gap-2">
-              <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Password</label>
+              <div class="flex justify-between items-center pl-1">
+                <label class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Password</label>
+                <span *ngIf="passwordFeedback" class="text-[10px] font-bold flex items-center gap-1"
+                      [ngClass]="isPasswordStrong ? 'text-green-500' : 'text-red-500'">
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="isPasswordStrong ? 'bg-green-500' : 'bg-red-500 animate-pulse'"></span>
+                  {{ isPasswordStrong ? 'Strong Password' : 'Weak Password' }}
+                </span>
+              </div>
               <input [(ngModel)]="formData.password" name="password" type="password" placeholder="••••••••" required
+                     (input)="checkPasswordStrength()"
                      class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 px-5 py-3.5 rounded-xl text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all font-body shadow-inner">
+              <p *ngIf="passwordFeedback && !isPasswordStrong" class="text-[9px] text-red-500 font-bold px-1 mt-[-2px] leading-tight">
+                {{ passwordFeedback }}
+              </p>
             </div>
             <div class="flex flex-col gap-2">
               <label class="pl-1 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Confirm Password</label>
@@ -108,8 +104,33 @@
             </div>
           </div>
 
+          <div class="mt-4 p-5 rounded-2xl border border-primary/20 bg-primary/5 dark:bg-[#0df2f2]/5 shadow-inner">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary dark:text-[#0df2f2] text-lg">shield_person</span> Security Recovery Questions
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-gray-400 mb-4 font-body">Used to recover your account if you forget your password. Answers are case-insensitive.</p>
+
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">1. What is your favorite color?</label>
+                <input [(ngModel)]="formData.secAnsColor" name="secAnsColor" type="text" placeholder="e.g. Blue" required
+                       class="w-full bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 px-4 py-2.5 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">2. Which state were you born in?</label>
+                <input [(ngModel)]="formData.secAnsState" name="secAnsState" type="text" placeholder="e.g. Selangor" required
+                       class="w-full bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 px-4 py-2.5 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all">
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="pl-1 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">3. What is your favorite fruit?</label>
+                <input [(ngModel)]="formData.secAnsFruit" name="secAnsFruit" type="text" placeholder="e.g. Apple" required
+                       class="w-full bg-white dark:bg-[#121212] border border-slate-200 dark:border-white/10 px-4 py-2.5 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:border-primary transition-all">
+              </div>
+            </div>
+          </div>
+
           <button type="submit" class="glow-button mt-4 h-14 w-full rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold tracking-widest transition-all hover:scale-[1.02] cursor-pointer border-none shadow-lg">
-            REGISTER ACCOUNT
+            REGISTER SECURE ACCOUNT
           </button>
 
           <p class="mt-2 text-center text-sm text-slate-500 dark:text-gray-400 font-body">

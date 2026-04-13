@@ -13,7 +13,6 @@ declare var AOS: any;
 })
 export class Home implements OnInit, OnDestroy {
 
-  // 🌟 倒计时变量
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
 
@@ -29,12 +28,14 @@ export class Home implements OnInit, OnDestroy {
     heading: 'InterNetWorks Research Laboratory',
     subheading: 'Advancing the frontiers of Cybersecurity, Data Science, and Digital Innovation. A centralized platform for academic collaboration and discovery.',
     announcement: 'Leading Research Center',
-    conferenceDate: '2026-11-06T00:00:00', // 默认倒计时目标
+    conferenceDate: '2026-11-06T00:00:00',
+    aboutTitle: 'What Is Internetworks Research Laboratory?',
+    aboutPurpose: 'Our purpose is to conduct focused research on Internet protocols, applications, and technology to contribute to its evolution.',
+    aboutImage: '',
     stats: { activePhds: '85+', globalAwards: '42', industryPartners: '200+' }
   };
 
   visionMission: any = {};
-
   newsList: any[] = [];
   currentNewsIndex: number = 0;
   private newsTimer: any;
@@ -48,7 +49,7 @@ export class Home implements OnInit, OnDestroy {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
 
-      // 1. 获取 Home 基础数据 (包含倒计时日期)
+      // 1. 获取 Home 基础数据
       this.cmsService.getCmsData('inwlab_cms_home').subscribe({
         next: (res: any) => {
           try {
@@ -58,7 +59,23 @@ export class Home implements OnInit, OnDestroy {
         }
       });
 
-      // 2. 获取 About 数据
+      // 2. 获取 Conference 数据 (同步倒计时)
+      this.cmsService.getCmsData('inwlab_cms_conferences').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            if (parsed && parsed.length > 0) {
+              parsed.sort((a: any, b: any) => parseInt(b.year) - parseInt(a.year));
+              const latestConf = parsed[0];
+              if (latestConf.home && latestConf.home.targetDate) {
+                this.cmsData.conferenceDate = latestConf.home.targetDate;
+              }
+            }
+          } catch(e) {}
+        }
+      });
+
+      // 3. 获取 About 数据
       this.cmsService.getCmsData('inwlab_cms_about').subscribe({
         next: (res: any) => {
           try {
@@ -68,18 +85,40 @@ export class Home implements OnInit, OnDestroy {
         }
       });
 
-      // 3. 获取 News 数据并启动轮播
+      // 🌟 4. 获取 News 数据并合并
       this.cmsService.getCmsData('inwlab_cms_news_events').subscribe({
         next: (res: any) => {
           try {
             const newsParsed = JSON.parse(res.contentJson);
-            this.newsList = newsParsed.gatherings || [];
+
+            let combinedNews: any[] = [];
+
+            // Flagship 活动 (打上 isFlagship = true 的标签)
+            if (newsParsed.flagship && newsParsed.flagship.title) {
+              combinedNews.push({
+                isFlagship: true, // 🌟 区分是否需要 RSVP
+                title: newsParsed.flagship.title,
+                desc: newsParsed.flagship.desc,
+                date: newsParsed.flagship.date,
+                location: newsParsed.flagship.location,
+                icon: newsParsed.flagship.icon || 'star',
+                imageUrl: newsParsed.flagship.imageUrl
+              });
+            }
+
+            // Gatherings 新闻 (打上 isFlagship = false 的标签)
+            if (newsParsed.gatherings && Array.isArray(newsParsed.gatherings)) {
+              const normalNews = newsParsed.gatherings.map((g: any) => ({ ...g, isFlagship: false }));
+              combinedNews = combinedNews.concat(normalNews);
+            }
+
+            this.newsList = combinedNews;
             this.startNewsCarousel();
           } catch(e) {}
         }
       });
 
-      // 统计数据拉取
+      // 5. 统计数据
       const pubs = JSON.parse(localStorage.getItem('inwlab_publications') || '[]');
       this.realPublications = pubs.filter((p: any) => p.visibility === 'Public').length;
       const projs = JSON.parse(localStorage.getItem('inwlab_projects') || '[]');
@@ -87,7 +126,6 @@ export class Home implements OnInit, OnDestroy {
       const users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
       this.realMembers = users.filter((u: any) => u.status === 'Active').length;
 
-      // 🌟 启动背景轮播与倒计时
       this.bgTimer = setInterval(() => { this.currentBgIndex = (this.currentBgIndex + 1) % this.bgImages.length; }, 10000);
 
       this.calculateCountdown();
@@ -105,7 +143,6 @@ export class Home implements OnInit, OnDestroy {
     if (this.timer) clearInterval(this.timer);
   }
 
-  // 🌟 倒计时计算逻辑
   calculateCountdown() {
     const now = new Date().getTime();
     const targetDate = new Date(this.cmsData.conferenceDate || '2026-11-06T00:00:00').getTime();

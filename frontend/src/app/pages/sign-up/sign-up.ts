@@ -21,8 +21,16 @@ export class SignUp implements OnInit {
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    // 🌟 新增：存放 3 个安全问题
+    secAnsColor: '',
+    secAnsState: '',
+    secAnsFruit: ''
   };
+
+  // 🌟 密码强度状态控制
+  isPasswordStrong: boolean = false;
+  passwordFeedback: string = '';
 
   constructor(
     private router: Router,
@@ -42,26 +50,62 @@ export class SignUp implements OnInit {
     }
   }
 
+  // 🌟 核心：实时检测密码强度
+  checkPasswordStrength() {
+    const p = this.formData.password;
+    if (!p) {
+      this.isPasswordStrong = false;
+      this.passwordFeedback = '';
+      return;
+    }
+
+    const hasUpper = /[A-Z]/.test(p);
+    const hasLower = /[a-z]/.test(p);
+    const hasNumber = /[0-9]/.test(p);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(p);
+    const isLongEnough = p.length > 10;
+
+    if (hasUpper && hasLower && hasNumber && hasSpecial && isLongEnough) {
+      this.isPasswordStrong = true;
+      this.passwordFeedback = 'Strong Password';
+    } else {
+      this.isPasswordStrong = false;
+      this.passwordFeedback = 'Weak: >10 chars, uppercase, lowercase, number, symbol needed.';
+    }
+  }
+
   onRegister() {
+    // 1. 验证密码强度
+    if (!this.isPasswordStrong) {
+      alert("Please ensure your password meets all security requirements.");
+      return;
+    }
+
     if (this.formData.password !== this.formData.confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
     }
 
-    if (!this.formData.fullName.trim()) {
-      alert("Please enter your full name.");
+    if (!this.formData.fullName.trim() || !this.formData.matricNumber.trim()) {
+      alert("Please enter your full name and ID.");
       return;
     }
 
+    // 2. 验证三个安全问题是否填写
+    if (!this.formData.secAnsColor.trim() || !this.formData.secAnsState.trim() || !this.formData.secAnsFruit.trim()) {
+      alert("Please answer all 3 security questions to secure your account.");
+      return;
+    }
+
+    // 3. 验证各种 ID 的格式
     if (this.regType === 'Student') {
-      const isIdValid = /^\d{6}$/.test(this.formData.matricNumber);
-      if (!isIdValid) {
+      if (!/^\d{6}$/.test(this.formData.matricNumber)) {
         alert("Student Matric Number must be exactly 6 digits (e.g., 298068).");
         return;
       }
-    } else if (this.regType === 'Faculty') {
-      if (!this.formData.matricNumber || this.formData.matricNumber.length < 4) {
-        alert("Staff ID must be at least 4 characters.");
+    } else if (this.regType === 'Faculty' || this.regType === 'Alumni') {
+      if (this.formData.matricNumber.length < 4) {
+        alert(`${this.regType} ID must be at least 4 characters.`);
         return;
       }
     }
@@ -71,16 +115,21 @@ export class SignUp implements OnInit {
       return;
     }
 
+    // 🌟 将安全问题一并打包发给后端
     const newUser = {
       fullName: this.formData.fullName,
-      email: this.formData.email.trim(), // 🌟 修复：不再强制转小写，原样发送
+      email: this.formData.email.trim(),
       password: this.formData.password,
-      role: this.regType
+      role: this.regType,
+      matricNumber: this.formData.matricNumber,
+      secAnsColor: this.formData.secAnsColor,
+      secAnsState: this.formData.secAnsState,
+      secAnsFruit: this.formData.secAnsFruit
     };
 
     this.authService.register(newUser).subscribe({
       next: (response: any) => {
-        alert(`Registration Successful as ${this.regType}! You can now login with your email.`);
+        alert(`Registration Successful as ${this.regType}! Please remember your security answers.`);
         this.router.navigate(['/login']);
       },
       error: (err: any) => {
