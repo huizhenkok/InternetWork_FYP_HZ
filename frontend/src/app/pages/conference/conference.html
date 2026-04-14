@@ -3,7 +3,19 @@
   <div class="tech-square sq-4"></div><div class="tech-square sq-5"></div>
 </div>
 
-<div class="relative min-h-screen flex flex-col w-full" *ngIf="confData">
+<div *ngIf="isLoading" class="min-h-[80vh] flex flex-col items-center justify-center gap-6 z-50 relative mt-20">
+  <div class="relative w-24 h-24">
+    <div class="absolute inset-0 border-4 border-slate-200 dark:border-white/10 rounded-full"></div>
+    <div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+    <span class="absolute inset-0 flex items-center justify-center material-symbols-outlined text-primary text-3xl animate-pulse">cloud_sync</span>
+  </div>
+  <div class="text-center flex flex-col gap-2">
+    <h3 class="text-xl font-bold text-slate-900 dark:text-white">Connecting to Secure Datacenter...</h3>
+    <p class="text-sm text-slate-500 dark:text-gray-400 max-w-sm">Please wait while we wake up the backend server. This may take up to 50 seconds on the first visit.</p>
+  </div>
+</div>
+
+<div class="relative min-h-screen flex flex-col w-full" *ngIf="!isLoading && confData">
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
     <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
@@ -15,7 +27,6 @@
     <main class="w-full max-w-7xl mx-auto flex flex-col gap-12 pt-4 pb-20 px-6">
 
       <div class="flex flex-col items-center justify-center text-center gap-6 border-b border-slate-200 pb-10 dark:border-white/5" data-aos="fade-down">
-
         <div class="flex flex-col items-center gap-2 max-w-4xl">
           <div class="flex items-center gap-2 text-primary mb-2">
             <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
@@ -35,11 +46,9 @@
             {{ tab }}
           </button>
         </div>
-
       </div>
 
       <div *ngIf="activeTab === 'HOME'" class="animate-fade-in flex flex-col gap-16 w-full">
-
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center" data-aos="fade-up">
           <div class="lg:col-span-7 flex flex-col gap-6">
             <p class="text-lg text-slate-600 dark:text-gray-300 font-body leading-relaxed text-justify">{{ confData.home.paragraph1 }}</p>
@@ -77,7 +86,7 @@
         </section>
 
         <section (click)="openImageModal()" class="w-full relative h-[400px] rounded-3xl overflow-hidden glass-card flex items-center justify-center group cursor-pointer" data-aos="fade-up">
-          <img *ngIf="confData.imageUrl && confData.imageUrl.trim() !== ''" [src]="confData.imageUrl" alt="Conference Banner" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+          <img *ngIf="confData.imageUrl && confData.imageUrl.trim() !== ''" [src]="fixUrl(confData.imageUrl)" alt="Conference Banner" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
           <div *ngIf="confData.imageUrl && confData.imageUrl.trim() !== ''" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <span class="material-symbols-outlined text-white text-5xl">zoom_in</span>
           </div>
@@ -179,7 +188,7 @@
       <span class="material-symbols-outlined text-3xl">close</span>
     </button>
     <div class="relative z-10 max-w-full max-h-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-      <img [src]="confData.imageUrl" alt="Conference Banner Full" class="max-w-full max-h-[85vh] object-contain">
+      <img [src]="fixUrl(confData.imageUrl)" alt="Conference Banner Full" class="max-w-full max-h-[85vh] object-contain">
     </div>
   </div>
 </div>

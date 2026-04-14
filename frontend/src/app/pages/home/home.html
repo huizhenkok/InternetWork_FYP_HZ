@@ -130,7 +130,7 @@
 
                 <div class="w-full md:w-5/12 flex justify-center lg:justify-end">
                   <div class="w-full max-w-[320px] aspect-[4/3] rounded-[2rem] overflow-hidden bg-gradient-to-tr from-slate-100 to-slate-200 dark:from-white/5 dark:to-white/10 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-lg relative">
-                    <img *ngIf="news.imageUrl" [src]="news.imageUrl" alt="News Image" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <img *ngIf="news.imageUrl" [src]="fixUrl(news.imageUrl)" alt="News Image" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                     <span *ngIf="!news.imageUrl" class="material-symbols-outlined text-6xl text-slate-400 dark:text-white/30 relative z-10">{{ news.icon || 'article' }}</span>
                   </div>
                 </div>
@@ -154,7 +154,7 @@
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             <div class="lg:col-span-4 relative">
               <div class="absolute -inset-4 bg-primary/10 rounded-xl blur-xl z-0"></div>
-              <img [src]="cmsData.aboutImage || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop'" alt="About INWLab" class="relative z-10 w-full h-[400px] object-cover rounded-sm shadow-xl border-4 border-white dark:border-slate-800">
+              <img [src]="fixUrl(cmsData.aboutImage) || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop'" alt="About INWLab" class="relative z-10 w-full h-[400px] object-cover rounded-sm shadow-xl border-4 border-white dark:border-slate-800">
             </div>
 
             <div class="lg:col-span-8 flex flex-col gap-10">

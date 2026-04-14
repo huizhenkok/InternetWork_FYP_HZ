@@ -51,7 +51,12 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-4 pb-20">
+        <div *ngIf="isLoading" class="w-full flex flex-col items-center justify-center py-20 gap-4 glass-card rounded-2xl border border-primary/20">
+          <div class="w-12 h-12 border-4 border-slate-200 dark:border-white/10 border-t-primary rounded-full animate-spin"></div>
+          <p class="text-slate-600 dark:text-gray-300 font-mono font-bold animate-pulse text-sm text-center px-4">Synchronizing Database...<br>Server cold start may take up to 50 seconds.</p>
+        </div>
+
+        <div *ngIf="!isLoading" class="flex flex-col gap-4 pb-20">
           <div *ngFor="let thread of filteredThreads; let i = index"
                data-aos="fade-up" [attr.data-aos-delay]="(i % 5) * 100"
                class="glass-card rounded-2xl p-5 md:p-6 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
