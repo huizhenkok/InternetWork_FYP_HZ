@@ -1,8 +1,8 @@
 import { Component, OnInit, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CmsService } from '../../../services/cms.service'; // 🌟 Added CmsService
-import { UploadService } from '../../../services/upload.service'; // 🌟 Added UploadService
+import { CmsService } from '../../../services/cms.service';
+import { UploadService } from '../../../services/upload.service';
 
 declare var AOS: any;
 
@@ -15,7 +15,7 @@ declare var AOS: any;
 export class Publication implements OnInit {
 
   isDragging: boolean = false;
-  isUploading: boolean = false; // 🌟 Added: Uploading state
+  isUploading: boolean = false;
   recentImports: any[] = [];
   currentUserEmail: string = '';
 
@@ -42,7 +42,6 @@ export class Publication implements OnInit {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
       this.currentUserEmail = activeUser.email;
 
-      // 🌟 Fetch real Publications from MySQL
       this.cmsService.getCmsData('inwlab_publications').subscribe({
         next: (res: any) => {
           try {
@@ -72,6 +71,27 @@ export class Publication implements OnInit {
             allImports[index].visibility = record.visibility;
             this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe();
           }
+        }
+      });
+    }
+  }
+
+  // 🌟 FIX: Added the logic to completely delete the record from database
+  deleteRecord(id: any) {
+    if (confirm('Are you sure you want to delete this publication? This action cannot be undone.')) {
+      this.cmsService.getCmsData('inwlab_publications').subscribe({
+        next: (res: any) => {
+          let allImports = JSON.parse(res.contentJson);
+          // Filter out the record that needs to be deleted
+          allImports = allImports.filter((r: any) => r.id !== id);
+
+          // Save the new cleaned array back to the database
+          this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe({
+            next: () => {
+              this.loadImports(); // Refresh the UI
+              alert('Publication deleted successfully!');
+            }
+          });
         }
       });
     }
@@ -108,7 +128,7 @@ export class Publication implements OnInit {
   handleFiles(files: FileList) {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const validExtensions = ['pdf', 'bib', 'xml', 'doc', 'docx', 'jpg', 'png']; // Added image formats just in case
+      const validExtensions = ['pdf', 'bib', 'xml', 'doc', 'docx', 'jpg', 'png'];
       const fileExt = file.name.split('.').pop()?.toLowerCase();
 
       if (!fileExt || !validExtensions.includes(fileExt)) {
@@ -118,11 +138,10 @@ export class Publication implements OnInit {
 
       this.isUploading = true;
 
-      // 🌟 Send actual file to Spring Boot backend!
       this.uploadService.uploadFile(file).subscribe({
         next: (res: any) => {
           this.isUploading = false;
-          this.saveFileRecord(file.name, res.url); // Pass the real URL to save
+          this.saveFileRecord(file.name, res.url);
         },
         error: (err: any) => {
           this.isUploading = false;
@@ -142,7 +161,6 @@ export class Publication implements OnInit {
           this.appendAndSaveRecord(allImports, fileName, fileUrl, activeUser);
         },
         error: () => {
-          // If DB is empty, start a new array
           this.appendAndSaveRecord([], fileName, fileUrl, activeUser);
         }
       });
@@ -153,7 +171,7 @@ export class Publication implements OnInit {
     const newRecord = {
       id: Date.now() + Math.random(),
       fileName: fileName,
-      fileUrl: fileUrl, // 🌟 Save the real server URL
+      fileUrl: fileUrl,
       userEmail: this.currentUserEmail,
       authorName: activeUser.fullName || 'Unknown Scholar',
       authorRole: activeUser.role || 'Member',

@@ -76,18 +76,18 @@ export class Home implements OnInit, OnDestroy {
       error: () => { this.realMembers = 0; }
     });
 
-    // 2. 抓取真实 Publication 数量
-    this.cmsService.getCmsData('inwlab_cms_publications').subscribe({
+    // 2. 抓取真实 Publication 数量 (已修复 Key 并只统计 Public)
+    this.cmsService.getCmsData('inwlab_publications').subscribe({
       next: (res: any) => {
         try {
           const pubs = JSON.parse(res.contentJson);
-          this.realPublications = pubs.length || 0;
+          this.realPublications = pubs.filter((p: any) => p.visibility === 'Public').length || 0;
         } catch(e) {}
       }
     });
 
-    // 3. 抓取真实 Projects 数量
-    this.cmsService.getCmsData('inwlab_cms_projects').subscribe({
+    // 3. 抓取真实 Projects 数量 (已修复 Key)
+    this.cmsService.getCmsData('inwlab_projects').subscribe({
       next: (res: any) => {
         try {
           const projs = JSON.parse(res.contentJson);
