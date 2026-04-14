@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RsvpService {
-  // 🌟 指向我们刚刚在 Spring Boot 写的 RSVP API
-  private apiUrl = 'http://localhost:8080/api/rsvps';
+  // 🌟 已更新为云端 API
+  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/rsvps';
 
   constructor(private http: HttpClient) {}
 

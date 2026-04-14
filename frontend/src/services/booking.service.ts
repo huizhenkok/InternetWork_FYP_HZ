@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BookingService {
-  // 🌟 指向 Spring Boot 写的 Bookings API
-  private apiUrl = 'http://localhost:8080/api/bookings';
+  // 🌟 已更新为云端 API
+  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/bookings';
 
   constructor(private http: HttpClient) {}
 

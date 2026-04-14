@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/users';
+  // 🌟 已更新为云端 API
+  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/users';
 
   constructor(private http: HttpClient) {}
 

@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CmsService {
-  private apiUrl = 'http://localhost:8080/api/cms';
+  // 🌟 已更新为云端 API
+  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/cms';
 
   constructor(private http: HttpClient) {}
 

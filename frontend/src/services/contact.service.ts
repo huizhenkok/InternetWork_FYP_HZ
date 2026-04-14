@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ContactService {
-  private apiUrl = 'http://localhost:8080/api/contact';
+  // 🌟 已更新为云端 API
+  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/contact';
 
   constructor(private http: HttpClient) {}
 

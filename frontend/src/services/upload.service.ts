@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UploadService {
-  // 🌟 指向我们之前在 Spring Boot 写的上传接口
-  private apiUrl = 'http://localhost:8080/api/upload';
+  // 🌟 已更新为云端 API
+  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/upload';
 
   constructor(private http: HttpClient) {}
 
