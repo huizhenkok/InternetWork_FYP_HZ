@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // 🌟 引入 FormsModule 用于表单
+import { FormsModule } from '@angular/forms';
 import { CmsService } from '../../../services/cms.service';
 import { UploadService } from '../../../services/upload.service';
 
@@ -19,7 +19,6 @@ export class Publication implements OnInit {
   recentImports: any[] = [];
   currentUserEmail: string = '';
 
-  // 🌟 表单数据
   pubForm = {
     paperTitle: '',
     journalName: '',
@@ -97,20 +96,23 @@ export class Publication implements OnInit {
     }
   }
 
-  // 🌟 核心：提交表单（文件变为可选）
+  // 🌟 核心修复：将 publishYear 转换成字符串再验证，防止报错
   submitPublication() {
-    if (!this.pubForm.paperTitle.trim() || !this.pubForm.journalName.trim() || !this.pubForm.publishYear.trim()) {
+    const titleValid = this.pubForm.paperTitle && this.pubForm.paperTitle.trim() !== '';
+    const journalValid = this.pubForm.journalName && this.pubForm.journalName.trim() !== '';
+    const yearValid = this.pubForm.publishYear && this.pubForm.publishYear.toString().trim() !== '';
+
+    if (!titleValid || !journalValid || !yearValid) {
       alert("Please fill in the Paper Title, Journal Name, and Year.");
       return;
     }
 
     this.isUploading = true;
 
-    // 如果有附件，先上传附件；如果没有，直接保存元数据
     if (this.selectedFile) {
       this.uploadService.uploadFile(this.selectedFile).subscribe({
         next: (res: any) => {
-          this.saveFileRecord(res.url); // 有文件，存真实 URL
+          this.saveFileRecord(res.url);
         },
         error: () => {
           this.isUploading = false;
@@ -118,10 +120,9 @@ export class Publication implements OnInit {
         }
       });
     } else {
-      this.saveFileRecord(''); // 没文件，存空字符串
+      this.saveFileRecord('');
     }
   }
-
   saveFileRecord(fileUrl: string) {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
@@ -138,16 +139,16 @@ export class Publication implements OnInit {
   appendAndSaveRecord(allImports: any[], fileUrl: string, activeUser: any) {
     const newRecord = {
       id: Date.now() + Math.random(),
-      fileName: this.pubForm.paperTitle, // 将 Paper Title 作为列表主标题
+      fileName: this.pubForm.paperTitle,
       journalName: this.pubForm.journalName,
       publishYear: this.pubForm.publishYear,
-      fileUrl: fileUrl, // 可空
+      fileUrl: fileUrl,
       userEmail: this.currentUserEmail,
       authorName: activeUser.fullName || 'Unknown Scholar',
       authorRole: activeUser.role || 'Member',
       timestamp: Date.now(),
       dateStr: new Date().toLocaleDateString(),
-      status: fileUrl ? 'With File' : 'Metadata', // 区分状态
+      status: fileUrl ? 'With File' : 'Metadata',
       visibility: 'Private'
     };
 
@@ -155,8 +156,8 @@ export class Publication implements OnInit {
     this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe({
       next: () => {
         this.isUploading = false;
-        this.pubForm = { paperTitle: '', journalName: '', publishYear: '' }; // 清空表单
-        this.selectedFile = null; // 清空文件
+        this.pubForm = { paperTitle: '', journalName: '', publishYear: '' };
+        this.selectedFile = null;
         this.loadImports();
         alert(`Publication successfully added!\nBy default, it is PRIVATE. Make it PUBLIC below.`);
       }

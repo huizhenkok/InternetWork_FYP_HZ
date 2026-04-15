@@ -127,8 +127,8 @@
             </div>
 
             <div class="col-span-1 md:col-span-2">
-              <p class="text-slate-900 dark:text-white text-sm font-bold">{{ booking.startTime || '00:00' }} - {{ booking.endTime || '00:00' }}</p>
-              <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5 font-mono">{{ booking.safeDate.split(' ')[0] }}</p>
+              <p class="text-slate-900 dark:text-white text-sm font-bold">{{ booking.startTime }} - {{ booking.endTime }}</p>
+              <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5 font-mono">{{ booking.safeDate?.split('T')[0] || booking.safeDate }}</p>
             </div>
 
             <div class="col-span-1 md:col-span-2 flex items-center justify-start">
@@ -266,8 +266,6 @@
           </div>
         </div>
       </div>
-
     </div>
-
   </main>
 </div>

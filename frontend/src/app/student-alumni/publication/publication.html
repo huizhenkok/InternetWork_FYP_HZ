@@ -14,13 +14,13 @@
           Register your research papers into the INWLab system. Uploading full-text PDFs is optional.
         </p>
       </div>
-      <a routerLink="/archive" class="glow-button bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-md no-underline">
+      <a routerLink="/resources" class="glow-button bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white px-6 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-md no-underline">
         <span class="material-symbols-outlined text-[18px]">public</span> View Global Archive
       </a>
     </section>
 
     <div class="relative rounded-2xl p-8 md:p-10 w-full max-w-3xl glass-panel dark:bg-[#121212]/60 border border-slate-200 dark:border-white/10 shadow-lg" data-aos="fade-up">
-      <form (submit)="submitPublication(); $event.preventDefault()" class="flex flex-col gap-6">
+      <form class="flex flex-col gap-6">
 
         <div class="flex flex-col gap-2">
           <label class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-gray-400">Name of the Paper</label>
@@ -48,7 +48,7 @@
           <p class="text-[10px] text-slate-500">PDF or Word document. Skip this if you only want to register the metadata.</p>
         </div>
 
-        <button type="submit" [disabled]="isUploading" class="glow-button mt-2 py-4 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold flex items-center justify-center gap-2 cursor-pointer border-none shadow-lg disabled:opacity-50">
+        <button type="button" (click)="submitPublication()" [disabled]="isUploading" class="glow-button mt-2 py-4 rounded-xl bg-gradient-to-r from-accent-teal to-accent-cyan text-white dark:text-black font-bold flex items-center justify-center gap-2 cursor-pointer border-none shadow-lg disabled:opacity-50 outline-none">
           <span class="material-symbols-outlined text-[18px]">{{ isUploading ? 'sync' : 'add_circle' }}</span>
           {{ isUploading ? 'Processing...' : 'Register Publication' }}
         </button>
@@ -87,7 +87,7 @@
               <span class="material-symbols-outlined text-[16px]">{{ record.visibility === 'Public' ? 'public' : 'lock' }}</span>
               {{ record.visibility }}
             </button>
-            <button (click)="deleteRecord(record.id)" class="text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none cursor-pointer p-1 ml-1" title="Delete">
+            <button (click)="deleteRecord(record.id)" class="text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none cursor-pointer p-1 ml-1 outline-none" title="Delete">
               <span class="material-symbols-outlined">delete</span>
             </button>
           </div>

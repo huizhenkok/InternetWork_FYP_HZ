@@ -18,7 +18,7 @@ export class Forum implements OnInit {
   filters: string[] = ['Most Recent'];
   allThreads: any[] = [];
   filteredThreads: any[] = [];
-  isLoading: boolean = true; // 🌟 增加加载状态
+  isLoading: boolean = true;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -37,11 +37,17 @@ export class Forum implements OnInit {
       next: (res: any) => {
         try {
           this.allThreads = JSON.parse(res.contentJson);
-          if (!this.allThreads || this.allThreads.length === 0) this.applyDefaultForumData();
-        } catch(e) { this.applyDefaultForumData(); }
+          // 🌟 修复：如果解析出来为空，就老老实实是个空数组，不要再塞假数据了
+          if (!this.allThreads) this.allThreads = [];
+        } catch(e) {
+          this.allThreads = [];
+        }
         this.finishLoading();
       },
-      error: () => { this.applyDefaultForumData(); this.finishLoading(); }
+      error: () => {
+        this.allThreads = [];
+        this.finishLoading();
+      }
     });
   }
 
@@ -49,12 +55,6 @@ export class Forum implements OnInit {
     this.applyFilters();
     this.isLoading = false;
     setTimeout(() => { if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); } }, 150);
-  }
-
-  applyDefaultForumData() {
-    this.allThreads = [
-      { id: 'zkp-iot-networks', title: 'Discussion: Implementing Zero-Knowledge Proofs in IoT Networks', authorName: 'Prof. Alan Turing', role: 'FACULTY', tag: 'Cryptography', timeAgo: '2 hours ago', content: 'I\'ve been working on reducing computational overhead...', views: '342 views', isOfficial: true, icon: 'lock', replies: [] }
-    ];
   }
 
   setFilter(filter: string) { this.activeFilter = filter; this.applyFilters(); }
