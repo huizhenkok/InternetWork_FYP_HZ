@@ -22,13 +22,11 @@ export class SignUp implements OnInit {
     phone: '',
     password: '',
     confirmPassword: '',
-    // 🌟 新增：存放 3 个安全问题
     secAnsColor: '',
     secAnsState: '',
     secAnsFruit: ''
   };
 
-  // 🌟 密码强度状态控制
   isPasswordStrong: boolean = false;
   passwordFeedback: string = '';
 
@@ -50,7 +48,6 @@ export class SignUp implements OnInit {
     }
   }
 
-  // 🌟 核心：实时检测密码强度
   checkPasswordStrength() {
     const p = this.formData.password;
     if (!p) {
@@ -58,7 +55,6 @@ export class SignUp implements OnInit {
       this.passwordFeedback = '';
       return;
     }
-
     const hasUpper = /[A-Z]/.test(p);
     const hasLower = /[a-z]/.test(p);
     const hasNumber = /[0-9]/.test(p);
@@ -75,53 +71,33 @@ export class SignUp implements OnInit {
   }
 
   onRegister() {
-    // 1. 验证密码强度
-    if (!this.isPasswordStrong) {
-      alert("Please ensure your password meets all security requirements.");
+    if (!this.isPasswordStrong) { alert("Please ensure your password meets all security requirements."); return; }
+    if (this.formData.password !== this.formData.confirmPassword) { alert("Passwords do not match. Please try again."); return; }
+    if (!this.formData.fullName.trim()) { alert("Please enter your full name."); return; }
+
+    // 🌟 修复：只有 Student 和 Faculty 需要验证 ID，Alumni 直接跳过
+    if (this.regType !== 'Alumni' && !this.formData.matricNumber.trim()) {
+      alert(`Please enter your ${this.regType} ID.`);
       return;
     }
 
-    if (this.formData.password !== this.formData.confirmPassword) {
-      alert("Passwords do not match. Please try again.");
-      return;
+    if (this.regType === 'Student' && !/^\d{6}$/.test(this.formData.matricNumber)) {
+      alert("Student Matric Number must be exactly 6 digits (e.g., 298068)."); return;
+    } else if (this.regType === 'Faculty' && this.formData.matricNumber.length < 4) {
+      alert("Faculty ID must be at least 4 characters."); return;
     }
 
-    if (!this.formData.fullName.trim() || !this.formData.matricNumber.trim()) {
-      alert("Please enter your full name and ID.");
-      return;
-    }
-
-    // 2. 验证三个安全问题是否填写
     if (!this.formData.secAnsColor.trim() || !this.formData.secAnsState.trim() || !this.formData.secAnsFruit.trim()) {
-      alert("Please answer all 3 security questions to secure your account.");
-      return;
+      alert("Please answer all 3 security questions to secure your account."); return;
     }
+    if (!this.formData.email) { alert("Please provide an email."); return; }
 
-    // 3. 验证各种 ID 的格式
-    if (this.regType === 'Student') {
-      if (!/^\d{6}$/.test(this.formData.matricNumber)) {
-        alert("Student Matric Number must be exactly 6 digits (e.g., 298068).");
-        return;
-      }
-    } else if (this.regType === 'Faculty' || this.regType === 'Alumni') {
-      if (this.formData.matricNumber.length < 4) {
-        alert(`${this.regType} ID must be at least 4 characters.`);
-        return;
-      }
-    }
-
-    if (!this.formData.email) {
-      alert("Please provide an email.");
-      return;
-    }
-
-    // 🌟 将安全问题一并打包发给后端
     const newUser = {
       fullName: this.formData.fullName,
       email: this.formData.email.trim(),
       password: this.formData.password,
       role: this.regType,
-      matricNumber: this.formData.matricNumber,
+      matricNumber: this.regType === 'Alumni' ? 'N/A' : this.formData.matricNumber, // Alumni 存入 N/A
       secAnsColor: this.formData.secAnsColor,
       secAnsState: this.formData.secAnsState,
       secAnsFruit: this.formData.secAnsFruit
@@ -133,7 +109,6 @@ export class SignUp implements OnInit {
         this.router.navigate(['/login']);
       },
       error: (err: any) => {
-        console.error("Registration Error:", err);
         alert(err.error || "Registration failed. This email might already be in use.");
       }
     });

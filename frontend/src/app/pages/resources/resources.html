@@ -1,23 +1,10 @@
-<div class="absolute top-0 left-0 w-full z-40 pointer-events-none flex justify-center">
-  <div class="absolute top-0 w-[40%] md:w-[20%] h-[1px] bg-gradient-to-r from-transparent via-white to-transparent opacity-80 animate-[pulse_3s_ease-in-out_infinite]"></div>
-  <div class="absolute top-0 w-[70%] md:w-[40%] h-[4px] bg-gradient-to-r from-transparent via-primary to-transparent blur-[6px] opacity-70 animate-[pulse_3s_ease-in-out_infinite]"></div>
-  <div class="absolute top-0 w-[100%] md:w-[70%] h-[80px] bg-gradient-to-b from-accent-cyan/10 to-transparent blur-[24px] opacity-50 animate-[pulse_3s_ease-in-out_infinite]"></div>
-</div>
-
 <div class="absolute inset-0 overflow-hidden pointer-events-none z-10">
-  <div class="tech-square sq-1"></div>
-  <div class="tech-square sq-2"></div>
-  <div class="tech-square sq-3"></div>
-  <div class="tech-square sq-4"></div>
-  <div class="tech-square sq-5"></div>
+  <div class="tech-square sq-1"></div><div class="tech-square sq-3"></div><div class="tech-square sq-5"></div>
 </div>
-
 <div class="relative min-h-screen flex flex-col w-full">
   <div class="absolute inset-0 z-0 fixed h-full w-full pointer-events-none">
     <div class="absolute inset-0 bg-hero-pattern opacity-90 z-10"></div>
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#f8fafc_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_0%,_#050505_100%)] z-20"></div>
-    <div class="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-accent-teal rounded-full blur-[120px] opacity-10 dark:opacity-20 animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] bg-accent-cyan rounded-full blur-[140px] opacity-10 dark:opacity-10"></div>
   </div>
 
   <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
@@ -28,64 +15,35 @@
           <h1 class="text-4xl font-bold uppercase tracking-tight text-slate-900 dark:text-white md:text-6xl">
             {{ titleFirstPart }} <span class="text-gradient" *ngIf="titleLastPart">{{ titleLastPart }}</span>
           </h1>
-          <p class="mx-auto max-w-2xl text-lg leading-relaxed text-slate-500 dark:text-gray-400 md:mx-0 font-body">
-            {{ cmsData.subTitle }}
-          </p>
-
-          <div class="pt-4 flex justify-center md:justify-start">
-            <a routerLink="/projects" class="glow-button inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-teal to-accent-cyan px-6 py-3 text-sm font-bold text-white dark:text-black transition-all hover:scale-105 cursor-pointer no-underline">
-              <span class="material-symbols-outlined text-[18px]">science</span>
-              View Research Projects
-            </a>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center" data-aos="fade-up" data-aos-delay="100">
-          <div class="w-full">
-            <p class="text-sm font-medium text-slate-500 dark:text-gray-400 border-l-2 border-primary pl-3 py-1 leading-relaxed">
-              {{ cmsData.filterTitle }}
-            </p>
-          </div>
+          <p class="mx-auto max-w-2xl text-lg leading-relaxed text-slate-500 dark:text-gray-400 md:mx-0 font-body">{{ cmsData.subTitle }}</p>
         </div>
 
         <div class="mt-4 grid grid-cols-1 gap-6 pb-12 md:grid-cols-2">
-
-          <div *ngIf="allResources.length === 0" class="col-span-full py-12 text-center text-slate-500 dark:text-gray-400 glass-panel rounded-2xl border border-slate-200 dark:border-white/10">
-            <span class="material-symbols-outlined text-5xl mb-2 opacity-50">search_off</span>
+          <div *ngIf="allResources.length === 0" class="col-span-full py-12 text-center text-slate-500 glass-panel rounded-2xl border">
             <p class="font-bold">No public publications found.</p>
-            <p class="text-sm mt-1">Students haven't made any papers public yet.</p>
           </div>
 
-          <div *ngFor="let res of allResources; let i = index" class="glass-panel group flex flex-col gap-4 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 md:p-8 shadow-sm hover:shadow-lg dark:border-white/10 dark:hover:shadow-[0_0_15px_rgba(13,242,242,0.2)]" data-aos="fade-up" [attr.data-aos-delay]="(i % 2) * 100">
-
+          <div *ngFor="let res of allResources; let i = index" class="glass-panel group flex flex-col gap-4 rounded-2xl p-6 transition-all hover:-translate-y-1 md:p-8" data-aos="fade-up">
             <div class="flex items-start justify-between">
-              <div [class]="res.typeClass" class="rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
-                {{ res.type }}
-              </div>
-              <span class="text-xs text-slate-500 dark:text-gray-500 font-body">{{ res.date }}</span>
+              <div [class]="res.typeClass" class="rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider">{{ res.journal }}</div>
+              <span class="text-xs text-slate-500 dark:text-gray-500 font-mono font-bold">{{ res.date }}</span>
             </div>
 
             <div>
-              <h3 class="text-2xl font-bold text-slate-900 transition-colors group-hover:text-primary dark:text-white dark:group-hover:text-[#0df2f2] truncate" [title]="res.title">{{ res.title }}</h3>
-              <p class="mt-1 text-sm text-slate-500 dark:text-gray-400 font-body">{{ res.authors }}</p>
+              <h3 class="text-2xl font-bold text-slate-900 transition-colors group-hover:text-primary dark:text-white truncate" [title]="res.title">{{ res.title }}</h3>
+              <p class="mt-1 text-sm text-slate-500 font-body">{{ res.authors }}</p>
             </div>
-
-            <p class="line-clamp-3 text-sm leading-relaxed text-slate-500 dark:text-gray-400 font-body">
-              {{ res.desc }}
-            </p>
+            <p class="line-clamp-3 text-sm leading-relaxed text-slate-500 font-body">{{ res.desc }}</p>
 
             <div class="mt-auto flex flex-wrap items-center gap-4 pt-4 border-t border-slate-100 dark:border-white/10">
-              <button (click)="handleAction(res.primaryBtnText, res.title)" type="button" class="glow-button flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-teal to-accent-cyan dark:from-[#1F958D] dark:to-[#17C6BA] px-5 py-2 text-xs font-bold text-white dark:text-black cursor-pointer border-none outline-none transition-transform hover:scale-105">
+              <button (click)="handleAction(res)" type="button"
+                      [ngClass]="res.fileUrl ? 'bg-gradient-to-r from-accent-teal to-accent-cyan text-white' : 'bg-slate-200 text-slate-400 dark:bg-white/10'"
+                      class="flex items-center gap-2 rounded-full px-5 py-2 text-xs font-bold cursor-pointer border-none outline-none transition-transform hover:scale-105">
                 <span>{{ res.primaryBtnText }}</span>
                 <span class="material-symbols-outlined text-sm">{{ res.primaryBtnIcon }}</span>
               </button>
-              <button (click)="handleAction(res.secondaryBtnText, res.title)" type="button" class="flex items-center gap-1 text-xs font-medium text-slate-500 transition-colors hover:text-slate-900 dark:text-gray-400 dark:hover:text-white cursor-pointer bg-transparent border-none outline-none">
-                <span>{{ res.secondaryBtnText }}</span>
-                <span class="material-symbols-outlined text-sm">{{ res.secondaryBtnIcon }}</span>
-              </button>
             </div>
           </div>
-
         </div>
 
       </div>

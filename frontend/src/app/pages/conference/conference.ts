@@ -31,8 +31,13 @@ export class Conference implements OnInit, OnDestroy {
     private cmsService: CmsService
   ) {}
 
-  public fixUrl(url: string): string {
-    return url ? url.replace('http://localhost:8080', 'https://internetwork-fyp-hz.onrender.com') : '';
+  // 🌟 全局统一的图片/文件修复逻辑 (覆盖了旧的)
+  public fixUrl(url: string | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url.replace('http://localhost:8080', 'https://internetworks.my').replace('https://internetwork-fyp-hz.onrender.com', 'https://internetworks.my');
+    }
+    return url.startsWith('/') ? `https://internetworks.my${url}` : `https://internetworks.my/${url}`;
   }
 
   ngOnInit() {

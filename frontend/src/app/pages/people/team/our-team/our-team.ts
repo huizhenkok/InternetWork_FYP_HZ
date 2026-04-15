@@ -18,6 +18,15 @@ export class OurTeam implements OnInit, OnChanges {
     private cmsService: CmsService
   ) {}
 
+  // 🌟 全局统一的图片修复逻辑
+  public fixUrl(url: string | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url.replace('http://localhost:8080', 'https://internetworks.my');
+    }
+    return url.startsWith('/') ? `https://internetworks.my${url}` : `https://internetworks.my/${url}`;
+  }
+
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.cmsService.getCmsData('inwlab_cms_team').subscribe({
@@ -45,7 +54,6 @@ export class OurTeam implements OnInit, OnChanges {
     }).filter(section => section.members.length > 0);
   }
 
-  // 🌟 新增：触发点击事件
   onMemberClick(member: TeamMember) {
     this.memberClick.emit(member);
   }

@@ -1,6 +1,7 @@
-import { Component, OnInit, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms'; // 🌟 引入 FormsModule 用于表单
 import { CmsService } from '../../../services/cms.service';
 import { UploadService } from '../../../services/upload.service';
 
@@ -9,15 +10,22 @@ declare var AOS: any;
 @Component({
   selector: 'app-publication',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './publication.html'
 })
 export class Publication implements OnInit {
 
-  isDragging: boolean = false;
   isUploading: boolean = false;
   recentImports: any[] = [];
   currentUserEmail: string = '';
+
+  // 🌟 表单数据
+  pubForm = {
+    paperTitle: '',
+    journalName: '',
+    publishYear: ''
+  };
+  selectedFile: File | null = null;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -29,10 +37,7 @@ export class Publication implements OnInit {
     this.loadImports();
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
-        if (typeof AOS !== 'undefined') {
-          AOS.init({ duration: 800, once: true, offset: 50 });
-          AOS.refreshHard();
-        }
+        if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); }
       }, 100);
     }
   }
@@ -49,10 +54,7 @@ export class Publication implements OnInit {
             this.recentImports = allImports
               .filter((doc: any) => doc.userEmail === this.currentUserEmail)
               .sort((a: any, b: any) => b.timestamp - a.timestamp);
-          } catch(e) {
-            console.error("Error parsing Publications", e);
-            this.recentImports = [];
-          }
+          } catch(e) { this.recentImports = []; }
         },
         error: () => this.recentImports = []
       });
@@ -62,7 +64,6 @@ export class Publication implements OnInit {
   toggleVisibility(record: any) {
     if (isPlatformBrowser(this.platformId)) {
       record.visibility = record.visibility === 'Public' ? 'Private' : 'Public';
-
       this.cmsService.getCmsData('inwlab_publications').subscribe({
         next: (res: any) => {
           const allImports = JSON.parse(res.contentJson);
@@ -76,116 +77,88 @@ export class Publication implements OnInit {
     }
   }
 
-  // 🌟 FIX: Added the logic to completely delete the record from database
   deleteRecord(id: any) {
-    if (confirm('Are you sure you want to delete this publication? This action cannot be undone.')) {
+    if (confirm('Are you sure you want to delete this record? This action cannot be undone.')) {
       this.cmsService.getCmsData('inwlab_publications').subscribe({
         next: (res: any) => {
           let allImports = JSON.parse(res.contentJson);
-          // Filter out the record that needs to be deleted
           allImports = allImports.filter((r: any) => r.id !== id);
-
-          // Save the new cleaned array back to the database
           this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe({
-            next: () => {
-              this.loadImports(); // Refresh the UI
-              alert('Publication deleted successfully!');
-            }
+            next: () => { this.loadImports(); alert('Record deleted successfully!'); }
           });
         }
       });
     }
   }
 
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = true;
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragging = false;
-
-    if (event.dataTransfer && event.dataTransfer.files.length > 0) {
-      this.handleFiles(event.dataTransfer.files);
-    }
-  }
-
   onFileSelect(event: any) {
     if (event.target.files.length > 0) {
-      this.handleFiles(event.target.files);
+      this.selectedFile = event.target.files[0];
     }
   }
 
-  handleFiles(files: FileList) {
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const validExtensions = ['pdf', 'bib', 'xml', 'doc', 'docx', 'jpg', 'png'];
-      const fileExt = file.name.split('.').pop()?.toLowerCase();
+  // 🌟 核心：提交表单（文件变为可选）
+  submitPublication() {
+    if (!this.pubForm.paperTitle.trim() || !this.pubForm.journalName.trim() || !this.pubForm.publishYear.trim()) {
+      alert("Please fill in the Paper Title, Journal Name, and Year.");
+      return;
+    }
 
-      if (!fileExt || !validExtensions.includes(fileExt)) {
-        alert(`Invalid format for file: ${file.name}.`);
-        continue;
-      }
+    this.isUploading = true;
 
-      this.isUploading = true;
-
-      this.uploadService.uploadFile(file).subscribe({
+    // 如果有附件，先上传附件；如果没有，直接保存元数据
+    if (this.selectedFile) {
+      this.uploadService.uploadFile(this.selectedFile).subscribe({
         next: (res: any) => {
-          this.isUploading = false;
-          this.saveFileRecord(file.name, res.url);
+          this.saveFileRecord(res.url); // 有文件，存真实 URL
         },
-        error: (err: any) => {
+        error: () => {
           this.isUploading = false;
-          alert(`Failed to upload ${file.name} to server.`);
+          alert(`Failed to upload ${this.selectedFile!.name}.`);
         }
       });
+    } else {
+      this.saveFileRecord(''); // 没文件，存空字符串
     }
   }
 
-  saveFileRecord(fileName: string, fileUrl: string) {
+  saveFileRecord(fileUrl: string) {
     if (isPlatformBrowser(this.platformId)) {
       const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
-
       this.cmsService.getCmsData('inwlab_publications').subscribe({
         next: (res: any) => {
           const allImports = JSON.parse(res.contentJson);
-          this.appendAndSaveRecord(allImports, fileName, fileUrl, activeUser);
+          this.appendAndSaveRecord(allImports, fileUrl, activeUser);
         },
-        error: () => {
-          this.appendAndSaveRecord([], fileName, fileUrl, activeUser);
-        }
+        error: () => this.appendAndSaveRecord([], fileUrl, activeUser)
       });
     }
   }
 
-  appendAndSaveRecord(allImports: any[], fileName: string, fileUrl: string, activeUser: any) {
+  appendAndSaveRecord(allImports: any[], fileUrl: string, activeUser: any) {
     const newRecord = {
       id: Date.now() + Math.random(),
-      fileName: fileName,
-      fileUrl: fileUrl,
+      fileName: this.pubForm.paperTitle, // 将 Paper Title 作为列表主标题
+      journalName: this.pubForm.journalName,
+      publishYear: this.pubForm.publishYear,
+      fileUrl: fileUrl, // 可空
       userEmail: this.currentUserEmail,
       authorName: activeUser.fullName || 'Unknown Scholar',
       authorRole: activeUser.role || 'Member',
       timestamp: Date.now(),
-      dateStr: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-      status: 'Completed',
+      dateStr: new Date().toLocaleDateString(),
+      status: fileUrl ? 'With File' : 'Metadata', // 区分状态
       visibility: 'Private'
     };
 
     allImports.push(newRecord);
     this.cmsService.saveCmsData('inwlab_publications', JSON.stringify(allImports)).subscribe({
       next: () => {
+        this.isUploading = false;
+        this.pubForm = { paperTitle: '', journalName: '', publishYear: '' }; // 清空表单
+        this.selectedFile = null; // 清空文件
         this.loadImports();
-        alert(`${fileName} uploaded successfully to Server!\nBy default, this file is PRIVATE. You can make it PUBLIC in the list below.`);
+        alert(`Publication successfully added!\nBy default, it is PRIVATE. Make it PUBLIC below.`);
       }
     });
   }

@@ -41,7 +41,7 @@
               <div class="lg:w-7/12 relative h-[400px] lg:h-auto overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent z-10 opacity-80 dark:from-[#020403]/80"></div>
                 <div class="w-full h-full bg-slate-200 dark:bg-white/5 flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out">
-                  <img *ngIf="cmsData.flagship.imageUrl" [src]="cmsData.flagship.imageUrl" class="absolute inset-0 w-full h-full object-cover">
+                  <img *ngIf="cmsData.flagship.imageUrl" [src]="fixUrl(cmsData.flagship.imageUrl)" class="absolute inset-0 w-full h-full object-cover">
                   <span *ngIf="!cmsData.flagship.imageUrl" class="material-symbols-outlined text-8xl text-primary/30 relative z-10">{{ cmsData.flagship.icon }}</span>
                 </div>
                 <div class="absolute top-6 left-6 z-20">
@@ -86,7 +86,7 @@
 
             <div *ngFor="let g of cmsData.gatherings; let i = index" class="glass-card p-6 rounded-xl flex flex-col sm:flex-row gap-6 items-center group cursor-pointer" (click)="openNewsModal(g)" data-aos="fade-up" [attr.data-aos-delay]="i * 100">
               <div class="w-full sm:w-48 h-32 rounded-lg overflow-hidden shrink-0 relative bg-slate-100 dark:bg-white/5 flex items-center justify-center">
-                <img *ngIf="g.imageUrl" [src]="g.imageUrl" alt="News Image" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <img *ngIf="g.imageUrl" [src]="fixUrl(g.imageUrl)" alt="News Image" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 <span *ngIf="!g.imageUrl" class="material-symbols-outlined text-4xl text-primary/40 group-hover:scale-110 transition-transform relative z-10">{{ g.icon || 'article' }}</span>
               </div>
               <div class="flex flex-col flex-grow text-center sm:text-left w-full">
@@ -147,37 +147,6 @@
   </div>
 
   <div *ngIf="isRsvpModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center px-4">
-    <div class="absolute inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm" (click)="!isSubmittingRsvp && !isRsvpSuccess ? closeRsvpModal() : null"></div>
-    <div class="relative w-full max-w-md glass-panel bg-white/95 dark:bg-[#121212]/95 rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-white/10 animate-fade-in">
-      <button *ngIf="!isSubmittingRsvp && !isRsvpSuccess" (click)="closeRsvpModal()" class="absolute top-6 right-6 text-slate-400 hover:text-red-500 cursor-pointer bg-transparent border-none outline-none transition-colors"><span class="material-symbols-outlined text-2xl">close</span></button>
-      <div class="flex flex-col gap-2 mb-6">
-        <div class="flex items-center gap-3 text-primary mb-2"><span class="material-symbols-outlined text-3xl">how_to_reg</span><h2 class="text-2xl font-black text-slate-900 dark:text-white">Event RSVP</h2></div>
-        <p class="text-slate-500 dark:text-gray-400 text-sm font-medium leading-snug">Registering for: <span class="text-primary font-bold">{{ rsvpEventName }}</span></p>
-      </div>
-      <ng-container *ngIf="!isRsvpSuccess">
-        <div class="flex flex-col gap-4">
-          <div class="flex flex-col gap-1"><label class="text-[10px] uppercase font-bold text-slate-500">Full Name</label><input type="text" [(ngModel)]="rsvpData.name" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-primary transition-colors"></div>
-          <div class="flex flex-col gap-1"><label class="text-[10px] uppercase font-bold text-slate-500">Email Address</label><input type="email" [(ngModel)]="rsvpData.email" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-primary transition-colors"></div>
-          <div class="flex flex-col gap-1">
-            <label class="text-[10px] uppercase font-bold text-slate-500">Participant Role</label>
-            <div class="relative">
-              <select [(ngModel)]="rsvpData.role" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-primary appearance-none cursor-pointer"><option value="UUM Student">UUM Student</option><option value="Faculty">Faculty / Staff</option><option value="Alumni">Alumni</option><option value="Public Visitor">Public Visitor / Guest</option></select>
-              <span class="material-symbols-outlined absolute right-4 top-3.5 text-slate-400 pointer-events-none">expand_more</span>
-            </div>
-          </div>
-          <div class="flex flex-col gap-1"><label class="text-[10px] uppercase font-bold text-slate-500">Additional Messages</label><textarea [(ngModel)]="rsvpData.message" rows="2" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none focus:border-primary"></textarea></div>
-          <button (click)="submitRSVP()" [disabled]="isSubmittingRsvp" class="glow-button w-full mt-4 bg-gradient-primary text-black font-bold px-6 py-3.5 rounded-xl text-sm hover:-translate-y-1 transition-all cursor-pointer border-none flex items-center justify-center gap-2 outline-none">
-            <ng-container *ngIf="!isSubmittingRsvp"><span>Submit Registration</span><span class="material-symbols-outlined text-[18px]">send</span></ng-container>
-            <ng-container *ngIf="isSubmittingRsvp"><span>Processing...</span><span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span></ng-container>
-          </button>
-        </div>
-      </ng-container>
-      <div *ngIf="isRsvpSuccess" class="flex flex-col items-center justify-center text-center py-6 animate-in zoom-in duration-300">
-        <div class="size-20 bg-green-100 text-green-500 dark:bg-green-500/20 dark:text-green-400 rounded-full flex items-center justify-center mb-4"><span class="material-symbols-outlined text-4xl">check_circle</span></div>
-        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Request Submitted!</h3>
-        <p class="text-slate-500 dark:text-gray-400 text-sm">Your RSVP has been sent to the admin.</p>
-      </div>
-    </div>
   </div>
 
   <div *ngIf="isNewsModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
@@ -190,7 +159,7 @@
       </button>
 
       <div class="w-full h-64 md:h-80 shrink-0 relative bg-slate-100 dark:bg-white/5 flex items-center justify-center overflow-hidden">
-        <img *ngIf="selectedNews?.imageUrl" [src]="selectedNews.imageUrl" class="w-full h-full object-cover">
+        <img *ngIf="selectedNews?.imageUrl" [src]="fixUrl(selectedNews.imageUrl)" class="w-full h-full object-cover">
         <span *ngIf="!selectedNews?.imageUrl" class="material-symbols-outlined text-8xl text-primary/40 relative z-10">{{ selectedNews?.icon || 'article' }}</span>
 
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>

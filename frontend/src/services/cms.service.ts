@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http'; // 🌟 引入 HttpHeaders
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CmsService {
-  // 🌟 已更新为云端 API
-  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/cms';
+  // 🌟 已更新为本地 cPanel Node.js 路径
+  private apiUrl = 'https://internetworks.my/api/cms';
 
   constructor(private http: HttpClient) {}
 
@@ -16,7 +16,6 @@ export class CmsService {
   }
 
   saveCmsData(pageKey: string, jsonContent: string): Observable<any> {
-    // 🌟 给请求加上 Content-Type 通行证，明确告诉后端这是 JSON
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(`${this.apiUrl}/${pageKey}`, jsonContent, { headers });
   }

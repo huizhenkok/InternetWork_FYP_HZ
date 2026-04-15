@@ -8,7 +8,7 @@
 
       <div class="relative mb-6">
         <div class="relative z-10 h-28 w-28 overflow-hidden rounded-full border-[3px] border-primary/30 bg-slate-100 shadow-[0_0_10px_rgba(8,145,178,0.12)] flex items-center justify-center transition-transform duration-500 group-hover:scale-105 group-hover:border-primary dark:border-primary/50 dark:bg-[#121212] dark:shadow-[0_0_15px_rgba(13,242,242,0.3)]">
-          <img *ngIf="student.avatar" [src]="student.avatar" [alt]="student.name" class="h-full w-full object-cover">
+          <img *ngIf="student.avatar" [src]="fixUrl(student.avatar)" [alt]="student.name" class="h-full w-full object-cover">
           <span *ngIf="!student.avatar" class="material-symbols-outlined text-5xl text-slate-400">school</span>
         </div>
         <div class="absolute inset-0 rounded-full bg-primary opacity-0 blur-[40px] transition-opacity group-hover:opacity-20 dark:group-hover:opacity-30"></div>

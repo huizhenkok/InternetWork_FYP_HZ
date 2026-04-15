@@ -91,6 +91,15 @@ export class AdminCms implements OnInit {
     private uploadService: UploadService
   ) {}
 
+  // 🌟 新增：全局统一的图片修复逻辑 (为了让 Admin CMS 的预览也能正常显示图片)
+  public fixUrl(url: string | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url.replace('http://localhost:8080', 'https://internetworks.my');
+    }
+    return url.startsWith('/') ? `https://internetworks.my${url}` : `https://internetworks.my/${url}`;
+  }
+
   ngOnInit() {
     this.loadAllData();
     if (isPlatformBrowser(this.platformId)) { setTimeout(() => { if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); } }, 100); }

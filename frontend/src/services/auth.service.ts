@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  // 🌟 已更新为云端 API
-  private apiUrl = 'https://internetwork-fyp-hz.onrender.com/api/users';
+  // 🌟 已更新为本地 cPanel Node.js 路径
+  private apiUrl = 'https://internetworks.my/api/users';
 
   constructor(private http: HttpClient) {}
 
@@ -19,17 +19,14 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login`, credentials);
   }
 
-  // 🌟 验证安全问题答案 (必须加 responseType: 'text')
   verifySecurityQuestions(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/verify-security`, data, { responseType: 'text' });
   }
 
-  // 🌟 重置密码 (必须加 responseType: 'text')
   resetPassword(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password`, data, { responseType: 'text' });
   }
 
-  // 🌟 获取所有用户 (供 Admin Dashboard 和 User Management 使用)
   getAllUsers(): Observable<any> {
     return this.http.get(`${this.apiUrl}/all`);
   }

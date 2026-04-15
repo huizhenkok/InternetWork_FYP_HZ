@@ -121,7 +121,7 @@
                       <input type="file" accept="image/*" (change)="onFileUpload($event, homeData, 'aboutImage')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-accent-cyan/10 file:text-accent-cyan hover:file:bg-accent-cyan/20 cursor-pointer">
                       <span *ngIf="isUploading" class="text-xs text-accent-cyan whitespace-nowrap">Uploading...</span>
                     </div>
-                    <img *ngIf="homeData.aboutImage" [src]="homeData.aboutImage" alt="Preview" class="mt-2 h-32 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
+                    <img *ngIf="homeData.aboutImage" [src]="fixUrl(homeData.aboutImage)" alt="Preview" class="mt-2 h-32 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                   </div>
                 </div>
 
@@ -184,7 +184,7 @@
                 <div class="flex flex-col gap-2 mt-4">
                   <label class="text-[10px] font-bold text-primary uppercase">Upload Cover Image</label>
                   <div class="flex items-center gap-2"><input type="file" accept="image/*" (change)="onFileUpload($event, newsAndEventsData.flagship, 'imageUrl')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"></div>
-                  <img *ngIf="newsAndEventsData.flagship.imageUrl" [src]="newsAndEventsData.flagship.imageUrl" alt="Preview" class="mt-2 h-32 w-auto object-cover rounded-lg shadow-sm border border-slate-200 dark:border-white/10">
+                  <img *ngIf="newsAndEventsData.flagship.imageUrl" [src]="fixUrl(newsAndEventsData.flagship.imageUrl)" alt="Preview" class="mt-2 h-32 w-auto object-cover rounded-lg shadow-sm border border-slate-200 dark:border-white/10">
                 </div>
               </div>
 
@@ -219,7 +219,7 @@
                     <div class="flex flex-col gap-1 mt-1">
                       <label class="text-[9px] uppercase text-primary font-bold">Upload News Image</label>
                       <input type="file" accept="image/*" (change)="onFileUpload($event, g, 'imageUrl')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-primary/10 file:text-primary cursor-pointer">
-                      <img *ngIf="g.imageUrl" [src]="g.imageUrl" alt="Preview" class="mt-2 h-16 w-32 object-cover rounded border border-slate-200 dark:border-white/10 shadow-sm">
+                      <img *ngIf="g.imageUrl" [src]="fixUrl(g.imageUrl)" alt="Preview" class="mt-2 h-16 w-32 object-cover rounded border border-slate-200 dark:border-white/10 shadow-sm">
                     </div>
                   </div>
                 </div>
@@ -313,7 +313,7 @@
                           <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                           <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
                         </div>
-                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
+                        <img *ngIf="member.avatar" [src]="fixUrl(member.avatar)" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
                       </div>
                     </div>
                     <button (click)="addTeamMember(sIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-2 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">person_add</span> Add Member</button>
@@ -356,7 +356,7 @@
                           <input type="file" accept="image/*" (change)="onFileUpload($event, member, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                           <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
                         </div>
-                        <img *ngIf="member.avatar" [src]="member.avatar" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
+                        <img *ngIf="member.avatar" [src]="fixUrl(member.avatar)" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
                       </div>
                     </div>
                     <button (click)="addAlumniMember(yIndex)" class="self-start text-xs font-bold text-slate-500 hover:text-primary transition-colors flex items-center gap-1 mt-2 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">person_add</span> Add Alumni</button>
@@ -391,7 +391,7 @@
                           <input type="file" accept="image/*" (change)="onFileUpload($event, student, 'avatar')" [disabled]="isUploading" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                           <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
                         </div>
-                        <img *ngIf="student.avatar" [src]="student.avatar" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
+                        <img *ngIf="student.avatar" [src]="fixUrl(student.avatar)" alt="Preview" class="mt-2 h-12 w-12 rounded-full border border-slate-200 dark:border-white/10 object-cover shadow-sm">
                       </div>
                     </div>
                   </div>
@@ -683,7 +683,7 @@
                           <input type="file" accept="image/*" (change)="onFileUpload($event, conferences[editingConfIndex], 'imageUrl')" [disabled]="isUploading" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
                           <span *ngIf="isUploading" class="text-xs text-primary whitespace-nowrap">Uploading...</span>
                         </div>
-                        <img *ngIf="conferences[editingConfIndex].imageUrl" [src]="conferences[editingConfIndex].imageUrl" alt="Preview" class="mt-2 h-24 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
+                        <img *ngIf="conferences[editingConfIndex].imageUrl" [src]="fixUrl(conferences[editingConfIndex].imageUrl)" alt="Preview" class="mt-2 h-24 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                       </div>
 
                       <div class="flex flex-col gap-2">
@@ -693,7 +693,7 @@
                           <span *ngIf="isUploading" class="text-xs text-accent-cyan whitespace-nowrap">Uploading...</span>
                         </div>
                         <div *ngIf="conferences[editingConfIndex].pdfUrl" class="mt-2 text-xs text-slate-500 dark:text-gray-400 break-all bg-white dark:bg-black/30 p-2 rounded border border-slate-200 dark:border-white/10">
-                          Current PDF URL:<br> <a [href]="conferences[editingConfIndex].pdfUrl" target="_blank" class="text-accent-cyan hover:underline">{{ conferences[editingConfIndex].pdfUrl }}</a>
+                          Current PDF URL:<br> <a [href]="fixUrl(conferences[editingConfIndex].pdfUrl)" target="_blank" class="text-accent-cyan hover:underline">{{ fixUrl(conferences[editingConfIndex].pdfUrl) }}</a>
                         </div>
                       </div>
                     </div>
