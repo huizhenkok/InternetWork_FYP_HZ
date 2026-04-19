@@ -33,7 +33,7 @@ export class AdminBookings implements OnInit, OnDestroy {
   filteredMessages: any[] = [];
   unreadMessageCount: number = 0;
 
-  private pollingTimer: any; // 🌟 新增：用于实时获取数据的计时器
+  private pollingTimer: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -51,10 +51,9 @@ export class AdminBookings implements OnInit, OnDestroy {
         if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); }
       }, 100);
 
-      // 🌟 核心修复：每 10 秒自动去后台抓取一次数据，更新铃铛数字 (无需刷新页面！)
       this.ngZone.runOutsideAngular(() => {
         this.pollingTimer = setInterval(() => {
-          this.ngZone.run(() => { this.loadData(true); }); // 传递 silent = true，避免页面闪烁
+          this.ngZone.run(() => { this.loadData(true); });
         }, 10000);
       });
     }
@@ -62,7 +61,7 @@ export class AdminBookings implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if (this.pollingTimer) {
-      clearInterval(this.pollingTimer); // 🌟 离开页面时清除计时器
+      clearInterval(this.pollingTimer);
     }
   }
 
@@ -74,16 +73,35 @@ export class AdminBookings implements OnInit, OnDestroy {
       // 1. 加载 Lab Bookings
       this.bookingService.getAllBookings().subscribe({
         next: (data: any) => {
-          // 🌟 核心修复：匹配 Node.js 真实的字段名 (userName, date, timeSlot, purpose)
+          // 🌟 核心时间解析逻辑：自动兼容不同格式的提交
           this.allBookings = data.map((b: any) => {
-            const timeParts = b.timeSlot ? b.timeSlot.split('-') : ['00:00', '00:00'];
+            let start = '00:00';
+            let end = '00:00';
+
+            // 情况1：如果提交的是分开的时间字段
+            if (b.startTime && b.endTime) {
+              start = b.startTime;
+              end = b.endTime;
+            }
+            // 情况2：如果提交的是合并的时间段，例如 "10:00-11:30"
+            else if (b.timeSlot && b.timeSlot.includes('-')) {
+              const timeParts = b.timeSlot.split('-');
+              start = timeParts[0].trim();
+              end = timeParts[1].trim();
+            }
+            // 情况3：如果直接是个单一字符串
+            else if (b.timeSlot) {
+              start = b.timeSlot;
+              end = '';
+            }
+
             return {
               ...b,
               safeName: b.userName || b.userEmail || 'Unknown User',
-              safeRoom: b.purpose || 'General Lab Request', // 如果没提供房间，默认显示 purpose
-              safeDate: b.date || b.createdAt || 'N/A', // 确保这个绝对是字符串
-              startTime: timeParts[0] ? timeParts[0].trim() : '00:00',
-              endTime: timeParts[1] ? timeParts[1].trim() : '00:00',
+              safeRoom: b.roomName || b.purpose || 'General Lab Request',
+              safeDate: b.bookingDate || b.date || b.createdAt || 'N/A',
+              startTime: start,
+              endTime: end,
               safeId: b.id ? b.id.toString() : '0'
             };
           });
@@ -127,7 +145,7 @@ export class AdminBookings implements OnInit, OnDestroy {
       );
     } else if (this.activeTab === 'rsvps') {
       this.filteredRsvps = this.allRsvps.filter(r =>
-        r.name.toLowerCase().includes(query) || r.eventName.toLowerCase().includes(query) || r.role.toLowerCase().includes(query)
+        r.name.toLowerCase().includes(query) || r.eventName.toLowerCase().includes(query) || (r.role && r.role.toLowerCase().includes(query))
       );
     } else if (this.activeTab === 'messages') {
       this.filteredMessages = this.allMessages.filter(m =>
