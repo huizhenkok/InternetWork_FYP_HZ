@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UploadService } from '../../../services/upload.service'; // 🌟 需要上传图片服务
 
 declare var AOS: any;
 
@@ -8,7 +9,7 @@ declare var AOS: any;
   selector: 'app-my-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './my-profile.html' // 🌟 已经修复：去掉了多余的 "template"
+  templateUrl: './my-profile.html'
 })
 export class MyProfile implements OnInit, AfterViewInit {
 
@@ -21,7 +22,7 @@ export class MyProfile implements OnInit, AfterViewInit {
     role: '',
     matricNumber: '',
     phone: '',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB0LswD0_6irjogIzA3SEKVww65eL9MDC5InK_ldo0TgrBDvcOlxglRnAHQap3CUDcsYblW9c8yug3byVje8c9h7svi3qK3Gx6PvFWJeBVPSGjSSC0DX7lN9ZjRCIgL2EpEdS1poq11nRv9VH-I90CYqx740GMVe1Ig4StAHOZRz3SphaRhNlOpTVhMChLa_iKqvy5nnfxOaRLwKc7rDI8slIvuHePon6eaKctGadtuI857f0fI74GvSCsWduEp0gWbP72OaeKera6z',
+    avatar: 'https://ui-avatars.com/api/?name=User&background=random',
     researchInterests: 'Currently focusing on IoT security protocols and machine learning applications in network defense.',
     focusAreas: ['Network Security', 'IoT Systems'],
     jobTitle: '',
@@ -33,7 +34,12 @@ export class MyProfile implements OnInit, AfterViewInit {
   private particles: any[] = [];
   private animationFrameId: number = 0;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  selectedFile: File | null = null; // 🌟 保存用户选中的图片文件
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private uploadService: UploadService // 🌟 注入上传服务
+  ) {}
 
   ngOnInit() {
     this.loadProfile();
@@ -61,12 +67,26 @@ export class MyProfile implements OnInit, AfterViewInit {
   toggleEditMode(status: boolean) {
     this.isEditMode = status;
     this.newTagValue = '';
+    this.selectedFile = null; // 退出编辑时清空已选文件
     if (!status) {
-      this.loadProfile();
+      this.loadProfile(); // Discard changes
     }
     this.refreshAnimations();
   }
 
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file; // 🌟 把文件存起来准备发给服务器
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.userProfile.avatar = e.target.result; // 只是预览
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // 🌟 核心修复：保存到后端数据库
   saveProfile() {
     if (!this.userProfile.fullName.trim()) {
       alert("Full Name cannot be empty.");
@@ -77,35 +97,43 @@ export class MyProfile implements OnInit, AfterViewInit {
       this.addTag();
     }
 
-    try {
-      localStorage.setItem('active_user', JSON.stringify(this.userProfile));
-
-      let users = JSON.parse(localStorage.getItem('inwlab_users') || '[]');
-      const index = users.findIndex((u: any) => u.email === this.userProfile.email);
-      if (index !== -1) {
-        users[index] = { ...users[index], ...this.userProfile };
-        localStorage.setItem('inwlab_users', JSON.stringify(users));
-      }
-
-      alert("Profile updated successfully in your local session.");
-      this.isEditMode = false;
-      this.refreshAnimations();
-
-    } catch (e) {
-      console.error("Error saving profile", e);
-      alert("Failed to save profile. Please try again.");
+    // 第一步：如果有新图片，先上传图片到服务器
+    if (this.selectedFile) {
+      this.uploadService.uploadFile(this.selectedFile).subscribe({
+        next: (res: any) => {
+          this.userProfile.avatar = res.url; // 拿到服务器给的真实图片链接
+          this.sendDataToServer(); // 接着发数据
+        },
+        error: () => {
+          alert("Failed to upload profile picture. Please try again.");
+        }
+      });
+    } else {
+      // 没有换照片，直接发数据
+      this.sendDataToServer();
     }
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.userProfile.avatar = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+  // 🌟 把更新后的资料发送到我们刚才在 server.js 加的 /api/users/update 接口
+  sendDataToServer() {
+    fetch('https://internetworks.my/api/users/update', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.userProfile)
+    }).then(response => {
+      if(response.ok) {
+        // 服务器存成功了，再更新本地缓存
+        localStorage.setItem('active_user', JSON.stringify(this.userProfile));
+        alert("Profile successfully updated and saved to the server!");
+        this.isEditMode = false;
+        this.refreshAnimations();
+      } else {
+        alert("Error saving profile to database.");
+      }
+    }).catch(err => {
+      console.error(err);
+      alert("Network error. Could not connect to server.");
+    });
   }
 
   addTag() {

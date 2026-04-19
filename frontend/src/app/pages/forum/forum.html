@@ -78,8 +78,8 @@
               <div class="flex flex-col flex-1 gap-2">
                 <div class="flex flex-wrap items-center gap-3">
                   <span class="text-primary font-bold text-sm">{{ thread.authorName }}</span>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 dark:bg-white/10 dark:text-gray-300 dark:border-white/20">{{ thread.role }}</span>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10">{{ thread.tag }}</span>
+                  <span *ngIf="thread.role" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200 dark:bg-white/10 dark:text-gray-300 dark:border-white/20">{{ thread.role }}</span>
+                  <span *ngIf="thread.tag" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500 border border-slate-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10">{{ thread.tag }}</span>
                   <span class="text-slate-500 dark:text-gray-500 text-xs font-mono">• {{ thread.timeAgo }}</span>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors cursor-pointer">{{ thread.title }}</h3>

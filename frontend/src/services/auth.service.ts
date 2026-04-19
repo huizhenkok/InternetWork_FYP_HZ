@@ -30,4 +30,9 @@ export class AuthService {
   getAllUsers(): Observable<any> {
     return this.http.get(`${this.apiUrl}/all`);
   }
+
+  // 🌟 新增：向服务器发送修改好的 Profile 数据
+  updateProfile(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update`, data);
+  }
 }
