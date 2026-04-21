@@ -1,7 +1,8 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UploadService } from '../../../services/upload.service'; // 🌟 需要上传图片服务
+import { UploadService } from '../../../services/upload.service';
+import { CmsService } from '../../../services/cms.service'; // 🌟 引入 CmsService
 
 declare var AOS: any;
 
@@ -16,6 +17,10 @@ export class MyProfile implements OnInit, AfterViewInit {
   isEditMode: boolean = false;
   newTagValue: string = '';
 
+  // 🌟 存放从 CMS 抓取过来的下拉菜单选项
+  availableDepartments: string[] = [];
+  availableYears: string[] = [];
+
   userProfile: any = {
     fullName: '',
     email: '',
@@ -23,10 +28,13 @@ export class MyProfile implements OnInit, AfterViewInit {
     matricNumber: '',
     phone: '',
     avatar: 'https://ui-avatars.com/api/?name=User&background=random',
-    researchInterests: 'Currently focusing on IoT security protocols and machine learning applications in network defense.',
-    focusAreas: ['Network Security', 'IoT Systems'],
+    researchInterests: '',
+    focusAreas: [],
     jobTitle: '',
-    company: ''
+    company: '',
+    bio: '',          // 🌟 新增：个人简介 / 研究描述
+    socialLink: '',   // 🌟 新增：社交链接 / 作品集
+    department: ''    // 🌟 核心：用于存储选择的部门或年份
   };
 
   @ViewChild('particleCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -34,15 +42,17 @@ export class MyProfile implements OnInit, AfterViewInit {
   private particles: any[] = [];
   private animationFrameId: number = 0;
 
-  selectedFile: File | null = null; // 🌟 保存用户选中的图片文件
+  selectedFile: File | null = null;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
-    private uploadService: UploadService // 🌟 注入上传服务
+    private uploadService: UploadService,
+    private cmsService: CmsService // 🌟 注入
   ) {}
 
   ngOnInit() {
     this.loadProfile();
+    this.fetchCmsOptions(); // 🌟 页面加载时去抓取 CMS 选项
   }
 
   ngAfterViewInit() {
@@ -50,6 +60,51 @@ export class MyProfile implements OnInit, AfterViewInit {
       this.initParticles();
       this.refreshAnimations();
     }
+  }
+
+  // 🌟 从 CMS 抓取部门和年份，变成下拉菜单选项！
+  fetchCmsOptions() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.cmsService.getCmsData('inwlab_cms_team').subscribe({
+        next: (res: any) => {
+          try {
+            const parsed = JSON.parse(res.contentJson);
+            if (parsed.ourTeam) {
+              this.availableDepartments = parsed.ourTeam.map((sec: any) => sec.title);
+            }
+            if (parsed.alumni) {
+              this.availableYears = parsed.alumni.map((yr: any) => yr.year);
+            }
+          } catch(e) { console.error("Error fetching CMS options", e); }
+        }
+      });
+    }
+  }
+
+  sanitizeData() {
+    if (!this.userProfile) return;
+
+    if (this.userProfile.focusAreas === null || this.userProfile.focusAreas === undefined) {
+      this.userProfile.focusAreas = [];
+    } else if (typeof this.userProfile.focusAreas === 'string') {
+      try {
+        const parsed = JSON.parse(this.userProfile.focusAreas);
+        this.userProfile.focusAreas = Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        this.userProfile.focusAreas = [];
+      }
+    }
+    if (!Array.isArray(this.userProfile.focusAreas)) {
+      this.userProfile.focusAreas = [];
+    }
+
+    this.userProfile.researchInterests = this.userProfile.researchInterests || '';
+    this.userProfile.jobTitle = this.userProfile.jobTitle || '';
+    this.userProfile.company = this.userProfile.company || '';
+    this.userProfile.bio = this.userProfile.bio || '';               // 🌟 保底防空
+    this.userProfile.socialLink = this.userProfile.socialLink || ''; // 🌟 保底防空
+    this.userProfile.department = this.userProfile.department || ''; // 🌟 保底防空
+    this.userProfile.avatar = this.userProfile.avatar || 'https://ui-avatars.com/api/?name=User&background=random';
   }
 
   loadProfile() {
@@ -62,59 +117,62 @@ export class MyProfile implements OnInit, AfterViewInit {
     } catch (e) {
       console.error("Error loading profile", e);
     }
+    this.sanitizeData();
   }
 
   toggleEditMode(status: boolean) {
     this.isEditMode = status;
     this.newTagValue = '';
-    this.selectedFile = null; // 退出编辑时清空已选文件
+    this.selectedFile = null;
     if (!status) {
-      this.loadProfile(); // Discard changes
+      this.loadProfile();
     }
     this.refreshAnimations();
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
+    const file = event?.target?.files?.[0];
     if (file) {
-      this.selectedFile = file; // 🌟 把文件存起来准备发给服务器
+      this.selectedFile = file;
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.userProfile.avatar = e.target.result; // 只是预览
+        if (e?.target?.result) {
+          this.userProfile.avatar = e.target.result;
+        }
       };
       reader.readAsDataURL(file);
     }
   }
 
-  // 🌟 核心修复：保存到后端数据库
   saveProfile() {
-    if (!this.userProfile.fullName.trim()) {
+    this.sanitizeData();
+
+    if (!this.userProfile.fullName || !this.userProfile.fullName.trim()) {
       alert("Full Name cannot be empty.");
       return;
     }
 
-    if (this.newTagValue.trim()) {
+    if (this.newTagValue && this.newTagValue.trim()) {
       this.addTag();
     }
 
-    // 第一步：如果有新图片，先上传图片到服务器
     if (this.selectedFile) {
       this.uploadService.uploadFile(this.selectedFile).subscribe({
         next: (res: any) => {
-          this.userProfile.avatar = res.url; // 拿到服务器给的真实图片链接
-          this.sendDataToServer(); // 接着发数据
+          if (res && res.url) {
+            this.userProfile.avatar = res.url;
+          }
+          this.sendDataToServer();
         },
         error: () => {
           alert("Failed to upload profile picture. Please try again.");
         }
       });
     } else {
-      // 没有换照片，直接发数据
       this.sendDataToServer();
     }
   }
 
-  // 🌟 把更新后的资料发送到我们刚才在 server.js 加的 /api/users/update 接口
   sendDataToServer() {
     fetch('https://internetworks.my/api/users/update', {
       method: 'PUT',
@@ -122,7 +180,6 @@ export class MyProfile implements OnInit, AfterViewInit {
       body: JSON.stringify(this.userProfile)
     }).then(response => {
       if(response.ok) {
-        // 服务器存成功了，再更新本地缓存
         localStorage.setItem('active_user', JSON.stringify(this.userProfile));
         alert("Profile successfully updated and saved to the server!");
         this.isEditMode = false;
@@ -137,7 +194,8 @@ export class MyProfile implements OnInit, AfterViewInit {
   }
 
   addTag() {
-    const value = this.newTagValue.trim();
+    this.sanitizeData();
+    const value = this.newTagValue?.trim();
     if (value && !this.userProfile.focusAreas.includes(value)) {
       this.userProfile.focusAreas = [...this.userProfile.focusAreas, value];
     }
@@ -145,6 +203,7 @@ export class MyProfile implements OnInit, AfterViewInit {
   }
 
   removeTag(tag: string) {
+    this.sanitizeData();
     this.userProfile.focusAreas = this.userProfile.focusAreas.filter((t: string) => t !== tag);
   }
 
@@ -159,7 +218,8 @@ export class MyProfile implements OnInit, AfterViewInit {
   }
 
   initParticles() {
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
     this.ctx = canvas.getContext('2d');
     if (!this.ctx) return;
     this.resizeCanvas();
@@ -169,14 +229,15 @@ export class MyProfile implements OnInit, AfterViewInit {
 
   @HostListener('window:resize')
   resizeCanvas() {
-    if (!this.canvasRef) return;
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   }
 
   createParticles() {
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
     const particleCount = window.innerWidth < 768 ? 40 : 80;
     this.particles = [];
     for (let i = 0; i < particleCount; i++) {
@@ -192,10 +253,13 @@ export class MyProfile implements OnInit, AfterViewInit {
 
   animateParticles() {
     if (!this.ctx) return;
-    const canvas = this.canvasRef.nativeElement;
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
+
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const isDark = document.documentElement.classList.contains('dark');
+    const isDark = document.documentElement?.classList?.contains('dark');
     const rgb = isDark ? '13, 242, 242' : '8, 145, 178';
+
     for (let i = 0; i < this.particles.length; i++) {
       let p = this.particles[i];
       p.x += p.vx; p.y += p.vy;

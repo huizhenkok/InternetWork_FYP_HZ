@@ -16,12 +16,8 @@
 
       <div class="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end" data-aos="fade-down">
         <div class="max-w-2xl">
-          <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white uppercase">
-            {{ cmsData.mainTitle }}
-          </h1>
-          <p class="max-w-xl text-lg font-light leading-relaxed text-slate-500 dark:text-slate-400 font-body">
-            {{ cmsData.subTitle }}
-          </p>
+          <h1 class="mb-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white uppercase">{{ cmsData.mainTitle }}</h1>
+          <p class="max-w-xl text-lg font-light leading-relaxed text-slate-500 dark:text-slate-400 font-body">{{ cmsData.subTitle }}</p>
         </div>
       </div>
 
@@ -58,15 +54,23 @@
         <p class="text-sm font-bold text-primary dark:text-[#0df2f2] mt-1 uppercase tracking-widest">{{ selectedMember?.role || selectedMember?.designation || selectedMember?.department }}</p>
       </div>
     </div>
-    <div class="w-full md:w-3/5 p-8 flex flex-col gap-6 relative">
+    <div class="w-full md:w-3/5 p-8 flex flex-col gap-6 relative overflow-y-auto max-h-[80vh] md:max-h-auto">
       <div *ngIf="selectedMember?.organization || selectedMember?.email" class="flex flex-col gap-3">
         <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-gray-300" *ngIf="selectedMember?.organization"><span class="material-symbols-outlined text-slate-400">corporate_fare</span> {{ selectedMember?.organization }}</div>
         <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-gray-300" *ngIf="selectedMember?.email"><span class="material-symbols-outlined text-slate-400">mail</span> {{ selectedMember?.email }}</div>
       </div>
       <div>
         <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-200 dark:border-white/10 pb-2">Biography / Research</h4>
-        <p class="text-sm text-slate-600 dark:text-gray-400 leading-relaxed text-justify">{{ selectedMember?.description || 'This researcher is dedicated to advancing the field of Internet protocols and network intelligence. More detailed biography will be updated by the administration soon.' }}</p>
+        <p class="text-sm text-slate-600 dark:text-gray-400 leading-relaxed text-justify">{{ selectedMember?.bio || 'This researcher is dedicated to advancing the field of Internet protocols and network intelligence.' }}</p>
       </div>
+
+      <div *ngIf="selectedMember?.focusAreas && selectedMember.focusAreas.length > 0">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-200 dark:border-white/10 pb-2">Focus Areas</h4>
+        <div class="flex flex-wrap gap-2">
+          <span *ngFor="let tag of selectedMember.focusAreas" class="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20 dark:bg-white/5 dark:text-gray-300 dark:border-white/10 shadow-sm">{{ tag }}</span>
+        </div>
+      </div>
+
       <div class="mt-auto pt-4" *ngIf="selectedMember?.socialLink">
         <a [href]="selectedMember?.socialLink" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-sm font-bold text-slate-700 dark:text-gray-300 transition-colors no-underline"><span class="material-symbols-outlined text-[18px]">link</span> Professional Profile</a>
       </div>

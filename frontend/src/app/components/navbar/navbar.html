@@ -3,8 +3,8 @@
 
     <div class="flex items-center gap-3">
       <a routerLink="/home" class="flex items-center gap-3 no-underline outline-none group">
-        <div class="bg-white rounded-xl p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-transparent dark:shadow-[0_0_12px_rgba(255,255,255,0.1)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
-          <img src="/logo.png" alt="UUM IoT Logo" class="h-6 w-auto object-contain" onerror="this.src='https://via.placeholder.com/24x24?text=Logo'">
+        <div class="bg-white rounded-2xl p-2.5 md:p-3 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-transparent dark:shadow-[0_0_12px_rgba(255,255,255,0.1)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
+          <img src="/logo.png" alt="UUM IoT Logo" class="h-14 md:h-16 lg:h-[4.5rem] w-auto object-contain" onerror="this.src='https://via.placeholder.com/72x72?text=Logo'">
         </div>
       </a>
     </div>
@@ -40,7 +40,7 @@
           <div class="h-[1px] w-full bg-slate-100 dark:bg-white/10 my-1"></div>
 
           <div class="px-4 py-1 text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">Our Team</div>
-          <a routerLink="/people" [queryParams]="{tab: 'team'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">admin_panel_settings</span> Leadership</a>
+          <a routerLink="/people" [queryParams]="{tab: 'team'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">group</span> Members</a>
           <a routerLink="/people" [queryParams]="{tab: 'alumni'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">school</span> Alumni</a>
           <a routerLink="/people" [queryParams]="{tab: 'student'}" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#0df2f2] rounded-xl transition-colors no-underline outline-none flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">groups</span> Student</a>
         </div>

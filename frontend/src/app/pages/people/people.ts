@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { CmsService } from '../../../services/cms.service'; // 🌟 引入 CmsService 获取标题
+import { CmsService } from '../../../services/cms.service';
 
 import { OurTeam } from './team/our-team/our-team';
 import { ActiveStudent } from './team/active-student/active-student';
@@ -25,27 +25,28 @@ export class People implements OnInit {
   isModalOpen: boolean = false;
   selectedMember: any = null;
 
-  // 🌟 Req 3: 绑定 CMS 的标题数据
   cmsData: any = {
-    mainTitle: 'Leadership & Team',
+    mainTitle: 'Members & Team', // 🌟 默认值改成了 Members
     subTitle: 'A dedicated team of academic professionals, post-graduate researchers, and alumni advancing the field of network intelligence.'
   };
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private route: ActivatedRoute,
-    private cmsService: CmsService // 🌟 注入
+    private cmsService: CmsService
   ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
 
-      // 🌟 从数据库获取 Team 数据，并只保留 Header 信息
       this.cmsService.getCmsData('inwlab_cms_team').subscribe({
         next: (res: any) => {
           try {
             const parsed = JSON.parse(res.contentJson);
-            if (parsed.mainTitle) this.cmsData.mainTitle = parsed.mainTitle;
+            // 🌟 如果 CMS 里写了 Leadership，在这里强制自动替换成 Members！
+            if (parsed.mainTitle) {
+              this.cmsData.mainTitle = parsed.mainTitle.replace(/Leadership/g, 'Members').replace(/Leader/g, 'Member');
+            }
             if (parsed.subTitle) this.cmsData.subTitle = parsed.subTitle;
           } catch(e) { console.error("Error parsing Team CMS", e); }
         }
