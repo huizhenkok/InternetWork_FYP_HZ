@@ -12,11 +12,9 @@ export class InternalNavbar implements OnInit {
   @Input() isDarkMode = false;
   @Output() toggleThemeEvent = new EventEmitter<void>();
 
-  // 🌟 动态 Home 链接：默认去 student
   homeLink: string = '/student';
-
-  // 🌟 声明 userRole 变量，用于 HTML 里的 *ngIf 判断
   userRole: string = '';
+  isMobileMenuOpen = false; // 🌟 新增移动端菜单开关
 
   constructor(
     private router: Router,
@@ -27,10 +25,9 @@ export class InternalNavbar implements OnInit {
     if (this.router.url.includes('/alumni')) {
       this.homeLink = '/alumni';
     } else if (this.router.url.includes('/faculty')) {
-      this.homeLink = '/faculty'; // 🌟 新增 Faculty 判断
+      this.homeLink = '/faculty';
     }
 
-    // 🌟 核心：在初始化时，从 localStorage 获取当前用户的角色 (Role)
     if (isPlatformBrowser(this.platformId)) {
       try {
         const activeUser = JSON.parse(localStorage.getItem('active_user') || '{}');
@@ -42,7 +39,20 @@ export class InternalNavbar implements OnInit {
     }
   }
 
-  toggleTheme() {
-    this.toggleThemeEvent.emit();
+  toggleTheme() { this.toggleThemeEvent.emit(); }
+
+  // 🌟 移动端菜单控制方法
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    if (this.isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    document.body.style.overflow = 'auto';
   }
 }

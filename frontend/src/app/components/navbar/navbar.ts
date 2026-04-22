@@ -14,7 +14,8 @@ export class Navbar implements OnInit {
   @Output() toggleThemeEvent = new EventEmitter<void>();
 
   isNetappsMenuOpen = false;
-  isMobileMenuOpen = false;
+  isMobileMenuOpen = false; // 🌟 移动端菜单开关
+  isMobileAboutOpen = false; // 🌟 移动端 About Us 折叠菜单开关
 
   conferenceYears: string[] = [];
 
@@ -25,7 +26,6 @@ export class Navbar implements OnInit {
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // 从 MySQL 获取会议年份
       this.cmsService.getCmsData('inwlab_cms_conferences').subscribe({
         next: (res: any) => {
           try {
@@ -40,4 +40,23 @@ export class Navbar implements OnInit {
   }
 
   onToggleTheme() { this.toggleThemeEvent.emit(); }
+
+  // 🌟 移动端菜单控制方法
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    if (this.isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden'; // 防止底部背景滚动
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  toggleMobileAbout() {
+    this.isMobileAboutOpen = !this.isMobileAboutOpen;
+  }
 }

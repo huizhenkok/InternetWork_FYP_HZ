@@ -1,33 +1,62 @@
 <div class="z-50 w-full px-6 pt-6 flex justify-center relative">
-  <nav class="glass-panel w-full max-w-[1200px] rounded-full px-8 py-4 flex items-center justify-between transition-all duration-300 dark:bg-[#121212]/80 dark:border-white/10 shadow-sm">
+  <nav class="glass-panel w-full max-w-[1200px] rounded-full px-4 md:px-8 py-3 md:py-4 flex items-center justify-between transition-all duration-300 dark:bg-[#121212]/80 dark:border-white/10 shadow-sm relative z-[60]">
 
     <div class="flex items-center gap-3">
-      <a [routerLink]="homeLink" class="flex items-center gap-3 no-underline outline-none group">
+      <a [routerLink]="homeLink" class="flex items-center gap-3 no-underline outline-none group" (click)="closeMobileMenu()">
         <div class="bg-white rounded-2xl p-2.5 md:p-3 shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-slate-100 dark:border-transparent dark:shadow-[0_0_12px_rgba(255,255,255,0.1)] flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105">
-          <img src="/logo.png" alt="UUM IoT Logo" class="h-14 md:h-16 lg:h-[4.5rem] w-auto object-contain" onerror="this.src='https://via.placeholder.com/72x72?text=Logo'">
+          <img src="/logo.png" alt="UUM IoT Logo" class="h-10 md:h-16 lg:h-[4.5rem] w-auto object-contain" onerror="this.src='https://via.placeholder.com/72x72?text=Logo'">
         </div>
       </a>
     </div>
 
-    <div class="hidden md:flex items-center gap-8 justify-center flex-1 mx-4">
+    <div class="hidden lg:flex items-center gap-8 justify-center flex-1 mx-4">
       <a [routerLink]="homeLink" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" [routerLinkActiveOptions]="{exact: true}" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Home</a>
       <a routerLink="/my-profile" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">My Profile</a>
-
       <a *ngIf="userRole !== 'Alumni'" routerLink="/booking" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Booking</a>
-
       <a routerLink="/forum-activity" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Forum Activity</a>
       <a routerLink="/publication" routerLinkActive="!text-primary !font-bold dark:!text-[#0df2f2] drop-shadow-sm" class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-gray-300 dark:hover:text-white transition-colors no-underline">Publication</a>
     </div>
 
-    <div class="hidden md:flex items-center gap-4">
+    <div class="hidden lg:flex items-center gap-4">
       <button type="button" (click)="toggleTheme()" class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm transition-all duration-300 hover:bg-slate-100 dark:border-white/10 dark:bg-white/5 dark:text-[#0df2f2] dark:hover:bg-white/10 border-none cursor-pointer outline-none">
         <span class="material-symbols-outlined text-[20px] dark:hidden">dark_mode</span>
         <span class="material-symbols-outlined text-[20px] hidden dark:inline">light_mode</span>
       </button>
       <a routerLink="/login" class="glow-button inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black text-sm font-bold px-6 py-2.5 rounded-full transition-all duration-300 hover:-translate-y-0.5 no-underline cursor-pointer outline-none">
-        <span class="material-symbols-outlined text-[18px]">logout</span>
-        Logout
+        <span class="material-symbols-outlined text-[18px]">logout</span> Logout
       </a>
     </div>
+
+    <button (click)="toggleMobileMenu()" class="lg:hidden flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-800 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-white cursor-pointer outline-none z-50">
+      <span class="material-symbols-outlined">{{ isMobileMenuOpen ? 'close' : 'menu' }}</span>
+    </button>
   </nav>
+</div>
+
+<div *ngIf="isMobileMenuOpen" class="fixed inset-0 z-50 lg:hidden">
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" (click)="closeMobileMenu()"></div>
+
+  <div class="absolute right-0 top-0 bottom-0 w-[80%] max-w-sm bg-white dark:bg-[#121212] shadow-2xl flex flex-col p-6 overflow-y-auto animate-fade-in border-l border-slate-200 dark:border-white/10">
+    <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-100 dark:border-white/10 pt-16">
+      <span class="text-sm font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Dashboard</span>
+      <button (click)="toggleTheme()" class="flex size-10 items-center justify-center rounded-full bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-[#0df2f2] cursor-pointer border-none outline-none">
+        <span *ngIf="!isDarkMode" class="material-symbols-outlined text-[20px]">dark_mode</span>
+        <span *ngIf="isDarkMode" class="material-symbols-outlined text-[20px]">light_mode</span>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <a [routerLink]="homeLink" (click)="closeMobileMenu()" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold bg-primary/5 dark:bg-white/5" [routerLinkActiveOptions]="{exact: true}" class="px-4 py-3 rounded-xl text-slate-700 dark:text-gray-300 font-medium no-underline flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard Home</a>
+      <a routerLink="/my-profile" (click)="closeMobileMenu()" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold bg-primary/5 dark:bg-white/5" class="px-4 py-3 rounded-xl text-slate-700 dark:text-gray-300 font-medium no-underline flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">person</span> My Profile</a>
+      <a *ngIf="userRole !== 'Alumni'" routerLink="/booking" (click)="closeMobileMenu()" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold bg-primary/5 dark:bg-white/5" class="px-4 py-3 rounded-xl text-slate-700 dark:text-gray-300 font-medium no-underline flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">event</span> Lab Booking</a>
+      <a routerLink="/forum-activity" (click)="closeMobileMenu()" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold bg-primary/5 dark:bg-white/5" class="px-4 py-3 rounded-xl text-slate-700 dark:text-gray-300 font-medium no-underline flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">forum</span> Forum Activity</a>
+      <a routerLink="/publication" (click)="closeMobileMenu()" routerLinkActive="!text-primary dark:!text-[#0df2f2] !font-bold bg-primary/5 dark:bg-white/5" class="px-4 py-3 rounded-xl text-slate-700 dark:text-gray-300 font-medium no-underline flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">menu_book</span> Publication</a>
+    </div>
+
+    <div class="mt-auto pt-8">
+      <a routerLink="/login" (click)="closeMobileMenu()" class="w-full inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-800 dark:text-white text-sm font-bold px-6 py-3.5 rounded-xl no-underline transition-colors">
+        <span class="material-symbols-outlined text-[18px]">logout</span> Sign Out
+      </a>
+    </div>
+  </div>
 </div>
