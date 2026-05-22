@@ -26,10 +26,6 @@ export class AdminCms implements OnInit {
 
   isUploading: boolean = false;
 
-  // ==============================
-  // 🗄️ Global Database Mapping
-  // ==============================
-
   homeData: any = {
     heading: 'Innovating the Future...',
     subheading: '...',
@@ -58,8 +54,11 @@ export class AdminCms implements OnInit {
         targetDate: '2026-11-06T00:00:00',
         date1: 'August 15, 2026',
         date2: 'Sept 30, 2026',
-        fee1: 'RM 1,000',
-        fee2: 'RM 800'
+        fee1: 'RM 1000',
+        fee1Intl: 'USD 300',
+        fee2: 'RM 800',
+        fee2Intl: 'USD 200',
+        customFees: [] // 🌟 包含 type, amountLocal, amountIntl
       },
       cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.\n\nPaper format guidelines...',
       reg: 'Registration & Final Submission details to be announced.',
@@ -91,7 +90,6 @@ export class AdminCms implements OnInit {
     private uploadService: UploadService
   ) {}
 
-  // 🌟 新增：全局统一的图片修复逻辑 (为了让 Admin CMS 的预览也能正常显示图片)
   public fixUrl(url: string | undefined): string {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -209,7 +207,17 @@ export class AdminCms implements OnInit {
       year: nextYear,
       title: 'The International Conference on Internet Applications, Protocols and Services',
       shortName: 'NETAPPS',
-      home: { paragraph1: 'Conference description here...', paragraph2: 'Goals and objectives...', confDate: `November ${nextYear}`, targetDate: `${nextYear}-11-06T00:00:00`, date1: `August 15, ${nextYear}`, date2: `Sept 30, ${nextYear}`, fee1: 'RM 1,000', fee2: 'RM 800' },
+      home: {
+        paragraph1: 'Conference description here...',
+        paragraph2: 'Goals and objectives...',
+        confDate: `November ${nextYear}`,
+        targetDate: `${nextYear}-11-06T00:00:00`,
+        date1: `August 15, ${nextYear}`,
+        date2: `Sept 30, ${nextYear}`,
+        fee1: 'RM 1000', fee1Intl: 'USD 300',
+        fee2: 'RM 800', fee2Intl: 'USD 200',
+        customFees: []
+      },
       cfp: 'Call for paper guidelines...',
       reg: 'Registration details...',
       imageUrl: '',
@@ -229,12 +237,27 @@ export class AdminCms implements OnInit {
   openConferenceEditor(index: number) { this.editingConfIndex = index; this.activeConfTab = 'home'; }
   closeConferenceEditor() { this.editingConfIndex = null; this.saveConferences(); }
 
+  // 🌟 动态添加自定义 Fee (带 Local 和 Intl)
+  addCustomFee() {
+    if (this.editingConfIndex !== null) {
+      if (!this.conferences[this.editingConfIndex].home.customFees) {
+        this.conferences[this.editingConfIndex].home.customFees = [];
+      }
+      this.conferences[this.editingConfIndex].home.customFees.push({ type: '', amountLocal: '', amountIntl: '' });
+    }
+  }
+
+  deleteCustomFee(index: number) {
+    if (this.editingConfIndex !== null && confirm("Delete this fee option?")) {
+      this.conferences[this.editingConfIndex].home.customFees.splice(index, 1);
+    }
+  }
+
   addConfCommittee() { if (this.editingConfIndex !== null) this.conferences[this.editingConfIndex].team.push({ title: 'New Committee', members: [] }); }
   deleteConfCommittee(cIndex: number) { if (this.editingConfIndex !== null && confirm("Delete this entire committee?")) this.conferences[this.editingConfIndex].team.splice(cIndex, 1); }
   addConfMember(cIndex: number) { if (this.editingConfIndex !== null) this.conferences[this.editingConfIndex].team[cIndex].members.push({ name: 'Member Name', org: 'University / Org', role: '' }); }
   deleteConfMember(cIndex: number, mIndex: number) { if (this.editingConfIndex !== null && confirm("Remove this member?")) this.conferences[this.editingConfIndex].team[cIndex].members.splice(mIndex, 1); }
 
-  // 🌟 核心：为新增的 Gathering / News 加入 fullContent 字段
   addGathering() {
     this.newsAndEventsData.gatherings.push({
       date: 'DATE', location: 'LOCATION', title: 'New Article Title',

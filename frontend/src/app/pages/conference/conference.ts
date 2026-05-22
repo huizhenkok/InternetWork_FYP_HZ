@@ -19,7 +19,7 @@ export class Conference implements OnInit, OnDestroy {
   currentYear: string = '2026';
   routeSub!: Subscription;
   confData: any = null;
-  isLoading: boolean = true; // 🌟 增加加载状态
+  isLoading: boolean = true;
 
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
@@ -31,7 +31,6 @@ export class Conference implements OnInit, OnDestroy {
     private cmsService: CmsService
   ) {}
 
-  // 🌟 全局统一的图片/文件修复逻辑 (覆盖了旧的)
   public fixUrl(url: string | undefined): string {
     if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -47,7 +46,7 @@ export class Conference implements OnInit, OnDestroy {
         if (yearParam) {
           this.currentYear = yearParam;
           this.activeTab = 'HOME';
-          this.isLoading = true; // 开始加载
+          this.isLoading = true;
           this.loadConferenceData(this.currentYear);
         }
       });
@@ -78,8 +77,31 @@ export class Conference implements OnInit, OnDestroy {
     setTimeout(() => { if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); } }, 150);
   }
 
+  // 🌟 加入了新属性的默认值：fee1Intl, fee2Intl, customFees
   applyDefaultConfData(year: string) {
-    this.confData = { year: year, title: 'The International Conference on Internet Applications', shortName: 'NETAPPS', home: { paragraph1: `...`, paragraph2: `...`, confDate: `6 & 7 November ${year}`, targetDate: `${year}-11-06T00:00:00`, date1: `August 15, ${year}`, date2: `Sept 30, ${year}`, fee1: 'RM 1,000', fee2: 'RM 800' }, cfp: 'All papers must be original...', reg: 'Registration details...', imageUrl: '', pdfUrl: '', team: [] };
+    this.confData = {
+      year: year,
+      title: 'The International Conference on Internet Applications',
+      shortName: 'NETAPPS',
+      home: {
+        paragraph1: `...`,
+        paragraph2: `...`,
+        confDate: `6 & 7 November ${year}`,
+        targetDate: `${year}-11-06T00:00:00`,
+        date1: `August 15, ${year}`,
+        date2: `Sept 30, ${year}`,
+        fee1: 'RM 1000',
+        fee1Intl: 'USD 300',
+        fee2: 'RM 800',
+        fee2Intl: 'USD 200',
+        customFees: []
+      },
+      cfp: 'All papers must be original...',
+      reg: 'Registration details...',
+      imageUrl: '',
+      pdfUrl: '',
+      team: []
+    };
     this.setCountdownForDate(this.confData.home.targetDate);
   }
 

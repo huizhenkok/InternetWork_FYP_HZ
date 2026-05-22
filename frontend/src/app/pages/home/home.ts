@@ -16,7 +16,7 @@ export class Home implements OnInit, OnDestroy {
   // ... (保留你原来的变量声明，不要动它们)
   days: number = 0; hours: number = 0; minutes: number = 0; seconds: number = 0;
   private timer: any;
-  bgImages: string[] = ['/b1.jpg', '/b2.jpg', '/b3.jpg', '/b4.jpg', '/b5.jpg'];
+  bgImages: string[] = ['/b1.jpg', '/b2.jpg','/soc.jpg' ,'/soc1.jpg','/b3.jpg', '/b4.jpg', '/b5.jpg'];
   currentBgIndex: number = 0;
   private bgTimer: any;
   realPublications: number = 0; realProjects: number = 0; realMembers: number = 0;

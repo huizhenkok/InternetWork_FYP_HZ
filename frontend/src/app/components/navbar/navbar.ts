@@ -13,9 +13,9 @@ export class Navbar implements OnInit {
   @Input() isDarkMode = false;
   @Output() toggleThemeEvent = new EventEmitter<void>();
 
-  isNetappsMenuOpen = false;
-  isMobileMenuOpen = false; // 🌟 移动端菜单开关
-  isMobileAboutOpen = false; // 🌟 移动端 About Us 折叠菜单开关
+  isMobileMenuOpen = false;
+  isMobileAboutOpen = false;
+  isMobileNetappsOpen = false; // 🌟 新增：控制手机端 NetApps 的展开
 
   conferenceYears: string[] = [];
 
@@ -41,14 +41,9 @@ export class Navbar implements OnInit {
 
   onToggleTheme() { this.toggleThemeEvent.emit(); }
 
-  // 🌟 移动端菜单控制方法
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    if (this.isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden'; // 防止底部背景滚动
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+    document.body.style.overflow = this.isMobileMenuOpen ? 'hidden' : 'auto';
   }
 
   closeMobileMenu() {
@@ -58,5 +53,10 @@ export class Navbar implements OnInit {
 
   toggleMobileAbout() {
     this.isMobileAboutOpen = !this.isMobileAboutOpen;
+  }
+
+  // 🌟 新增：手机端 NetApps 展开方法
+  toggleMobileNetapps() {
+    this.isMobileNetappsOpen = !this.isMobileNetappsOpen;
   }
 }

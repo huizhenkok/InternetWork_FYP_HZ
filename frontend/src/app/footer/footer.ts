@@ -10,6 +10,9 @@ import { Router } from '@angular/router';
 })
 export class Footer {
 
+  // 🌟 新增：自动获取当前实时年份
+  currentYear: number = new Date().getFullYear();
+
   // 注入 Router，用来判断当前所在的网页网址
   constructor(public router: Router) {}
 
