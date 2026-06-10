@@ -640,10 +640,11 @@
                 </div>
 
                 <div class="flex flex-wrap border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/5 mb-8">
-                  <button (click)="activeConfTab = 'home'" [ngClass]="activeConfTab === 'home' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Basic & Home</button>
-                  <button (click)="activeConfTab = 'cfp'" [ngClass]="activeConfTab === 'cfp' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Call For Paper</button>
-                  <button (click)="activeConfTab = 'reg'" [ngClass]="activeConfTab === 'reg' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Registration</button>
-                  <button (click)="activeConfTab = 'team'" [ngClass]="activeConfTab === 'team' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-5 py-3 text-sm font-bold flex-1 cursor-pointer outline-none transition-colors border-none">Conf. Team</button>
+                  <button (click)="activeConfTab = 'home'" [ngClass]="activeConfTab === 'home' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-3 py-3 text-xs font-bold flex-1 cursor-pointer outline-none transition-colors border-none whitespace-nowrap">Basic & Home</button>
+                  <button (click)="activeConfTab = 'cfp'" [ngClass]="activeConfTab === 'cfp' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-3 py-3 text-xs font-bold flex-1 cursor-pointer outline-none transition-colors border-none whitespace-nowrap">Call For Paper</button>
+                  <button (click)="activeConfTab = 'reg'" [ngClass]="activeConfTab === 'reg' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-3 py-3 text-xs font-bold flex-1 cursor-pointer outline-none transition-colors border-none whitespace-nowrap">Registration</button>
+                  <button (click)="activeConfTab = 'keynote'" [ngClass]="activeConfTab === 'keynote' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-3 py-3 text-xs font-bold flex-1 cursor-pointer outline-none transition-colors border-none whitespace-nowrap">Keynote Speakers</button>
+                  <button (click)="activeConfTab = 'team'" [ngClass]="activeConfTab === 'team' ? 'bg-white dark:bg-[#121212] text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'" class="px-3 py-3 text-xs font-bold flex-1 cursor-pointer outline-none transition-colors border-none whitespace-nowrap">Conf. Team</button>
                 </div>
 
                 <div class="p-6 flex flex-col gap-8 bg-slate-50/50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl">
@@ -656,6 +657,15 @@
                       <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Countdown Target (YYYY-MM-DDTHH:mm:ss)</label><input type="text" [(ngModel)]="conferences[editingConfIndex].home.targetDate" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-primary font-mono outline-none"></div>
                     </div>
                     <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Full Conference Title</label><input type="text" [(ngModel)]="conferences[editingConfIndex].title" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white font-bold outline-none"></div>
+
+                    <div class="flex flex-col gap-2 p-4 bg-white dark:bg-black/30 rounded-xl border border-slate-200 dark:border-white/10">
+                      <label class="text-[10px] font-bold text-primary uppercase">Conference Title Logo (Will display on the left of Full Title)</label>
+                      <div class="flex items-center gap-3">
+                        <input type="file" accept="image/*" (change)="onFileUpload($event, conferences[editingConfIndex], 'titleLogo')" [disabled]="isUploading" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                        <span *ngIf="isUploading" class="text-xs text-primary">Uploading...</span>
+                      </div>
+                      <img *ngIf="conferences[editingConfIndex].titleLogo" [src]="fixUrl(conferences[editingConfIndex].titleLogo)" alt="Title Logo Preview" class="mt-2 h-16 w-auto object-contain rounded border border-slate-200 dark:border-white/5 p-1 bg-slate-50">
+                    </div>
 
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-2 mt-4">Home Page Content</h3>
                     <div class="flex flex-col gap-2"><label class="text-[10px] font-bold text-slate-500 uppercase">Paragraph 1</label><textarea [(ngModel)]="conferences[editingConfIndex].home.paragraph1" rows="3" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea></div>
@@ -671,7 +681,6 @@
 
                       <div class="p-4 bg-white dark:bg-black/30 rounded-xl border border-slate-200 dark:border-white/10 flex flex-col gap-4">
                         <h4 class="text-[10px] font-bold text-accent-cyan uppercase border-b border-slate-200 dark:border-white/10 pb-1">Registration Fees</h4>
-
                         <div class="flex flex-col gap-2">
                           <label class="text-[10px] font-bold text-slate-700 dark:text-white uppercase">Presenter Fee</label>
                           <div class="flex gap-2">
@@ -679,7 +688,6 @@
                             <input type="text" [(ngModel)]="conferences[editingConfIndex].home.fee1Intl" placeholder="Intl (e.g. USD 300)" class="w-1/2 bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none text-slate-900 dark:text-white">
                           </div>
                         </div>
-
                         <div class="flex flex-col gap-2">
                           <label class="text-[10px] font-bold text-slate-700 dark:text-white uppercase">Student / IEEE Member Fee</label>
                           <div class="flex gap-2">
@@ -687,7 +695,6 @@
                             <input type="text" [(ngModel)]="conferences[editingConfIndex].home.fee2Intl" placeholder="Intl (e.g. USD 200)" class="w-1/2 bg-transparent border border-slate-200 dark:border-white/10 rounded px-2 py-1 text-sm outline-none text-slate-900 dark:text-white">
                           </div>
                         </div>
-
                         <div class="flex flex-col gap-2 mt-2">
                           <label class="text-[10px] font-bold text-slate-700 dark:text-white uppercase">Custom Fee Options</label>
                           <div *ngFor="let fee of conferences[editingConfIndex].home.customFees; let fIndex = index" class="flex flex-col gap-1 p-3 border border-slate-200 dark:border-white/5 rounded-lg relative bg-slate-50 dark:bg-black/20">
@@ -713,7 +720,6 @@
                         </div>
                         <img *ngIf="conferences[editingConfIndex].imageUrl" [src]="fixUrl(conferences[editingConfIndex].imageUrl)" alt="Preview" class="mt-2 h-24 w-auto object-cover rounded-lg border border-slate-200 dark:border-white/10 shadow-sm">
                       </div>
-
                       <div class="flex flex-col gap-2">
                         <label class="text-[10px] font-bold text-accent-cyan uppercase">Upload Program Book (PDF)</label>
                         <div class="flex items-center gap-2">
@@ -725,17 +731,130 @@
                         </div>
                       </div>
                     </div>
-
                   </div>
 
-                  <div *ngIf="activeConfTab === 'cfp'" class="animate-in fade-in flex flex-col gap-4">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Submission Guidelines Content</label>
-                    <textarea [(ngModel)]="conferences[editingConfIndex].cfp" rows="12" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                  <div *ngIf="activeConfTab === 'cfp'" class="animate-in fade-in flex flex-col gap-2">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-2 gap-2">
+                      <label class="text-xs font-bold text-slate-500 uppercase">Submission Guidelines (Visual Editor)</label>
+
+                      <div class="flex gap-1 flex-wrap bg-white dark:bg-black/40 p-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs items-center shadow-sm">
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('bold')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded font-bold border-none outline-none cursor-pointer">B</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('italic')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded italic border-none outline-none cursor-pointer">I</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('underline')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded underline border-none outline-none cursor-pointer">U</button>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertUnorderedList')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded border-none outline-none cursor-pointer flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[14px]">format_list_bulleted</span> List
+                        </button>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <div class="flex items-center gap-1 px-2">
+                          <label class="font-bold text-slate-500">Size:</label>
+                          <select (change)="formatSize($event)" class="bg-transparent border border-slate-300 dark:border-white/20 rounded px-1 py-0.5 outline-none text-slate-700 dark:text-white cursor-pointer">
+                            <option value="3">Normal</option>
+                            <option value="4">Large</option>
+                            <option value="5">X-Large</option>
+                            <option value="6">Huge</option>
+                          </select>
+                        </div>
+                        <div class="flex items-center gap-1 px-2">
+                          <label class="font-bold text-slate-500">Color:</label>
+                          <input type="color" (input)="formatColor($event)" class="w-6 h-6 p-0 border-0 rounded cursor-pointer bg-transparent">
+                        </div>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="insertLink()" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded text-blue-500 underline border-none outline-none cursor-pointer">🔗 Link</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertHorizontalRule')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded font-bold border-none outline-none cursor-pointer">— Line</button>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertText', '✨')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded border-none outline-none cursor-pointer">✨</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertText', '📅')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded border-none outline-none cursor-pointer">📅</button>
+                      </div>
+                    </div>
+
+                    <div id="cfpEditor" #cfpEditor
+                         contenteditable="true"
+                         [innerHTML]="conferences[editingConfIndex].cfp"
+                         (blur)="conferences[editingConfIndex].cfp = encodeFourByteChars(cfpEditor.innerHTML)"
+                         class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none min-h-[300px] overflow-y-auto prose prose-ul:list-disc prose-ul:ml-6 prose-li:marker:text-primary prose-a:text-blue-500 prose-a:underline dark:prose-invert focus:border-primary transition-colors">
+                    </div>
                   </div>
 
-                  <div *ngIf="activeConfTab === 'reg'" class="animate-in fade-in flex flex-col gap-4">
-                    <label class="text-xs font-bold text-slate-500 uppercase">Registration & Final Submission Content</label>
-                    <textarea [(ngModel)]="conferences[editingConfIndex].reg" rows="12" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none resize-none"></textarea>
+                  <div *ngIf="activeConfTab === 'reg'" class="animate-in fade-in flex flex-col gap-2">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 dark:border-white/10 pb-2 mb-2 gap-2">
+                      <label class="text-xs font-bold text-slate-500 uppercase">Registration & Final Submission (Visual Editor)</label>
+
+                      <div class="flex gap-1 flex-wrap bg-white dark:bg-black/40 p-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs items-center shadow-sm">
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('bold')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded font-bold border-none outline-none cursor-pointer">B</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('italic')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded italic border-none outline-none cursor-pointer">I</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('underline')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded underline border-none outline-none cursor-pointer">U</button>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertUnorderedList')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded border-none outline-none cursor-pointer flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[14px]">format_list_bulleted</span> List
+                        </button>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <div class="flex items-center gap-1 px-2">
+                          <label class="font-bold text-slate-500">Size:</label>
+                          <select (change)="formatSize($event)" class="bg-transparent border border-slate-300 dark:border-white/20 rounded px-1 py-0.5 outline-none text-slate-700 dark:text-white cursor-pointer">
+                            <option value="3">Normal</option>
+                            <option value="4">Large</option>
+                            <option value="5">X-Large</option>
+                            <option value="6">Huge</option>
+                          </select>
+                        </div>
+                        <div class="flex items-center gap-1 px-2">
+                          <label class="font-bold text-slate-500">Color:</label>
+                          <input type="color" (input)="formatColor($event)" class="w-6 h-6 p-0 border-0 rounded cursor-pointer bg-transparent">
+                        </div>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="insertLink()" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded text-blue-500 underline border-none outline-none cursor-pointer">🔗 Link</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertHorizontalRule')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded font-bold border-none outline-none cursor-pointer">— Line</button>
+                        <div class="w-[1px] h-4 bg-slate-300 dark:bg-white/20 mx-1"></div>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertText', '✅')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded border-none outline-none cursor-pointer">✅</button>
+                        <button type="button" (mousedown)="$event.preventDefault()" (click)="formatDoc('insertText', '📝')" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/10 rounded border-none outline-none cursor-pointer">📝</button>
+                      </div>
+                    </div>
+
+                    <div id="regEditor" #regEditor
+                         contenteditable="true"
+                         [innerHTML]="conferences[editingConfIndex].reg"
+                         (blur)="conferences[editingConfIndex].reg = encodeFourByteChars(regEditor.innerHTML)"
+                         class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white outline-none min-h-[300px] overflow-y-auto prose prose-ul:list-disc prose-ul:ml-6 prose-li:marker:text-primary prose-a:text-blue-500 prose-a:underline dark:prose-invert focus:border-primary transition-colors">
+                    </div>
+                  </div>
+
+                  <div *ngIf="activeConfTab === 'keynote'" class="animate-in fade-in flex flex-col gap-6">
+                    <div class="flex justify-between items-center border-b border-slate-200 dark:border-white/10 pb-2">
+                      <h3 class="text-sm font-bold text-slate-900 dark:text-white">Keynote Speakers Management</h3>
+                      <button (click)="addKeynoteSpeaker(editingConfIndex)" class="flex items-center gap-1 text-xs font-bold text-primary hover:text-accent-cyan transition-colors bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">add_circle</span> Add Keynote Speaker</button>
+                    </div>
+
+                    <div class="flex flex-col gap-6">
+                      <div *ngFor="let speaker of conferences[editingConfIndex].keynoteSpeakers; let sIndex = index" class="p-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative flex flex-col gap-4 group">
+                        <button (click)="deleteKeynoteSpeaker(editingConfIndex, sIndex)" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div class="flex flex-col gap-1">
+                            <label class="text-[9px] font-bold text-primary uppercase">Speaker Full Name</label>
+                            <input type="text" [(ngModel)]="speaker.name" placeholder="Prof. Dr. Saad Mekhilef" class="w-full bg-transparent border-b border-slate-200 dark:border-white/10 px-1 py-1 text-sm font-bold text-slate-900 dark:text-white outline-none">
+                          </div>
+                          <div class="flex flex-col gap-1">
+                            <label class="text-[9px] font-bold text-primary uppercase">University & Country</label>
+                            <input type="text" [(ngModel)]="speaker.university" placeholder="Swinburne University of Technology, Australia" class="w-full bg-transparent border-b border-slate-200 dark:border-white/10 px-1 py-1 text-sm font-bold text-slate-900 dark:text-white outline-none">
+                          </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                          <label class="text-[9px] font-bold text-primary uppercase">Speaker Photo</label>
+                          <div class="flex items-center gap-3">
+                            <input type="file" accept="image/*" (change)="onFileUpload($event, speaker, 'photo')" class="text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+                          </div>
+                          <img *ngIf="speaker.photo" [src]="fixUrl(speaker.photo)" alt="Speaker Preview" class="h-20 w-20 object-cover rounded-full border border-slate-200 mt-1 shadow-sm">
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                          <label class="text-[9px] font-bold text-primary uppercase">Biography & Description</label>
+                          <textarea [(ngModel)]="speaker.description" rows="5" placeholder="Enter speaker background details here..." class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"></textarea>
+                        </div>
+                      </div>
+                      <div *ngIf="!conferences[editingConfIndex].keynoteSpeakers || conferences[editingConfIndex].keynoteSpeakers.length === 0" class="text-center py-6 text-sm text-slate-500">No keynote speakers added yet.</div>
+                    </div>
                   </div>
 
                   <div *ngIf="activeConfTab === 'team'" class="animate-in fade-in flex flex-col gap-8">
@@ -746,12 +865,10 @@
 
                     <div *ngFor="let committee of conferences[editingConfIndex].team; let cIndex = index" class="p-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl relative group">
                       <button (click)="deleteConfCommittee(cIndex)" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
-
                       <div class="flex flex-col gap-1 mb-4 w-64">
                         <label class="text-[9px] font-bold text-primary uppercase">Committee Title</label>
                         <input type="text" [(ngModel)]="committee.title" class="w-full bg-transparent border-b border-slate-200 dark:border-white/10 px-1 py-1 text-sm font-bold text-slate-900 dark:text-white outline-none">
                       </div>
-
                       <div class="flex flex-col gap-2 pl-3 border-l-2 border-slate-200 dark:border-white/10">
                         <div *ngFor="let member of committee.members; let mIndex = index" class="grid grid-cols-1 md:grid-cols-3 gap-2 bg-slate-50 dark:bg-black/30 p-2 rounded-lg border border-slate-200 dark:border-white/5 relative pr-8">
                           <button (click)="deleteConfMember(cIndex, mIndex)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer outline-none"><span class="material-symbols-outlined text-[16px]">close</span></button>
@@ -762,7 +879,6 @@
                         <button (click)="addConfMember(cIndex)" class="self-start text-[10px] font-bold text-slate-500 hover:text-primary transition-colors mt-1 bg-transparent border-none cursor-pointer outline-none">+ Add Member</button>
                       </div>
                     </div>
-
                     <div *ngIf="conferences[editingConfIndex].team.length === 0" class="text-center py-6 text-sm text-slate-500">No committees added yet.</div>
                   </div>
 

@@ -15,7 +15,8 @@ export class Navbar implements OnInit {
 
   isMobileMenuOpen = false;
   isMobileAboutOpen = false;
-  isMobileNetappsOpen = false; // 🌟 新增：控制手机端 NetApps 的展开
+  isMobileNetappsOpen = false;
+  isMobilePlatformOpen = false; // 🌟 任务 6：控制手机端 Platform 的状态变量
 
   conferenceYears: string[] = [];
 
@@ -51,12 +52,7 @@ export class Navbar implements OnInit {
     document.body.style.overflow = 'auto';
   }
 
-  toggleMobileAbout() {
-    this.isMobileAboutOpen = !this.isMobileAboutOpen;
-  }
-
-  // 🌟 新增：手机端 NetApps 展开方法
-  toggleMobileNetapps() {
-    this.isMobileNetappsOpen = !this.isMobileNetappsOpen;
-  }
+  toggleMobileAbout() { this.isMobileAboutOpen = !this.isMobileAboutOpen; }
+  toggleMobileNetapps() { this.isMobileNetappsOpen = !this.isMobileNetappsOpen; }
+  toggleMobilePlatform() { this.isMobilePlatformOpen = !this.isMobilePlatformOpen; } // 🌟 任务 6
 }

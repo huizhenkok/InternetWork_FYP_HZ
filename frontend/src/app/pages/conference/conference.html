@@ -11,7 +11,7 @@
   </div>
   <div class="text-center flex flex-col gap-2">
     <h3 class="text-xl font-bold text-slate-900 dark:text-white">Connecting to Secure Datacenter...</h3>
-    <p class="text-sm text-slate-500 dark:text-gray-400 max-w-sm">Please wait while we wake up the backend server. This may take up to 50 seconds on the first visit.</p>
+    <p class="text-sm text-slate-500 dark:text-gray-400 max-w-sm">Please wait while we wake up the backend server.</p>
   </div>
 </div>
 
@@ -26,23 +26,30 @@
   <div class="relative z-30 flex-grow flex flex-col items-center w-full mt-10">
     <main class="w-full max-w-7xl mx-auto flex flex-col gap-12 pt-4 pb-20 px-6">
 
-      <div class="flex flex-col items-center justify-center text-center gap-6 border-b border-slate-200 pb-10 dark:border-white/5" data-aos="fade-down">
-        <div class="flex flex-col items-center gap-2 max-w-4xl">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-8 border-b border-slate-200 pb-10 dark:border-white/5" data-aos="fade-down">
+
+        <div *ngIf="confData.titleLogo" class="w-full md:w-1/2 flex items-center justify-center md:justify-end pr-0 md:pr-4">
+          <img [src]="fixUrl(confData.titleLogo)" alt="Conference Logo" class="w-full max-w-[500px] h-auto object-contain drop-shadow-lg rounded-2xl">
+        </div>
+
+        <div class="flex flex-col items-center md:items-start gap-2" [ngClass]="confData.titleLogo ? 'w-full md:w-1/2 text-center md:text-left' : 'w-full text-center max-w-4xl mx-auto'">
           <div class="flex items-center gap-2 text-primary mb-2">
             <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
             <span class="text-xs font-bold tracking-[0.2em] uppercase">Official Conference</span>
           </div>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+          <h1 class="text-3xl md:text-5xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
             {{ confData.title }}
           </h1>
           <p class="text-xl font-bold text-gradient mt-2 tracking-widest">({{ confData.shortName }} {{ confData.year }})</p>
         </div>
+      </div>
 
-        <div class="glass-panel p-2 rounded-3xl flex flex-wrap justify-center items-center gap-2 w-full max-w-4xl mx-auto mt-6 border border-slate-200/50 dark:border-white/10 shadow-md">
+      <div class="w-full overflow-x-auto pb-4 -mb-4">
+        <div class="glass-panel p-2 rounded-3xl flex justify-between items-center gap-1 w-full max-w-[1200px] mx-auto border border-slate-200/50 dark:border-white/10 shadow-md min-w-max px-2">
           <button *ngFor="let tab of tabs"
                   (click)="setTab(tab)"
                   [ngClass]="activeTab === tab ? 'bg-gradient-primary text-black shadow-[0_0_15px_rgba(13,242,242,0.3)] scale-105' : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10'"
-                  class="flex-1 min-w-[140px] px-4 py-3.5 rounded-2xl font-bold text-xs tracking-widest uppercase transition-all duration-300 cursor-pointer border-none outline-none">
+                  class="flex-1 min-w-fit px-3 py-3 rounded-2xl font-bold text-[10px] md:text-xs tracking-wider md:tracking-widest uppercase transition-all duration-300 cursor-pointer border-none outline-none whitespace-nowrap text-center">
             {{ tab }}
           </button>
         </div>
@@ -123,9 +130,7 @@
               <span class="material-symbols-outlined text-accent-cyan text-3xl">payments</span>
               <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Registration Fees</h2>
             </div>
-
             <div class="flex flex-col gap-5 flex-grow justify-center">
-
               <div class="bg-white/50 dark:bg-black/30 p-5 rounded-2xl border border-slate-200 dark:border-white/10 flex flex-col gap-3 transition-transform hover:-translate-y-1">
                 <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">Presenter</p>
                 <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-white/5 pb-2">
@@ -137,7 +142,6 @@
                   <span class="text-xl font-bold text-accent-cyan">{{ confData.home.fee1Intl }}</span>
                 </div>
               </div>
-
               <div class="bg-white/50 dark:bg-black/30 p-5 rounded-2xl border border-slate-200 dark:border-white/10 flex flex-col gap-3 transition-transform hover:-translate-y-1">
                 <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">Student / IEEE Member</p>
                 <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-white/5 pb-2">
@@ -149,7 +153,6 @@
                   <span class="text-xl font-bold text-accent-cyan">{{ confData.home.fee2Intl }}</span>
                 </div>
               </div>
-
               <div *ngFor="let fee of confData.home.customFees" class="bg-white/50 dark:bg-black/30 p-5 rounded-2xl border border-slate-200 dark:border-white/10 flex flex-col gap-3 transition-transform hover:-translate-y-1">
                 <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">{{ fee.type }}</p>
                 <div class="flex justify-between items-center border-b border-slate-200/60 dark:border-white/5 pb-2">
@@ -161,7 +164,6 @@
                   <span class="text-xl font-bold text-accent-cyan">{{ fee.amountIntl }}</span>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -170,18 +172,37 @@
       <div *ngIf="activeTab === 'CALL FOR PAPER'" class="animate-fade-in flex flex-col gap-12 w-full">
         <section class="glass-panel p-8 md:p-12 rounded-3xl" data-aos="fade-up">
           <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Submission Guidelines</h2>
-          <p class="text-slate-600 dark:text-gray-300 font-body leading-relaxed mb-6 whitespace-pre-wrap">
-            {{ confData.cfp }}
-          </p>
+          <div class="text-slate-600 dark:text-gray-300 font-body leading-relaxed mb-6 whitespace-pre-wrap prose prose-a:text-accent-cyan prose-a:underline hover:prose-a:text-primary dark:prose-invert max-w-none" [innerHTML]="confData.cfp"></div>
         </section>
       </div>
 
       <div *ngIf="activeTab === 'REGISTRATION'" class="animate-fade-in flex flex-col gap-8 w-full" data-aos="fade-up">
         <div class="glass-panel p-8 md:p-12 rounded-3xl border border-primary/20">
           <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Registration & Final Submission</h2>
-          <p class="text-slate-600 dark:text-gray-300 font-body leading-relaxed whitespace-pre-wrap">
-            {{ confData.reg }}
-          </p>
+          <div class="text-slate-600 dark:text-gray-300 font-body leading-relaxed whitespace-pre-wrap prose prose-a:text-accent-cyan prose-a:underline hover:prose-a:text-primary dark:prose-invert max-w-none" [innerHTML]="confData.reg"></div>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'KEYNOTE SPEAKERS'" class="animate-fade-in flex flex-col gap-12 w-full" data-aos="fade-up">
+        <div class="flex flex-col gap-8">
+          <div *ngFor="let speaker of confData.keynoteSpeakers" class="glass-panel p-6 md:p-10 rounded-3xl flex flex-col md:flex-row gap-8 items-start hover:border-primary/40 transition-colors duration-300">
+            <div class="w-full md:w-48 lg:w-64 shrink-0 flex flex-col items-center gap-4">
+              <div class="w-48 h-48 lg:w-64 lg:h-64 rounded-2xl overflow-hidden border-4 border-white dark:border-[#121212] shadow-xl relative bg-slate-100 dark:bg-white/5">
+                <img *ngIf="speaker.photo" [src]="fixUrl(speaker.photo)" alt="{{ speaker.name }}" class="absolute inset-0 w-full h-full object-cover">
+                <span *ngIf="!speaker.photo" class="material-symbols-outlined absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl text-slate-300">person</span>
+              </div>
+            </div>
+            <div class="flex-1 flex flex-col gap-2">
+              <h2 class="text-3xl font-bold text-primary dark:text-[#0df2f2]">{{ speaker.name }}</h2>
+              <h4 class="text-lg font-bold text-slate-600 dark:text-gray-300 border-b border-slate-200 dark:border-white/10 pb-4 mb-2">{{ speaker.university }}</h4>
+              <div class="text-sm md:text-base text-slate-600 dark:text-gray-400 font-body leading-relaxed text-justify whitespace-pre-wrap" [innerHTML]="speaker.description"></div>
+            </div>
+          </div>
+
+          <div *ngIf="!confData.keynoteSpeakers || confData.keynoteSpeakers.length === 0" class="text-center py-16 glass-panel rounded-3xl">
+            <span class="material-symbols-outlined text-6xl text-slate-300 mb-4">mic_external_off</span>
+            <h3 class="text-xl font-bold text-slate-700 dark:text-gray-300">Speakers to be announced.</h3>
+          </div>
         </div>
       </div>
 

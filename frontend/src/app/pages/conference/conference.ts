@@ -14,7 +14,8 @@ declare var AOS: any;
   templateUrl: './conference.html'
 })
 export class Conference implements OnInit, OnDestroy {
-  tabs: string[] = ['HOME', 'CALL FOR PAPER', 'REGISTRATION', 'PROGRAM BOOK', 'CONFERENCE TEAM'];
+  // 🌟 任务 1: 加入 KEYNOTE SPEAKERS，注意排列顺序
+  tabs: string[] = ['HOME', 'CALL FOR PAPER', 'REGISTRATION', 'KEYNOTE SPEAKERS', 'PROGRAM BOOK', 'CONFERENCE TEAM'];
   activeTab: string = 'HOME';
   currentYear: string = '2026';
   routeSub!: Subscription;
@@ -77,12 +78,12 @@ export class Conference implements OnInit, OnDestroy {
     setTimeout(() => { if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: true, offset: 50 }); AOS.refreshHard(); window.scrollTo(0, 0); } }, 150);
   }
 
-  // 🌟 加入了新属性的默认值：fee1Intl, fee2Intl, customFees
   applyDefaultConfData(year: string) {
     this.confData = {
       year: year,
       title: 'The International Conference on Internet Applications',
       shortName: 'NETAPPS',
+      titleLogo: '', // 🌟 新增
       home: {
         paragraph1: `...`,
         paragraph2: `...`,
@@ -96,6 +97,7 @@ export class Conference implements OnInit, OnDestroy {
         fee2Intl: 'USD 200',
         customFees: []
       },
+      keynoteSpeakers: [], // 🌟 新增
       cfp: 'All papers must be original...',
       reg: 'Registration details...',
       imageUrl: '',

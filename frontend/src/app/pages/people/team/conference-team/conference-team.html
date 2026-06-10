@@ -16,14 +16,13 @@
 
           <div class="shrink-0 h-16 w-16 overflow-hidden rounded-full border-2 border-accent-cyan/30 bg-slate-50 flex items-center justify-center transition-transform duration-500 group-hover:scale-105 group-hover:border-accent-cyan dark:border-accent-cyan/60 dark:bg-[#121212] shadow-sm"
                [ngClass]="{'border-amber-400/50 dark:border-amber-500/60 group-hover:border-amber-500': committee.title === 'Executive Chairs'}">
-            <span class="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-500">person</span>
+            <span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500">badge</span>
           </div>
 
           <div class="flex-1">
             <h3 class="text-lg font-bold text-slate-900 transition-colors group-hover:text-accent-cyan dark:text-white dark:group-hover:text-primary mb-1">
               {{ member.name }}
             </h3>
-
             <p *ngIf="member.role" class="text-xs font-bold uppercase tracking-wide text-amber-600 dark:text-amber-500">
               {{ member.role }}
             </p>

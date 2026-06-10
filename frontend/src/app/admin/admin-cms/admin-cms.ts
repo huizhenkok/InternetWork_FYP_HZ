@@ -47,6 +47,7 @@ export class AdminCms implements OnInit {
       year: '2026',
       title: 'The International Conference on Internet Applications, Protocols and Services',
       shortName: 'NETAPPS',
+      titleLogo: '',
       home: {
         paragraph1: 'The International Conference on Internet Applications, Protocols and Services (NETAPPS 2026) is a no-frills conference in the area of Internet communications and networking.',
         paragraph2: 'The main goal of this conference is to serve as an affordable platform to promote greater engagement of network researchers from around the globe...',
@@ -58,9 +59,10 @@ export class AdminCms implements OnInit {
         fee1Intl: 'USD 300',
         fee2: 'RM 800',
         fee2Intl: 'USD 200',
-        customFees: [] // 🌟 包含 type, amountLocal, amountIntl
+        customFees: []
       },
-      cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.\n\nPaper format guidelines...',
+      keynoteSpeakers: [],
+      cfp: 'All papers must be original and not simultaneously submitted to another journal or conference.',
       reg: 'Registration & Final Submission details to be announced.',
       imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop',
       pdfUrl: '',
@@ -70,7 +72,7 @@ export class AdminCms implements OnInit {
 
   contactData: any = {
     mainTitle: 'Get in Touch.',
-    subTitle: 'Initiate a secure inquiry. Our team is ready to discuss research collaborations, industry partnerships, and academic opportunities.',
+    subTitle: 'Initiate a secure inquiry.',
     emailLabel: 'General Inquiries',
     email: 'netapps@internetworks.my',
     addressLabel: 'Base of Operations',
@@ -156,13 +158,56 @@ export class AdminCms implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       this.cmsService.saveCmsData(key, JSON.stringify(data)).subscribe({
         next: () => {
-          if (!silent) alert(`✅ ${moduleName} updated successfully! Visitors will see this instantly from the Database.`);
+          if (!silent) alert(`✅ ${moduleName} updated successfully!`);
         },
         error: (err: any) => {
           if (!silent) alert(`❌ Failed to update ${moduleName}. Check server connection.`);
           console.error(err);
         }
       });
+    }
+  }
+
+  // 🌟 解决 MySQL Emoji 变成 ? 的终极魔法函数
+  public encodeFourByteChars(text: string): string {
+    if (!text) return '';
+    // 自动扫描所有从手机、网页复制过来的 4 字节 Emoji，转换为安全的 HTML 实体代码
+    return text.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(match) {
+      const codePoint = (match.charCodeAt(0) - 0xD800) * 0x400 + (match.charCodeAt(1) - 0xDC00) + 0x10000;
+      return '&#' + codePoint + ';';
+    });
+  }
+
+  // 🌟 富文本基本命令
+  public formatDoc(command: string, value: string = '') {
+    if (isPlatformBrowser(this.platformId)) {
+      document.execCommand(command, false, value);
+    }
+  }
+
+  // 🌟 插入链接
+  public insertLink() {
+    if (isPlatformBrowser(this.platformId)) {
+      const url = prompt('Enter the link URL (e.g., https://example.com):', 'https://');
+      if (url) {
+        document.execCommand('createLink', false, url);
+      }
+    }
+  }
+
+  // 🌟 颜色选择器功能
+  public formatColor(event: any) {
+    if (isPlatformBrowser(this.platformId)) {
+      const color = event.target.value;
+      document.execCommand('foreColor', false, color);
+    }
+  }
+
+  // 🌟 字号大小选择功能
+  public formatSize(event: any) {
+    if (isPlatformBrowser(this.platformId)) {
+      const size = event.target.value;
+      document.execCommand('fontSize', false, size);
     }
   }
 
@@ -174,6 +219,7 @@ export class AdminCms implements OnInit {
   saveNews() { this.saveModule('inwlab_cms_news_events', this.newsAndEventsData, 'News & Events'); }
   saveContact() { this.saveModule('inwlab_cms_contact', this.contactData, 'Contact Info'); }
   saveRooms() { this.saveModule('inwlab_rooms', this.rooms, 'Lab Facilities'); }
+  saveLetters() { } // Alias
   saveBulletins() { this.saveModule('inwlab_bulletins', this.bulletins, 'System Bulletins'); }
 
   onFileUpload(event: any, targetObject: any, targetProperty: string) {
@@ -197,6 +243,18 @@ export class AdminCms implements OnInit {
   }
 
   saveConferences() {
+    if (isPlatformBrowser(this.platformId)) {
+      // 🌟 保存前，获取所有 HTML 内容并拦截/编码所有 Emoji
+      const cfpElement = document.getElementById('cfpEditor');
+      if (cfpElement && this.editingConfIndex !== null) {
+        this.conferences[this.editingConfIndex].cfp = this.encodeFourByteChars(cfpElement.innerHTML);
+      }
+      const regElement = document.getElementById('regEditor');
+      if (regElement && this.editingConfIndex !== null) {
+        this.conferences[this.editingConfIndex].reg = this.encodeFourByteChars(regElement.innerHTML);
+      }
+    }
+
     this.conferences.sort((a: any, b: any) => parseInt(b.year) - parseInt(a.year));
     this.saveModule('inwlab_cms_conferences', this.conferences, 'Conference Databases');
   }
@@ -207,6 +265,7 @@ export class AdminCms implements OnInit {
       year: nextYear,
       title: 'The International Conference on Internet Applications, Protocols and Services',
       shortName: 'NETAPPS',
+      titleLogo: '',
       home: {
         paragraph1: 'Conference description here...',
         paragraph2: 'Goals and objectives...',
@@ -218,92 +277,54 @@ export class AdminCms implements OnInit {
         fee2: 'RM 800', fee2Intl: 'USD 200',
         customFees: []
       },
+      keynoteSpeakers: [],
       cfp: 'Call for paper guidelines...',
       reg: 'Registration details...',
-      imageUrl: '',
-      pdfUrl: '',
-      team: []
+      imageUrl: '', pdfUrl: '', team: []
     });
     this.saveConferences();
   }
 
-  deleteConference(index: number) {
-    if (confirm(`Are you sure you want to completely delete the conference for year ${this.conferences[index].year}?`)) {
-      this.conferences.splice(index, 1);
-      this.saveConferences();
-    }
-  }
-
+  deleteConference(index: number) { if (confirm(`Are you sure you want to completely delete the conference for year ${this.conferences[index].year}?`)) { this.conferences.splice(index, 1); this.saveConferences(); } }
   openConferenceEditor(index: number) { this.editingConfIndex = index; this.activeConfTab = 'home'; }
   closeConferenceEditor() { this.editingConfIndex = null; this.saveConferences(); }
 
-  // 🌟 动态添加自定义 Fee (带 Local 和 Intl)
-  addCustomFee() {
-    if (this.editingConfIndex !== null) {
-      if (!this.conferences[this.editingConfIndex].home.customFees) {
-        this.conferences[this.editingConfIndex].home.customFees = [];
-      }
-      this.conferences[this.editingConfIndex].home.customFees.push({ type: '', amountLocal: '', amountIntl: '' });
-    }
-  }
+  addCustomFee() { if (this.editingConfIndex !== null) { if (!this.conferences[this.editingConfIndex].home.customFees) { this.conferences[this.editingConfIndex].home.customFees = []; } this.conferences[this.editingConfIndex].home.customFees.push({ type: '', amountLocal: '', amountIntl: '' }); } }
+  deleteCustomFee(index: number) { if (this.editingConfIndex !== null && confirm("Delete this fee option?")) { this.conferences[this.editingConfIndex].home.customFees.splice(index, 1); } }
 
-  deleteCustomFee(index: number) {
-    if (this.editingConfIndex !== null && confirm("Delete this fee option?")) {
-      this.conferences[this.editingConfIndex].home.customFees.splice(index, 1);
-    }
-  }
+  addKeynoteSpeaker(confIndex: number) { if (!this.conferences[confIndex].keynoteSpeakers) { this.conferences[confIndex].keynoteSpeakers = []; } this.conferences[confIndex].keynoteSpeakers.push({ name: '', university: '', photo: '', description: '' }); }
+  deleteKeynoteSpeaker(confIndex: number, speakerIndex: number) { if (confirm("Are you sure you want to remove this Keynote Speaker?")) { this.conferences[confIndex].keynoteSpeakers.splice(speakerIndex, 1); } }
 
-  addConfCommittee() { if (this.editingConfIndex !== null) this.conferences[this.editingConfIndex].team.push({ title: 'New Committee', members: [] }); }
-  deleteConfCommittee(cIndex: number) { if (this.editingConfIndex !== null && confirm("Delete this entire committee?")) this.conferences[this.editingConfIndex].team.splice(cIndex, 1); }
-  addConfMember(cIndex: number) { if (this.editingConfIndex !== null) this.conferences[this.editingConfIndex].team[cIndex].members.push({ name: 'Member Name', org: 'University / Org', role: '' }); }
-  deleteConfMember(cIndex: number, mIndex: number) { if (this.editingConfIndex !== null && confirm("Remove this member?")) this.conferences[this.editingConfIndex].team[cIndex].members.splice(mIndex, 1); }
+  addConfCommittee() { if (this.editingConfIndex !== null) { this.conferences[this.editingConfIndex].team.push({ title: 'New Committee', members: [] }); } }
+  deleteConfCommittee(cIndex: number) { if (this.editingConfIndex !== null && confirm("Delete this entire committee?")) { this.conferences[this.editingConfIndex].team.splice(cIndex, 1); } }
+  addConfMember(cIndex: number) { if (this.editingConfIndex !== null) { this.conferences[this.editingConfIndex].team[cIndex].members.push({ name: 'Member Name', org: 'University / Org', role: '' }); } }
+  deleteConfMember(cIndex: number, mIndex: number) { if (this.editingConfIndex !== null && confirm("Remove this member?")) { this.conferences[this.editingConfIndex].team[cIndex].members.splice(mIndex, 1); } }
 
-  addGathering() {
-    this.newsAndEventsData.gatherings.push({
-      date: 'DATE', location: 'LOCATION', title: 'New Article Title',
-      desc: 'Short snippet shown on the main card.',
-      fullContent: 'Full article text goes here...',
-      icon: 'article', imageUrl: ''
-    });
-  }
-  deleteGathering(index: number) { if (confirm("Remove this article?")) this.newsAndEventsData.gatherings.splice(index, 1); }
+  addGathering() { this.newsAndEventsData.gatherings.push({ date: 'DATE', location: 'LOCATION', title: 'New Article Title', desc: 'Short snippet...', fullContent: 'Full article text...', icon: 'article', imageUrl: '' }); }
+  deleteGathering(index: number) { if (confirm("Remove this article?")) { this.newsAndEventsData.gatherings.splice(index, 1); } }
   addQuickUpdate() { this.newsAndEventsData.quickUpdates.push({ tag: 'NEW TAG', text: 'New update text here.' }); }
-  deleteQuickUpdate(index: number) { if (confirm("Remove this update?")) this.newsAndEventsData.quickUpdates.splice(index, 1); }
+  deleteQuickUpdate(index: number) { if (confirm("Remove this update?")) { this.newsAndEventsData.quickUpdates.splice(index, 1); } }
 
   addTeamSection() { this.teamData.ourTeam.push({ title: 'New Department', members: [] }); }
-  deleteTeamSection(index: number) { if (confirm("Delete this entire department?")) this.teamData.ourTeam.splice(index, 1); }
-
-  addTeamMember(sectionIndex: number) {
-    this.teamData.ourTeam[sectionIndex].members.push({ name: 'New Member', role: 'Role', email: '', socialLink: '', avatar: '', description: '' });
-  }
-  deleteTeamMember(sectionIndex: number, memberIndex: number) { if (confirm("Remove this member?")) this.teamData.ourTeam[sectionIndex].members.splice(memberIndex, 1); }
+  deleteTeamSection(index: number) { if (confirm("Delete this entire department?")) { this.teamData.ourTeam.splice(index, 1); } }
+  addTeamMember(sectionIndex: number) { this.teamData.ourTeam[sectionIndex].members.push({ name: 'New Member', role: 'Role', email: '', socialLink: '', avatar: '', description: '' }); }
+  deleteTeamMember(sectionIndex: number, memberIndex: number) { if (confirm("Remove this member?")) { this.teamData.ourTeam[sectionIndex].members.splice(memberIndex, 1); } }
 
   addAlumniYear() { this.teamData.alumni.unshift({ year: new Date().getFullYear().toString(), members: [] }); }
-  deleteAlumniYear(index: number) { if (confirm("Delete this entire class year?")) this.teamData.alumni.splice(index, 1); }
-  addAlumniMember(yearIndex: number) {
-    this.teamData.alumni[yearIndex].members.push({ name: 'New Alumni', designation: 'Job Title', organization: 'Company / Uni', email: '', socialLink: '', avatar: '', description: '' });
-  }
-  deleteAlumniMember(yearIndex: number, memberIndex: number) { if (confirm("Remove this alumni?")) this.teamData.alumni[yearIndex].members.splice(memberIndex, 1); }
+  deleteAlumniYear(index: number) { if (confirm("Delete this entire class year?")) { this.teamData.alumni.splice(index, 1); } }
+  addAlumniMember(yearIndex: number) { this.teamData.alumni[yearIndex].members.push({ name: 'New Alumni', designation: 'Job Title', organization: 'Company / Uni', email: '', socialLink: '', avatar: '', description: '' }); }
+  deleteAlumniMember(yearIndex: number, memberIndex: number) { if (confirm("Remove this alumni?")) { this.teamData.alumni[yearIndex].members.splice(memberIndex, 1); } }
 
-  addStudent() {
-    this.teamData.students.unshift({ name: 'New Student', department: 'MSc / PhD Program', email: '', socialLink: '', avatar: '', description: '' });
-  }
-  deleteStudent(index: number) { if (confirm("Remove this student?")) this.teamData.students.splice(index, 1); }
+  addStudent() { this.teamData.students.unshift({ name: 'New Student', department: 'MSc / PhD Program', email: '', socialLink: '', avatar: '', description: '' }); }
+  deleteStudent(index: number) { if (confirm("Remove this student?")) { this.teamData.students.splice(index, 1); } }
 
   addProject() { this.resourceData.projects.unshift({ id: new Date().getTime(), title: 'New Research Project', name: 'Researcher Name', date: new Date().toISOString().split('T')[0], summary: 'Enter project description here.' }); }
-  deleteProject(index: number) { if (confirm("Delete this project permanently?")) this.resourceData.projects.splice(index, 1); }
+  deleteProject(index: number) { if (confirm("Delete this project permanently?")) { this.resourceData.projects.splice(index, 1); } }
 
-  addNewRoom() {
-    const colors = ['teal', 'slate', 'cyan', 'orange'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    this.rooms.push({ id: '#'+Math.floor(Math.random()*900+100), name: 'New Room', capacity: 10, status: 'Available', icon: 'meeting_room', color: randomColor });
-  }
-  deleteRoom(index: number) { if (confirm("Delete this facility?")) this.rooms.splice(index, 1); }
+  addNewRoom() { const colors = ['teal', 'slate', 'cyan', 'orange']; const randomColor = colors[Math.floor(Math.random() * colors.length)]; this.rooms.push({ id: '#'+Math.floor(Math.random()*900+100), name: 'New Room', capacity: 10, status: 'Available', icon: 'meeting_room', color: randomColor }); }
+  deleteRoom(index: number) { if (confirm("Delete this facility?")) { this.rooms.splice(index, 1); } }
 
-  addNewBulletin() {
-    this.bulletins.unshift({ title: 'New Important Notice', dateLabel: 'Just Now', content: 'Enter the details of the announcement here...', icon: 'campaign', color: 'primary' });
-    this.saveBulletins();
-  }
+  addNewBulletin() { this.bulletins.unshift({ title: 'New Important Notice', dateLabel: 'Just Now', content: 'Enter the details of the announcement here...', icon: 'campaign', color: 'primary' }); this.saveBulletins(); }
   deleteBulletin(index: number) { if (confirm("Are you sure you want to delete this bulletin?")) { this.bulletins.splice(index, 1); this.saveBulletins(); } }
 
   logout() { if (confirm("Are you sure you want to logout?")) { localStorage.removeItem('active_user'); this.router.navigate(['/login']); } }
